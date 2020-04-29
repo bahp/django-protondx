@@ -25,7 +25,7 @@ See requirements.txt
 + django-import-export
 + django-filter
 
-## Installation or Getting Started
+## Installation
 
 
 First, ensure that you have python installed
@@ -35,13 +35,34 @@ First, ensure that you have python installed
    
 Then, lets create a virtual environment for our project (e.g. virtualenv)
 
-    $ virtualenv -p python3-path virtualenv-name   # Create the environment
-    $ source virtualenv-name/bin/activate          # Activate virtual enviroment
+    $ virtualenv -p <python3-path> <virtualenv-name>  # Create the environment
+    $ source <virtualenv-name>/bin/activate           # Activate virtual enviroment
+
+Then, go to the corresponding folder and install the requirements
+
+    $ pip install -r requirements.txt   # Install requirements
+
 
 ## Usage
 
-Show how to use the project or library.
-    
+Remember to do the migrations when altering the database
+ 
+    $ python manage.py makemigrations <appname>
+    $ python manage.py migrate
+   
+If it is the first time, create a superuser (user:cbit, pass:toor)
+
+    $ cd protondx
+    $ python manage.py createsu
+  
+Run the server locally
+
+    $ python manage.py runserver
+   
+Go to the browser and access the admin localhost:8000/admin
+
+For more information read the django docs
+
 ## Reference
 
 + [jxson](https://gist.github.com/jxson) - [README.md](https://gist.github.com/jxson/1784669)

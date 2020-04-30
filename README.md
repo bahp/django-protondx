@@ -77,3 +77,13 @@ Let people know how they can dive into the project, include important links to t
 ## License
 
 A short snippet describing the license ([MIT](http://opensource.org/licenses/mit-license.php), [Apache](http://opensource.org/licenses/Apache-2.0), etc.)
+
+
+## To Do
++ Geo-Location: There are many approaches to address this problem. The first option is to just save the coordinates (latitude and longitude) sent by the phone in the .json. If using this project evaluate 
+whether using Float or Decimal models for the database. In addition, have a look to other django libraries that might be way more powerful and the benefits they could bring (e.g. GeoDjango, django-geoposition)
+
++ Reusability: Remember to follow the reusable app tutorial once the work is done (https://docs.djangoproject.com/en/3.0/intro/reusable-apps/)
+
+
+https://docs.djangoproject.com/en/3.0/intro/reusable-apps/

@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard</title>
+</head>
+<body>
+
+    <h1>Total tests (UK): {{ count_total_exp }}</h1>
+    <h1>Total positive (UK): {{ count_pos_exp }}</h1>
+    <h1>Total negative (UK): {{ count_neg_exp }}</h1>
+    <h1>Total patients tested (UK): {{ count_indiv_patients }}</h1>
+
+    <br>
+
+    <h1>{{ test1 }}</h1>
+    <h1>{{ test2 }}</h1>
+
+    <br>
+
+    <form action = "" method = "get">
+        <label for="post_code">Postcode: </label>
+        <input id="post_code" type="text" name="post_code">
+        <input type="submit" value="OK">
+    </form>
+
+</body>
+</html>

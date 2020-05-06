@@ -37,6 +37,9 @@ urlpatterns = [
     # Add diagnostics application
     path('diagnostics/', include('diagnostics.urls')),
 
+    # Add dashboard application
+    path('dashboard/', include('dashboard.urls')),
+
     # ------------------------------------------
     # Adding full REST API
     # ------------------------------------------

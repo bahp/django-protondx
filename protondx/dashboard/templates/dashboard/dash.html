@@ -1,28 +1,78 @@
+<!--    <h1>Total tests (UK): {{ count_total_exp }}</h1>-->
+<!--    <h1>Total positive (UK): {{ count_pos_exp }}</h1>-->
+<!--    <h1>Total negative (UK): {{ count_neg_exp }}</h1>-->
+<!--    <h1>Total patients tested (UK): {{ count_indiv_patients }}</h1>-->
+<!--    <br>-->
+<!--    <h1>{{ test1 }}</h1>-->
+<!--    <h1>{{ test2 }}</h1>-->
+
+
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <title>Dashboard</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>COVID-19 Dashboard</title>
+    <style>
+        html,
+        body,
+        #viewDiv {
+            padding: 0;
+            margin: 0;
+            height: 100%;
+            width: 100%;
+        }
+    </style>
+
+    <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/dark/main.css">
+    <script src="https://js.arcgis.com/4.15/"></script>
+
+    <script>
+        require([
+            "esri/Map",
+            "esri/views/MapView",
+            "esri/widgets/Search",
+            "esri/layers/FeatureLayer"
+        ], function(Map, MapView, Search, FeatureLayer) {
+
+            var map = new Map({
+                basemap: "dark-gray-vector"
+            });
+
+            var view = new MapView({
+                container: "viewDiv",
+                map: map,
+                center: [-2.89479, 54.093409],
+                zoom: 5
+            });
+
+            // Search widget
+            const search = new Search({
+                view: view
+            });
+
+            // postcode popup
+            var popupPostcode = {
+                title: "{NAME_1}, {POSTCODE_1}",
+                content: "<b>Total Cases:</b> {{ count_total_exp }} <br><b>Positive:</b> {{ count_pos_exp }}<br><b>Negative:</b> {{ count_neg_exp }}<br><b>Patients:</b> {{ count_indiv_patients }}"
+            }
+
+            var postcodes = new FeatureLayer({
+                url: "https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer",
+                outFields: ["POSTCODE_1","NAME_1"],
+                popupTemplate: popupPostcode,
+            });
+
+
+
+            map.add(postcodes);
+
+            view.ui.add(search, "top-right");
+
+        });
+    </script>
 </head>
 <body>
-
-    <h1>Total tests (UK): {{ count_total_exp }}</h1>
-    <h1>Total positive (UK): {{ count_pos_exp }}</h1>
-    <h1>Total negative (UK): {{ count_neg_exp }}</h1>
-    <h1>Total patients tested (UK): {{ count_indiv_patients }}</h1>
-
-    <br>
-
-    <h1>{{ test1 }}</h1>
-    <h1>{{ test2 }}</h1>
-
-    <br>
-
-    <form action = "" method = "get">
-        <label for="post_code">Postcode: </label>
-        <input id="post_code" type="text" name="post_code">
-        <input type="submit" value="OK">
-    </form>
-
+<div id="viewDiv"></div>
 </body>
 </html>

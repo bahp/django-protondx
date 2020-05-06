@@ -25,24 +25,24 @@ def get_individuals_tested():
 
 
 def get_postcode_total_experiments(postcode):
-    return DiagnosticTest.objects.filter(testing_centre__postcode=postcode).count()
+    return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode).count()
 
 
 def get_postcode_negative_experiments(postcode):
-    return DiagnosticTest.objects.filter(testing_centre__postcode=postcode, test_result=False).count()
+    return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode, test_result=False).count()
 
 
 def get_postcode_positive_experiments(postcode):
-    return DiagnosticTest.objects.filter(testing_centre__postcode=postcode, test_result=True).count()
+    return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode, test_result=True).count()
 
 
 def get_postcode_individuals_tested(postcode):
-    return DiagnosticTest\
-        .objects\
-        .select_related('patient', 'testing_centre')\
-        .filter(testing_centre__postcode=postcode)\
-        .values('patient_id')\
-        .distinct()\
+    return DiagnosticTest \
+        .objects \
+        .select_related('patient', 'testing_centre') \
+        .filter(testing_centre__postcode__startswith=postcode) \
+        .values('patient_id') \
+        .distinct() \
         .count()
 
 
@@ -72,3 +72,9 @@ def DashView(request):
     }
 
     return render(request, 'dashboard/dash.html', context)
+
+
+def request_page(request):
+    if request.GET.get('mybtn'):
+        context = {'result': get_postcode_data(request.GET.get('post_code'))}
+        return render(request, 'dashboard/dash.html', context)

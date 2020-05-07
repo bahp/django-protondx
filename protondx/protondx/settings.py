@@ -46,6 +46,7 @@ INSTALLED_APPS = [
 
     # Rest framework
     # --------------
+    'django_filters',
     'rest_framework',
     'rest_framework_swagger',
 

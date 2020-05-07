@@ -120,6 +120,7 @@ class DeviceAdmin(ImportExportActionModelAdmin,
                     'euid',
                     'date_created',
                     'date_updated',
+                    'date_acquired',
                     'manufacturer']
 
     # ----------------------------
@@ -131,7 +132,8 @@ class DeviceAdmin(ImportExportActionModelAdmin,
             {'fields': ['euid']}),
         ('Metadata',
             {'fields': ['date_created',
-                        'date_updated']}),
+                        'date_updated',
+                        'date_acquired']}),
         ('Information',
             {'fields': ['manufacturer']})
     ]
@@ -211,6 +213,7 @@ class CartridgeAdmin(ImportExportActionModelAdmin,
                     'euid',
                     'date_created',
                     'date_updated',
+                    'date_acquired',
                     'manufacturer']
 
     # ----------------------------
@@ -222,7 +225,8 @@ class CartridgeAdmin(ImportExportActionModelAdmin,
             {'fields': ['euid']}),
         ('Metadata',
             {'fields': ['date_created',
-                        'date_updated']}),
+                        'date_updated',
+                        'date_acquired']}),
         ('Information',
             {'fields': ['manufacturer']})
     ]

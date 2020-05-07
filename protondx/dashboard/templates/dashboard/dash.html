@@ -7,6 +7,13 @@
 <!--    <h1>{{ test2 }}</h1>-->
 
 
+<!--    <form method="post">-->
+<!--        {% csrf_token %}-->
+<!--        {{ form.as_p }}-->
+<!--        <button type="submit">Submit</button>-->
+<!--    </form>-->
+
+<!--    <h1>{{ post_code_query }}</h1>-->
 <!DOCTYPE html>
 <html>
 <head>
@@ -15,12 +22,50 @@
     <title>COVID-19 Dashboard</title>
     <style>
         html,
-        body,
-        #viewDiv {
+        body {
             padding: 0;
             margin: 0;
             height: 100%;
             width: 100%;
+        }
+
+        #viewDiv {
+            float: left;
+            padding: 0;
+            margin: 0;
+            height: 80%;
+            width: 75%;
+            /*border:1px solid black;*/
+        }
+
+        #feature-node-right-top {
+            float: left;
+            width: 25%;
+            height: 40%;
+            padding: 1em;
+            border:3px solid black;
+        }
+        #feature-node-right-mid {
+            float: left;
+            width: 25%;
+            height: 40%;
+            padding: 1em;
+            border:3px solid black;
+        }
+
+        #feature-node-right-bottom {
+            float: left;
+            width: 25%;
+            height: 20%;
+            padding: 1em;
+            border:3px solid black;
+        }
+        #feature-node-left-bottom {
+            float: left;
+            width: 75%;
+            height: 20%;
+            padding: 1em;
+            border:3px solid black;
         }
     </style>
 
@@ -32,47 +77,107 @@
             "esri/Map",
             "esri/views/MapView",
             "esri/widgets/Search",
-            "esri/layers/FeatureLayer"
-        ], function(Map, MapView, Search, FeatureLayer) {
+            "esri/layers/FeatureLayer",
+            "esri/widgets/Home",
+            "esri/widgets/Feature",
+        ], function(Map, MapView, Search, FeatureLayer, Home) {
 
-            var map = new Map({
+            // Map view
+            const map = new Map({
                 basemap: "dark-gray-vector"
             });
 
-            var view = new MapView({
+            const view = new MapView({
                 container: "viewDiv",
                 map: map,
                 center: [-2.89479, 54.093409],
                 zoom: 5
             });
 
+
             // Search widget
             const search = new Search({
                 view: view
             });
 
-            // postcode popup
-            var popupPostcode = {
-                title: "{NAME_1}, {POSTCODE_1}",
-                content: "<b>Total Cases:</b> {{ count_total_exp }} <br><b>Positive:</b> {{ count_pos_exp }}<br><b>Negative:</b> {{ count_neg_exp }}<br><b>Patients:</b> {{ count_indiv_patients }}"
-            }
 
-            var postcodes = new FeatureLayer({
-                url: "https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer",
-                outFields: ["POSTCODE_1","NAME_1"],
-                popupTemplate: popupPostcode,
+            //Home button to reset view
+            const homeWidget = new Home({
+                view: view
             });
 
 
+            // postcode popup
+            const postcodeRenderer = {
+                type: "simple",
+                symbol: {
+                    type: "simple-fill",
+                    color: [0, 0, 0, 0],
+                    outline: {
+                        width: 0.5,
+                        color: [0, 0, 0, 0.4],
+                    }
+                }
+            };
 
+            const popupPostcode = {
+                title: "{NAME_1}, {POSTCODE_1}",
+                content:"<table> <tbody> <tr> <td style=\"padding:0 15px 0 0;\">Total Cases:</td> <td>{{ post_code_query.total }}</td> </tr> <tr> <td>Positive:</td> <td>{{ post_code_query.positive }}</td> </tr> <tr> <td>Negative:</td> <td>{{ post_code_query.negative }}</td> </tr> <tr> <td>Patients:</td> <td>{{ post_code_query.patients }}</td> </tr> </tbody> </table>"
+            };
+
+            const postcodes = new FeatureLayer({
+                url: "https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer",
+                outFields: ["POSTCODE_1", "NAME_1"],
+                popupTemplate: popupPostcode,
+                renderer: postcodeRenderer,
+            });
+
+            view.popup = {
+                dockEnabled: true,
+                dockOptions: {
+                    // Disables the dock button from the popup
+                    buttonEnabled: false,
+                    // Ignore the default sizes that trigger responsive docking
+                    breakpoint: false
+                }
+            };
+
+
+            // add views and widgets
             map.add(postcodes);
-
+            view.ui.add(homeWidget, "top-left");
             view.ui.add(search, "top-right");
 
         });
     </script>
 </head>
 <body>
+
 <div id="viewDiv"></div>
+<div id="feature-node-right-top" class="esri-widget"></div>
+<div id="feature-node-right-mid" class="esri-widget"></div>
+<div id="feature-node-left-bottom" class="esri-widget"></div>
+<div id="feature-node-right-bottom" class="esri-widget">
+    <table>
+        <tbody>
+        <tr>
+            <td>Total tests (UK):</td>
+            <td>{{ count_total_exp }}</td>
+        </tr>
+        <tr>
+            <td>Total positive (UK):</td>
+            <td>{{ count_pos_exp }}</td>
+        </tr>
+        <tr>
+            <td>Total negative (UK):</td>
+            <td>{{ count_neg_exp }}</td>
+        </tr>
+        <tr>
+            <td>Total patients tested (UK):</td>
+            <td>{{ count_indiv_patients }}</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

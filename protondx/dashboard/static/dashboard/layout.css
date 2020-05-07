@@ -1,0 +1,68 @@
+/*
+
+    This file contains the layout and sizes
+    for the dashboard divs
+    ____________________
+    |              | 2 |
+    |       1      |___|
+    |              | 3 |
+    |______________|___|
+    |_______4______|_5_|
+
+    1. viewDiv
+    2. feature-node-right-top
+    3. feature-node-right-mid
+    4. feature-node-left-bottom
+    5. feature-node-right-bottom
+
+    Divs must be added to HTML body in the above order
+
+ */
+
+html, body {
+    padding: 0;
+    margin: 0;
+    height: 100%;
+    width: 100%;
+}
+
+#viewDiv {
+    float: left;
+    padding: 0;
+    margin: 0;
+    height: 80%;
+    width: 75%;
+    /*border:1px solid black;*/
+}
+
+#feature-node-right-top {
+    float: left;
+    width: 25%;
+    height: 40%;
+    padding: 1em;
+    border:3px solid black;
+}
+
+#feature-node-right-mid {
+    float: left;
+    width: 25%;
+    height: 40%;
+    padding: 1em;
+    border:3px solid black;
+}
+
+#feature-node-right-bottom {
+    float: left;
+    width: 25%;
+    height: 20%;
+    padding: 1em;
+    border:3px solid black;
+}
+
+#feature-node-left-bottom {
+    float: left;
+    width: 75%;
+    height: 20%;
+    padding: 1em;
+    border:3px solid black;
+}

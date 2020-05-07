@@ -20,55 +20,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>COVID-19 Dashboard</title>
-    <style>
-        html,
-        body {
-            padding: 0;
-            margin: 0;
-            height: 100%;
-            width: 100%;
-        }
 
-        #viewDiv {
-            float: left;
-            padding: 0;
-            margin: 0;
-            height: 80%;
-            width: 75%;
-            /*border:1px solid black;*/
-        }
+    {% load static %}
 
-        #feature-node-right-top {
-            float: left;
-            width: 25%;
-            height: 40%;
-            padding: 1em;
-            border:3px solid black;
-        }
-        #feature-node-right-mid {
-            float: left;
-            width: 25%;
-            height: 40%;
-            padding: 1em;
-            border:3px solid black;
-        }
-
-        #feature-node-right-bottom {
-            float: left;
-            width: 25%;
-            height: 20%;
-            padding: 1em;
-            border:3px solid black;
-        }
-        #feature-node-left-bottom {
-            float: left;
-            width: 75%;
-            height: 20%;
-            padding: 1em;
-            border:3px solid black;
-        }
-    </style>
-
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/layout.css' %}">
     <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/dark/main.css">
     <script src="https://js.arcgis.com/4.15/"></script>
 
@@ -79,15 +34,30 @@
             "esri/widgets/Search",
             "esri/layers/FeatureLayer",
             "esri/widgets/Home",
-            "esri/widgets/Feature",
-        ], function(Map, MapView, Search, FeatureLayer, Home) {
+            "esri/geometry/Extent",
+            "esri/renderers/DotDensityRenderer",
+            "esri/widgets/Legend",
+            "esri/widgets/Bookmarks",
+            "esri/widgets/Expand",
+            "esri/widgets/Fullscreen",
+        ], function(Map,
+                    MapView,
+                    Search,
+                    FeatureLayer,
+                    Home,
+                    Extent,
+                    DotDensityRenderer,
+                    Legend,
+                    Bookmarks,
+                    Expand,
+                    Fullscreen) {
 
             // Map view
             const map = new Map({
                 basemap: "dark-gray-vector"
             });
 
-            const view = new MapView({
+            const baseMap = new MapView({
                 container: "viewDiv",
                 map: map,
                 center: [-2.89479, 54.093409],
@@ -95,59 +65,101 @@
             });
 
 
-            // Search widget
-            const search = new Search({
-                view: view
-            });
-
-
             //Home button to reset view
             const homeWidget = new Home({
-                view: view
+                view: baseMap
             });
 
-
-            // postcode popup
-            const postcodeRenderer = {
-                type: "simple",
-                symbol: {
-                    type: "simple-fill",
-                    color: [0, 0, 0, 0],
+            baseMap.when().then(function() {
+                // postcode map and popup
+                const postcodeRenderer = {
+                    type: "dot-density",
+                    dotValue: 1,  // 1 dot = 1,000 people when the view.scale is 1:1,000,000
+                    referenceScale: 10000,
+                    legendOptions: {
+                        unit: "people"
+                    },
+                    attributes: [
+                        {
+                            field: "OBJECTID",
+                            label: "Postcode DB PK",
+                            color: "red"
+                        },
+                    ],
                     outline: {
-                        width: 0.5,
+                        width: 0.1,
                         color: [0, 0, 0, 0.4],
                     }
-                }
-            };
+                };
 
-            const popupPostcode = {
-                title: "{NAME_1}, {POSTCODE_1}",
-                content:"<table> <tbody> <tr> <td style=\"padding:0 15px 0 0;\">Total Cases:</td> <td>{{ post_code_query.total }}</td> </tr> <tr> <td>Positive:</td> <td>{{ post_code_query.positive }}</td> </tr> <tr> <td>Negative:</td> <td>{{ post_code_query.negative }}</td> </tr> <tr> <td>Patients:</td> <td>{{ post_code_query.patients }}</td> </tr> </tbody> </table>"
-            };
+                const popupPostcode = {
+                    title: "{NAME_1}, {POSTCODE_1}",
+                    content: "<table> <tbody>" +
+                        "<tr> <td style=\"padding:0 15px 0 0;\">Total Cases:</td> <td>{{ post_code_query.total }}</td> </tr>" +
+                        "<tr> <td>Positive:</td> <td>{{ post_code_query.positive }}</td> </tr>" +
+                        "<tr> <td>Negative:</td> <td>{{ post_code_query.negative }}</td> </tr>" +
+                        "<tr> <td>Patients:</td> <td>{{ post_code_query.patients }}</td> </tr>" +
+                        "</tbody> </table>"
+                };
 
-            const postcodes = new FeatureLayer({
-                url: "https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer",
-                outFields: ["POSTCODE_1", "NAME_1"],
-                popupTemplate: popupPostcode,
-                renderer: postcodeRenderer,
+                const postcodes = new FeatureLayer({
+                    url: "https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer",
+                    outFields: ["POSTCODE_1", "NAME_1", "OBJECTID"],
+                    popupTemplate: popupPostcode,
+                    renderer: postcodeRenderer,
+                    title: "Current COVID-19 spread in the UK",
+                });
+
+                baseMap.popup = {
+                    dockEnabled: true,
+                    dockOptions: {
+                        buttonEnabled: false,
+                        breakpoint: false
+                    }
+                };
+
+
+                // Search widget
+                const extent = new Extent({
+                    spatialReference: {
+                        wkid: 4326
+                    },
+                    xmin: -8.64999581199993,
+                    xmax: 1.76294150100006,
+                    ymin: 49.864679134,
+                    ymax: 60.8607873510001
+                });
+
+                const search = new Search({
+                    view: baseMap,
+                    locationEnabled: true,
+
+                });
+
+
+                // fullscreen
+                const fullscreen = new Fullscreen({
+                    view: baseMap
+                });
+
+
+                // add views and widgets
+                map.add(postcodes);
+                baseMap.ui.add(fullscreen, "bottom-right");
+                baseMap.ui.add(homeWidget, "top-left");
+                baseMap.ui.add(search, "top-right");
+                baseMap.ui.add(
+                    [
+                        new Expand({
+                            view: baseMap,
+                            content: new Legend({ view: baseMap }),
+                            group: "top-left",
+                            expanded: true
+                        })
+                    ],
+                    "top-left"
+                );
             });
-
-            view.popup = {
-                dockEnabled: true,
-                dockOptions: {
-                    // Disables the dock button from the popup
-                    buttonEnabled: false,
-                    // Ignore the default sizes that trigger responsive docking
-                    breakpoint: false
-                }
-            };
-
-
-            // add views and widgets
-            map.add(postcodes);
-            view.ui.add(homeWidget, "top-left");
-            view.ui.add(search, "top-right");
-
         });
     </script>
 </head>

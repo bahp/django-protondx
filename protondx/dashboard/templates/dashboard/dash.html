@@ -1,29 +1,14 @@
-<!--    <h1>Total tests (UK): {{ count_total_exp }}</h1>-->
-<!--    <h1>Total positive (UK): {{ count_pos_exp }}</h1>-->
-<!--    <h1>Total negative (UK): {{ count_neg_exp }}</h1>-->
-<!--    <h1>Total patients tested (UK): {{ count_indiv_patients }}</h1>-->
-<!--    <br>-->
-<!--    <h1>{{ test1 }}</h1>-->
-<!--    <h1>{{ test2 }}</h1>-->
-
-
-<!--    <form method="post">-->
-<!--        {% csrf_token %}-->
-<!--        {{ form.as_p }}-->
-<!--        <button type="submit">Submit</button>-->
-<!--    </form>-->
-
-<!--    <h1>{{ post_code_query }}</h1>-->
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no">
+
     <title>COVID-19 Dashboard</title>
 
     {% load static %}
-
     <link rel="stylesheet" type="text/css" href="{% static 'dashboard/layout.css' %}">
+
     <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/dark/main.css">
     <script src="https://js.arcgis.com/4.15/"></script>
 
@@ -31,26 +16,26 @@
         require([
             "esri/Map",
             "esri/views/MapView",
-            "esri/widgets/Search",
-            "esri/layers/FeatureLayer",
-            "esri/widgets/Home",
             "esri/geometry/Extent",
+            "esri/layers/FeatureLayer",
             "esri/renderers/DotDensityRenderer",
+            "esri/widgets/Home",
             "esri/widgets/Legend",
             "esri/widgets/Bookmarks",
             "esri/widgets/Expand",
             "esri/widgets/Fullscreen",
+            "esri/widgets/Search",
         ], function(Map,
                     MapView,
-                    Search,
-                    FeatureLayer,
-                    Home,
                     Extent,
+                    FeatureLayer,
                     DotDensityRenderer,
+                    Home,
                     Legend,
                     Bookmarks,
                     Expand,
-                    Fullscreen) {
+                    Fullscreen,
+                    Search,) {
 
             // Map view
             const map = new Map({
@@ -65,101 +50,114 @@
             });
 
 
-            //Home button to reset view
+            // postcode map and popup
+            const postcodeRenderer = {
+                type: "dot-density",
+                dotValue: 1,  // 1 dot = 1,000 people when the view.scale is 1:1,000,000
+                referenceScale: 10000,
+                legendOptions: {
+                    unit: "people"
+                },
+                attributes: [
+                    {
+                        field: "OBJECTID",
+                        label: "Postcode DB PK",
+                        color: "red"
+                    },
+                ],
+                outline: {
+                    width: 0.1,
+                    color: [0, 0, 0, 0.4],
+                }
+            };
+
+            const popupPostcode = {
+                title: "{NAME_1}, {POSTCODE_1}",
+                content: "<table> <tbody>" +
+                    "<tr> <td style=\"padding:0 15px 0 0;\">Total Cases:</td> <td>{{ post_code_query.total }}</td> </tr>" +
+                    "<tr> <td>Positive:</td> <td>{{ post_code_query.positive }}</td> </tr>" +
+                    "<tr> <td>Negative:</td> <td>{{ post_code_query.negative }}</td> </tr>" +
+                    "<tr> <td>Patients:</td> <td>{{ post_code_query.patients }}</td> </tr>" +
+                    "</tbody> </table>"
+            };
+
+            const postcodes = new FeatureLayer({
+                url: "https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer",
+                outFields: ["POSTCODE_1", "NAME_1", "OBJECTID"],
+                popupTemplate: popupPostcode,
+                renderer: postcodeRenderer,
+                title: "Postcode Database IDs",
+            });
+
+            baseMap.popup = {
+                dockEnabled: true,
+                dockOptions: {
+                    buttonEnabled: false,
+                    breakpoint: false
+                }
+            };
+
+
+            //Home button widget to reset view
             const homeWidget = new Home({
                 view: baseMap
             });
 
-            baseMap.when().then(function() {
-                // postcode map and popup
-                const postcodeRenderer = {
-                    type: "dot-density",
-                    dotValue: 1,  // 1 dot = 1,000 people when the view.scale is 1:1,000,000
-                    referenceScale: 10000,
-                    legendOptions: {
-                        unit: "people"
-                    },
-                    attributes: [
-                        {
-                            field: "OBJECTID",
-                            label: "Postcode DB PK",
-                            color: "red"
-                        },
-                    ],
-                    outline: {
-                        width: 0.1,
-                        color: [0, 0, 0, 0.4],
-                    }
-                };
 
-                const popupPostcode = {
-                    title: "{NAME_1}, {POSTCODE_1}",
-                    content: "<table> <tbody>" +
-                        "<tr> <td style=\"padding:0 15px 0 0;\">Total Cases:</td> <td>{{ post_code_query.total }}</td> </tr>" +
-                        "<tr> <td>Positive:</td> <td>{{ post_code_query.positive }}</td> </tr>" +
-                        "<tr> <td>Negative:</td> <td>{{ post_code_query.negative }}</td> </tr>" +
-                        "<tr> <td>Patients:</td> <td>{{ post_code_query.patients }}</td> </tr>" +
-                        "</tbody> </table>"
-                };
-
-                const postcodes = new FeatureLayer({
-                    url: "https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer",
-                    outFields: ["POSTCODE_1", "NAME_1", "OBJECTID"],
-                    popupTemplate: popupPostcode,
-                    renderer: postcodeRenderer,
-                    title: "Current COVID-19 spread in the UK",
-                });
-
-                baseMap.popup = {
-                    dockEnabled: true,
-                    dockOptions: {
-                        buttonEnabled: false,
-                        breakpoint: false
-                    }
-                };
-
-
-                // Search widget
-                const extent = new Extent({
-                    spatialReference: {
-                        wkid: 4326
-                    },
-                    xmin: -8.64999581199993,
-                    xmax: 1.76294150100006,
-                    ymin: 49.864679134,
-                    ymax: 60.8607873510001
-                });
-
-                const search = new Search({
-                    view: baseMap,
-                    locationEnabled: true,
-
-                });
-
-
-                // fullscreen
-                const fullscreen = new Fullscreen({
-                    view: baseMap
-                });
-
-
-                // add views and widgets
-                map.add(postcodes);
-                baseMap.ui.add(fullscreen, "bottom-right");
-                baseMap.ui.add(homeWidget, "top-left");
-                baseMap.ui.add(search, "top-right");
-                baseMap.ui.add(
-                    [
-                        new Expand({
-                            view: baseMap,
-                            content: new Legend({ view: baseMap }),
-                            group: "top-left",
-                            expanded: true
-                        })
-                    ],
-                    "top-left"
-                );
+            // Search widget
+            const extent = new Extent({
+                spatialReference: {
+                    wkid: 4326
+                },
+                xmin: -8.64999581199993,
+                xmax: 1.76294150100006,
+                ymin: 49.864679134,
+                ymax: 60.8607873510001
             });
+
+            const search = new Search({
+                view: baseMap,
+                locationEnabled: true,
+            });
+
+
+            // fullscreen widget
+            const fullscreen = new Fullscreen({
+                view: baseMap
+            });
+
+
+            //bookmarks widget
+            const bookmarks = new Bookmarks({
+                view: baseMap,
+
+            });
+
+            const bookmarkExpand = new Expand({
+                view: baseMap,
+                content: bookmarks,
+                expanded: false,
+            });
+
+
+            // add views and widgets
+            map.add(postcodes);
+            baseMap.ui.add(fullscreen, "bottom-right");
+            baseMap.ui.add(homeWidget, "top-left");
+            baseMap.ui.add(search, "top-right");
+            baseMap.ui.add(
+                [
+                    new Expand({
+                        view: baseMap,
+                        content: new Legend({ view: baseMap }),
+                        group: "top-left",
+                        expanded: true
+                    }),
+                ],
+                "top-left"
+            );
+            baseMap.ui.add(bookmarkExpand, "top-left");
+
         });
     </script>
 </head>
@@ -193,3 +191,15 @@
 </div>
 </body>
 </html>
+
+
+
+<!--Form to query postcode information from our database-->
+
+<!--    <form method="post">-->
+<!--        {% csrf_token %}-->
+<!--        {{ form.as_p }}-->
+<!--        <button type="submit">Submit</button>-->
+<!--    </form>-->
+
+<!--    <h1>{{ post_code_query }}</h1>-->

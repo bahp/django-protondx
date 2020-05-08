@@ -11,6 +11,7 @@
 
     <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/dark/main.css">
     <script src="https://js.arcgis.com/4.15/"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
 
     <script>
         require([
@@ -20,6 +21,7 @@
             "esri/layers/FeatureLayer",
             "esri/renderers/DotDensityRenderer",
             "esri/renderers/SimpleRenderer",
+            "esri/Graphic",
             "esri/widgets/Home",
             "esri/widgets/Legend",
             "esri/widgets/Expand",
@@ -31,6 +33,7 @@
                     FeatureLayer,
                     DotDensityRenderer,
                     SimpleRenderer,
+                    Graphic,
                     Home,
                     Legend,
                     Expand,
@@ -84,15 +87,50 @@
                 },
             };
 
+
             // postcode map and popup
+            function queryPopup(target) {
+
+                const url = "http://localhost:8000/dashboard/api/diagnostic-tests/?format=json&postcode="
+                    + encodeURIComponent((target.graphic.attributes.POSTCODE_1).trim())
+
+                //////
+                // WORKING BUT...
+                // DO NOT USE ASYNC: FALSE
+                // CHANGE TO PROPER AJAX GOOD PRACTICE
+                //////
+                let popupQuerySettings = {
+                    "url": url,
+                    "async": false,
+                    "method": "GET",
+                    "timeout": 0,
+                };
+
+                let postcodeData;
+                $.ajax(popupQuerySettings).done(function (response) {
+                    postcodeData = response;
+                });
+
+
+                ///////
+                // Change postcodeData.count to postcodeData.total
+                // and  " + 0 + " to postcodeData.positive, ...
+                // once the backend has been implemented
+                ///////
+
+                return (
+                    "<table> <tbody>" +
+                    "<tr> <td style=\"padding:0 15px 0 0;\">Total Cases:</td> <td>"+ (postcodeData.count) + "</td> </tr>" +
+                    "<tr> <td>Positive:</td> <td>" + 0 + "</td> </tr>" +
+                    "<tr> <td>Negative:</td> <td>" + 0 + "</td> </tr>" +
+                    "<tr> <td>Patients:</td> <td>" + 0 + "</td> </tr>" +
+                    "</tbody> </table>"
+                );
+            }
+
             const popupPostcode = {
                 title: "{NAME_1}, {POSTCODE_1}",
-                content: "<table> <tbody>" +
-                    "<tr> <td style=\"padding:0 15px 0 0;\">Total Cases:</td> <td>{{ post_code_query.total }}</td> </tr>" +
-                    "<tr> <td>Positive:</td> <td>{{ post_code_query.positive }}</td> </tr>" +
-                    "<tr> <td>Negative:</td> <td>{{ post_code_query.negative }}</td> </tr>" +
-                    "<tr> <td>Patients:</td> <td>{{ post_code_query.patients }}</td> </tr>" +
-                    "</tbody> </table>"
+                content: queryPopup
             };
 
             // postcode layer

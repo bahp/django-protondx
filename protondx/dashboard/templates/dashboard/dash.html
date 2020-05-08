@@ -19,9 +19,9 @@
             "esri/geometry/Extent",
             "esri/layers/FeatureLayer",
             "esri/renderers/DotDensityRenderer",
+            "esri/renderers/SimpleRenderer",
             "esri/widgets/Home",
             "esri/widgets/Legend",
-            "esri/widgets/Bookmarks",
             "esri/widgets/Expand",
             "esri/widgets/Fullscreen",
             "esri/widgets/Search",
@@ -30,9 +30,9 @@
                     Extent,
                     FeatureLayer,
                     DotDensityRenderer,
+                    SimpleRenderer,
                     Home,
                     Legend,
-                    Bookmarks,
                     Expand,
                     Fullscreen,
                     Search,) {
@@ -49,9 +49,12 @@
                 zoom: 5
             });
 
+            // //////
+            // renderers for postcode map
+            // //////
 
-            // postcode map and popup
-            const postcodeRenderer = {
+            // density renderer
+            const densityRenderer = {
                 type: "dot-density",
                 dotValue: 1,  // 1 dot = 1,000 people when the view.scale is 1:1,000,000
                 referenceScale: 10000,
@@ -71,6 +74,17 @@
                 }
             };
 
+            // dot renderer
+            const dotRenderer = {
+                type: "simple",
+                symbol: {
+                    type: "simple-marker",
+                    size: 6,
+                    color: "red",
+                },
+            };
+
+            // postcode map and popup
             const popupPostcode = {
                 title: "{NAME_1}, {POSTCODE_1}",
                 content: "<table> <tbody>" +
@@ -81,14 +95,16 @@
                     "</tbody> </table>"
             };
 
-            const postcodes = new FeatureLayer({
+            // postcode layer
+            let postcodes = new FeatureLayer({
                 url: "https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer",
                 outFields: ["POSTCODE_1", "NAME_1", "OBJECTID"],
                 popupTemplate: popupPostcode,
-                renderer: postcodeRenderer,
+                renderer: densityRenderer,
                 title: "Postcode Database IDs",
             });
 
+            //postcode popup
             baseMap.popup = {
                 dockEnabled: true,
                 dockOptions: {
@@ -96,6 +112,20 @@
                     breakpoint: false
                 }
             };
+
+            //renderer selection w/ radio
+            let radios = document.getElementsByName("renderer");
+            for (let i = 0; i < radios.length; i++) {
+                radios[i].addEventListener("change", function(event) {
+                    const fieldName = event.target.value;
+                    if (fieldName === "DENSITY") {
+                        postcodes.renderer = densityRenderer;
+                    }
+                    if (fieldName === "DOTS") {
+                        postcodes.renderer = dotRenderer;
+                    }
+                });
+            }
 
 
             //Home button widget to reset view
@@ -127,19 +157,6 @@
             });
 
 
-            //bookmarks widget
-            const bookmarks = new Bookmarks({
-                view: baseMap,
-
-            });
-
-            const bookmarkExpand = new Expand({
-                view: baseMap,
-                content: bookmarks,
-                expanded: false,
-            });
-
-
             // add views and widgets
             map.add(postcodes);
             baseMap.ui.add(fullscreen, "bottom-right");
@@ -156,17 +173,31 @@
                 ],
                 "top-left"
             );
-            baseMap.ui.add(bookmarkExpand, "top-left");
-
         });
     </script>
 </head>
 <body>
 
 <div id="viewDiv"></div>
+
 <div id="feature-node-right-top" class="esri-widget"></div>
+
 <div id="feature-node-right-mid" class="esri-widget"></div>
-<div id="feature-node-left-bottom" class="esri-widget"></div>
+
+<div id="feature-node-left-bottom" class="esri-widget">
+    <p>Visualise COVID-19 spread using:</p>
+    <label>
+        <input type="radio" name="renderer" value="DENSITY" checked />
+        Heatmap
+    </label> <br />
+
+    <label>
+        <input type="radio" name="renderer" value="DOTS" />
+        Dots
+    </label> <br />
+
+</div>
+
 <div id="feature-node-right-bottom" class="esri-widget">
     <table>
         <tbody>
@@ -189,6 +220,7 @@
         </tbody>
     </table>
 </div>
+
 </body>
 </html>
 

@@ -52,7 +52,8 @@ INSTALLED_APPS = [
 
     # Own applications
     # ----------------
-    'diagnostics'
+    'diagnostics',
+    'dashboard.apps.DashboardConfig',
 ]
 
 MIDDLEWARE = [

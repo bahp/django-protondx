@@ -23,3 +23,16 @@ class ExperimentSerializer(serializers.ModelSerializer):
   class Meta:
     model = Experiment
     fields = '__all__'
+
+class GroupSerializer(serializers.ModelSerializer):
+
+  # Add summary information
+  summary_count = serializers.SerializerMethodField()
+
+  class Meta:
+    model = Experiment
+    fields = '__all__'
+
+  def get_summary_count(self, obj):
+    return 5
+    #return obj.user_set.count()

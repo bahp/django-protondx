@@ -1,73 +1,111 @@
 from rest_framework import viewsets
+from rest_framework import permissions, generics
+from rest_framework.filters import SearchFilter
+from rest_framework.filters import OrderingFilter
+
+# Django filters
+from django_filters.rest_framework import DjangoFilterBackend, FilterSet
+
 from rest_framework import views
 from rest_framework.response import Response
-from .api_serializers import PatientSerializer, TestingCentreSerializer, DiagnosticTestSerializer #, PopupSerializer
+from .api_serializers import PatientSerializer, TestingCentreSerializer, DiagnosticTestSerializer, PostcodeSerializer
 from .models import Patient, TestingCentre, DiagnosticTest
+from .queries import get_postcode_data
 
 
+# This viewset and the associated serializer may not be needed. Here now for testing purposes
 class PatientViewSet(viewsets.ModelViewSet):
     queryset = Patient.objects.all().order_by('first_name')
     serializer_class = PatientSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    # -------
+    #  Filters
+    # -------
+    #  Filters
+    # search_fields = ('comments', )
+    filter_fields = '__all__'
+    ordering_fields = '__all__'
+
+    #  Set backends
+    filter_backends = (DjangoFilterBackend,
+                       SearchFilter,
+                       OrderingFilter)
+
+    # Enable further filtering
+    # filter_class =
+
+    # Define default ordering
+    ordering = ('last_name', 'first_name')
 
 
+# This viewset and the associated serializer may not be needed. Here now for testing purposes
 class TestingCentreViewSet(viewsets.ModelViewSet):
     queryset = TestingCentre.objects.all().order_by('centre_type')
     serializer_class = TestingCentreSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    # -------
+    #  Filters
+    # -------
+    #  Filters
+    # search_fields = ('comments', )
+    filter_fields = '__all__'
+    ordering_fields = '__all__'
+
+    #  Set backends
+    filter_backends = (DjangoFilterBackend,
+                       SearchFilter,
+                       OrderingFilter)
+
+    # Enable further filtering
+    # filter_class =
+
+    # Define default ordering
+    ordering = ('postcode',)
 
 
-class DiagnosticTestViewSet(viewsets.ModelViewSet):
+class PostcodeFilter(FilterSet):
+    class Meta:
+        model = DiagnosticTest
+        fields = {
+            'testing_centre__postcode': ['startswith'],
+            'date_test': ['date__lt'],
+            'test_result': ['exact'],
+        }
+
+
+class DiagnosticTestViewSet(generics.ListAPIView):
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = DiagnosticTestSerializer
+    # permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
+    # -------
+    #  Filters
+    # -------
+    #  Filters
+    # search_fields = ('testing_centre__postcode',)
+    # filter_fields = ('testing_centre__postcode', 'test_result', 'date_test')
+    ordering_fields = '__all__'
+
+    #  Set backends
+    filter_backends = (DjangoFilterBackend,
+                       SearchFilter,
+                       OrderingFilter)
+
+    # Enable further filtering
+    filter_class = PostcodeFilter
+
+    # Define default ordering
+    ordering = ('date_test',)
+
+
+class PostcodeData(generics.ListAPIView):
+    queryset = DiagnosticTest.objects.all().order_by('date_test')
+    serializer_class = PostcodeSerializer
+
+    def list(self, request, *args, **kwargs):
         postcode = self.request.query_params.get('postcode', False)
-        if postcode:
-            tests = DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode)
-        else:
-            tests = DiagnosticTest.objects.all().order_by('date_test')
-        return tests
-
-
-# def get_postcode_total_experiments(postcode):
-#     return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode).count()
-#
-#
-# def get_postcode_negative_experiments(postcode):
-#     return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode, test_result=False).count()
-#
-#
-# def get_postcode_positive_experiments(postcode):
-#     return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode, test_result=True).count()
-#
-#
-# def get_postcode_individuals_tested(postcode):
-#     return DiagnosticTest \
-#         .objects \
-#         .select_related('patient', 'testing_centre') \
-#         .filter(testing_centre__postcode__startswith=postcode) \
-#         .values('patient_id') \
-#         .distinct() \
-#         .count()
-#
-#
-# def get_postcode_data(postcode):
-#     data = {
-#         'total': get_postcode_total_experiments(postcode),
-#         'positive': get_postcode_positive_experiments(postcode),
-#         'negative': get_postcode_negative_experiments(postcode),
-#         'patients': get_postcode_individuals_tested(postcode),
-#     }
-#
-#     return data
-#
-#
-# class PopupViewSet(views.APIView):
-#     @classmethod
-#     def get_extra_actions(cls):
-#         return []
-#
-#     def get(self, request, *args, **kw):
-#         postcode = request.GET.get('postcode', None)
-#         data = get_postcode_data(postcode)
-#         results = PopupSerializer(data, many=True).data
-#         return Response(results)
+        response = super(PostcodeData, self).list(request, args, kwargs)
+        response.data['summary'] = get_postcode_data(postcode)
+        return response

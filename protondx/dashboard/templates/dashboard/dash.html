@@ -91,7 +91,7 @@
             // postcode map and popup
             function queryPopup(target) {
 
-                const url = "http://localhost:8000/dashboard/api/diagnostic-tests/?format=json&postcode="
+                const url = "http://localhost:8000/dashboard/api/get-postcode-data/?postcode="
                     + encodeURIComponent((target.graphic.attributes.POSTCODE_1).trim())
 
                 //////
@@ -108,7 +108,8 @@
 
                 let postcodeData;
                 $.ajax(popupQuerySettings).done(function (response) {
-                    postcodeData = response;
+                    console.log(response)
+                    postcodeData = response.summary;
                 });
 
 
@@ -120,10 +121,10 @@
 
                 return (
                     "<table> <tbody>" +
-                    "<tr> <td style=\"padding:0 15px 0 0;\">Total Cases:</td> <td>"+ (postcodeData.count) + "</td> </tr>" +
-                    "<tr> <td>Positive:</td> <td>" + 0 + "</td> </tr>" +
-                    "<tr> <td>Negative:</td> <td>" + 0 + "</td> </tr>" +
-                    "<tr> <td>Patients:</td> <td>" + 0 + "</td> </tr>" +
+                    "<tr> <td style=\"padding:0 15px 0 0;\">Total Cases:</td> <td>"+ (postcodeData.total) + "</td> </tr>" +
+                    "<tr> <td>Positive:</td> <td>" + (postcodeData.positive) + "</td> </tr>" +
+                    "<tr> <td>Negative:</td> <td>" + (postcodeData.negative) + "</td> </tr>" +
+                    "<tr> <td>Patients:</td> <td>" + (postcodeData.patients) + "</td> </tr>" +
                     "</tbody> </table>"
                 );
             }

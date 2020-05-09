@@ -26,8 +26,7 @@ class DiagnosticTestSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-# class PopupSerializer(serializers.Serializer):
-#     total = serializers.IntegerField()
-#     positive = serializers.IntegerField()
-#     negative = serializers.IntegerField()
-#     patients = serializers.IntegerField()
+class PostcodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DiagnosticTest
+        fields = ''

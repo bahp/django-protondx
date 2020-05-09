@@ -205,7 +205,7 @@ class ExperimentViewSet(viewsets.ModelViewSet):
 
 
 
-class SummaryExperimentViewSet(generics.ListAPIView):
+class SummaryViewSet(generics.ListAPIView):
     """This class returns a summary of the experiment tests.
 
     """     
@@ -214,7 +214,6 @@ class SummaryExperimentViewSet(generics.ListAPIView):
     # -------
     # Basic configuration
     queryset = models.Experiment.objects.all()
-
     serializer_class = serializers.ExperimentSerializer
     #serializer_class = serializers.GroupSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -227,6 +226,7 @@ class SummaryExperimentViewSet(generics.ListAPIView):
     search_fields = ('disease', )
     filter_fields = '__all__'
     ordering_fields = '__all__'
+    #filterset_fields equality filter
 
     # Set backends
     filter_backends = (DjangoFilterBackend, 
@@ -243,26 +243,32 @@ class SummaryExperimentViewSet(generics.ListAPIView):
     def list(self, request, *args, **kwargs):
         """This method lists and adds count summary.
 
-        .. note: There are possible options to get the display value for 
-                 attributes that are choice fields (e.g. MALARIA - Malaria).
-                 However, they are not generic as you need the name of the
-                 attribute to use get_<attribute>_display().
+        .. note: In order to count groups properly, it needs order_by.
+
+        .. todo: Find a generic approach for the case of choice field to
+                 translate the code (e.g. MALARIA) to the display name
+                 (e.g. Malaria). Remember that the method used for display
+                 is get_<attribute>_display(). 
 
                  see: https://stackoverflow.com/questions/23693631/get-full-label-name-of-choicefield-in-queryset-values-list
         """
         response = super().list(request, args, kwargs)
         # Get attribute from model to count by
-        attribute = self.request.query_params.get('attribute', False)
-        # Count
-        smry_v1 = self.queryset.values(attribute) \
-                               .annotate(count=Count(attribute))
-        # Format count
-        smry_v2 = {e[attribute]:e['count'] for e in smry_v1}
-        # Add data to response
-        response.data['summary_v0'] = {'p':1, 'n':2, 't':3}
-        response.data['summary_v1'] = smry_v1
-        response.data['summary_v2'] = smry_v2
+        attribute = self.request.query_params.get('by', None)
+        # Group count
+        if attribute:
+            smry = self.filter_queryset(self.queryset) \
+                       .values(attribute) \
+                       .annotate(count=Count(attribute)) \
+                       .order_by(attribute) 
+            # Format count
+            smry = {e[attribute]:e['count'] for e in smry}
+            # Add data to response
+            response.data['summary'] = smry
         # Return
         return response
+
+
+
 
 

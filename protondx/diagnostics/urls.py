@@ -21,7 +21,6 @@ router = routers.DefaultRouter()
 router.register('device', api_viewsets.DeviceViewSet)
 router.register('cartridge', api_viewsets.CartridgeViewSet)
 router.register('experiment', api_viewsets.ExperimentViewSet)
-#router.register('summary', api_viewsets.SummaryExperimentViewSet)
 
 # ----------------------------------
 # Define url patterns
@@ -30,5 +29,6 @@ urlpatterns = [
     # Add the API
     path('api/', include(router.urls)),
 
-    path('api/summary/count', api_viewsets.SummaryExperimentViewSet.as_view()),
+    # Return devices and summary (?by=... to include summary)
+    path('api/summary/count', api_viewsets.SummaryViewSet.as_view())
 ]

@@ -24,8 +24,8 @@ class ExperimentSerializer(serializers.ModelSerializer):
     model = Experiment
     fields = '__all__'
 
+"""
 class GroupSerializer(serializers.ModelSerializer):
-
   # Add summary information
   summary_count = serializers.SerializerMethodField()
 
@@ -35,4 +35,4 @@ class GroupSerializer(serializers.ModelSerializer):
 
   def get_summary_count(self, obj):
     return 5
-    #return obj.user_set.count()
+"""

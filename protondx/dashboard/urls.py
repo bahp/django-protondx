@@ -17,6 +17,7 @@ urlpatterns = [
     path('', views.DashView.as_view(), name='dash'),
     path('api/diagnostic-tests/', api_viewsets.DiagnosticTestViewSet.as_view()),
     path('api/get-postcode-data/', api_viewsets.PostcodeData.as_view()),
+    path('api/get-points/', api_viewsets.GeoView.as_view()),
     # API
     path('api/', include(router.urls)),
 ]

@@ -40,6 +40,10 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
+    # Geo-location
+    # ------------
+    'django.contrib.gis',
+
     # Data import/export
     # ------------------
     'import_export',
@@ -92,8 +96,12 @@ WSGI_APPLICATION = 'protondx.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'sample_database',
+        'USER': 'oliver_django',
+        'PASSWORD': '1234567T',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 

@@ -19,6 +19,7 @@
             "esri/views/MapView",
             "esri/geometry/Extent",
             "esri/layers/FeatureLayer",
+            "esri/layers/GeoJSONLayer",
             "esri/renderers/DotDensityRenderer",
             "esri/renderers/SimpleRenderer",
             "esri/Graphic",
@@ -31,6 +32,7 @@
                     MapView,
                     Extent,
                     FeatureLayer,
+                    GeoJSONLayer,
                     DotDensityRenderer,
                     SimpleRenderer,
                     Graphic,
@@ -52,29 +54,29 @@
                 zoom: 5
             });
 
-            // //////
-            // renderers for postcode map
-            // //////
+            // Test data layer
 
-            // density renderer
-            const densityRenderer = {
-                type: "dot-density",
-                dotValue: 1,  // 1 dot = 1,000 people when the view.scale is 1:1,000,000
-                referenceScale: 10000,
-                legendOptions: {
-                    unit: "people"
-                },
-                attributes: [
-                    {
-                        field: "OBJECTID",
-                        label: "Postcode DB PK",
-                        color: "red"
-                    },
+            // heatmap renderer
+            const heatRenderer = {
+                type: "heatmap",
+                colorStops: [
+                    { color: "rgba(63, 40, 102, 0)", ratio: 0 },
+                    { color: "#472b77", ratio: 0.083 },
+                    { color: "#4e2d87", ratio: 0.166 },
+                    { color: "#563098", ratio: 0.249 },
+                    { color: "#5d32a8", ratio: 0.332 },
+                    { color: "#6735be", ratio: 0.415 },
+                    { color: "#7139d4", ratio: 0.498 },
+                    { color: "#7b3ce9", ratio: 0.581 },
+                    { color: "#853fff", ratio: 0.664 },
+                    { color: "#a46fbf", ratio: 0.747 },
+                    { color: "#c29f80", ratio: 0.83 },
+                    { color: "#e0cf40", ratio: 0.913 },
+                    { color: "#ffff00", ratio: 1 }
                 ],
-                outline: {
-                    width: 0.1,
-                    color: [0, 0, 0, 0.4],
-                }
+                maxPixelIntensity: 25,
+                minPixelIntensity: 0,
+                label: "Density of cases",
             };
 
             // dot renderer
@@ -85,8 +87,102 @@
                     size: 6,
                     color: "red",
                 },
+                label: "Individual case",
             };
 
+            const renderer = {
+                type: "simple",
+                label: "Individual case",
+                symbol: {
+                    type: "simple-marker",
+                    size: 6,
+                    color: "red",
+                },
+            };
+            const template = {
+                title: "Centre Info",
+                content: "Centre type: {centre_type} <br> Postcode:{postcode}",
+                // fieldInfos: [
+                //     {
+                //         fieldName: "time",
+                //         format: {
+                //             dateFormat: "short-date-short-time"
+                //         }
+                //     }
+                // ]
+            };
+
+            const geoJSONLayer = new GeoJSONLayer({
+                url: "http://localhost:8000/dashboard/api/get-points/",
+                copyright: "Add copyright for COVID data if needed",
+                renderer: renderer,
+                title: "COVID-19 spread",
+                popupTemplate: template,
+            });
+            map.add(geoJSONLayer);
+
+
+
+            //renderer selection w/ radio
+            let radios = document.getElementsByName("renderer");
+            for (let i = 0; i < radios.length; i++) {
+                radios[i].addEventListener("change", function(event) {
+                    const fieldName = event.target.value;
+                    if (fieldName === "HEAT") {
+                        geoJSONLayer.renderer = heatRenderer;
+                    }
+                    if (fieldName === "DOTS") {
+                        geoJSONLayer.renderer = dotRenderer;
+                    }
+                });
+            }
+
+
+            ///////////////////////////
+
+
+
+
+
+
+            // //////
+            // renderers for postcode map
+            // //////
+
+            // density renderer
+            // const densityRenderer = {
+            //     type: "dot-density",
+            //     dotValue: 1,  // 1 dot = 1,000 people when the view.scale is 1:1,000,000
+            //     referenceScale: 10000,
+            //     legendOptions: {
+            //         unit: "people"
+            //     },
+            //     attributes: [
+            //         {
+            //             field: "OBJECTID",
+            //             label: "Postcode DB PK",
+            //             color: "red"
+            //         },
+            //     ],
+            //     outline: {
+            //         width: 0.1,
+            //         color: [0, 0, 0, 0.4],
+            //     }
+            // };
+
+            const lineRenderer = {
+                type: "simple",
+
+                symbol: {
+                    type: "simple-fill",
+                    style: "none",
+                    outline:{
+                        width: 0.1,
+                        color: [0, 0, 0, 0.4],
+                    },
+                },
+                label: "Postcode Sector Boundaries"
+            };
 
             // postcode map and popup
             function queryPopup(target) {
@@ -137,10 +233,10 @@
             // postcode layer
             let postcodes = new FeatureLayer({
                 url: "https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer",
-                outFields: ["POSTCODE_1", "NAME_1", "OBJECTID"],
+                outFields: ["POSTCODE_1", "NAME_1",], // "OBJECTID"],
                 popupTemplate: popupPostcode,
-                renderer: densityRenderer,
-                title: "Postcode Database IDs",
+                renderer: lineRenderer,
+                title: "Map features",
             });
 
             //postcode popup
@@ -152,19 +248,7 @@
                 }
             };
 
-            //renderer selection w/ radio
-            let radios = document.getElementsByName("renderer");
-            for (let i = 0; i < radios.length; i++) {
-                radios[i].addEventListener("change", function(event) {
-                    const fieldName = event.target.value;
-                    if (fieldName === "DENSITY") {
-                        postcodes.renderer = densityRenderer;
-                    }
-                    if (fieldName === "DOTS") {
-                        postcodes.renderer = dotRenderer;
-                    }
-                });
-            }
+
 
 
             //Home button widget to reset view
@@ -226,7 +310,7 @@
 <div id="feature-node-left-bottom" class="esri-widget">
     <p>Visualise COVID-19 spread using:</p>
     <label>
-        <input type="radio" name="renderer" value="DENSITY" checked />
+        <input type="radio" name="renderer" value="HEAT" checked />
         Heatmap
     </label> <br />
 
@@ -262,15 +346,3 @@
 
 </body>
 </html>
-
-
-
-<!--Form to query postcode information from our database-->
-
-<!--    <form method="post">-->
-<!--        {% csrf_token %}-->
-<!--        {{ form.as_p }}-->
-<!--        <button type="submit">Submit</button>-->
-<!--    </form>-->
-
-<!--    <h1>{{ post_code_query }}</h1>-->

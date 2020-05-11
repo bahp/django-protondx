@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.gis import forms
 
 # Register your models here.
 from .models import Patient, TestingCentre, DiagnosticTest
@@ -27,14 +28,19 @@ class DiagnosticTestAdmin(admin.ModelAdmin):
     ]
 
 
-class CentreAdmin(admin.ModelAdmin):
-    fieldsets = [
-        ('Centre Information', {'fields': ['centre_type', 'postcode', 'lon', 'lat']}),
-    ]
 
+
+
+class TestingCentreAdminForm(forms.ModelForm):
+    coordinates = forms.PointField(widget=forms.OSMWidget(attrs={
+        'display_raw': False}))
+
+
+class CentreAdmin(admin.ModelAdmin):
     inlines = [TestInLine]
     list_display = ['centre_type', 'postcode']
     search_fields = ['centre_type', 'postcode']
+    form = TestingCentreAdminForm
 
 
 admin.site.register(Patient, PatientAdmin)

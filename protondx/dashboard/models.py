@@ -1,7 +1,10 @@
 from django.db import models
-
+from django.contrib.gis.db import models as geomodels
 
 # Create your models here.
+from django.contrib.gis.geos import Point
+
+
 class Patient(models.Model):
     """
     This class contains basic patient information.
@@ -34,7 +37,7 @@ class Patient(models.Model):
         return self.last_name + ", " + self.first_name
 
 
-class TestingCentre(models.Model):
+class TestingCentre(geomodels.Model):
     """
     This class contains testing centre information
     """
@@ -57,8 +60,9 @@ class TestingCentre(models.Model):
     ]
 
     centre_type = models.CharField(max_length=4, choices=CENTRE_TYPE, verbose_name='Centre type')
-    lon = models.FloatField(verbose_name='Longitude')
-    lat = models.FloatField(verbose_name='Latitude')
+    # lon = models.FloatField(verbose_name='Longitude')
+    # lat = models.FloatField(verbose_name='Latitude')
+    coordinates = geomodels.PointField(verbose_name='Coordinates')
     postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
     # postcode. If other countries are to be added the max_length must be revised
 

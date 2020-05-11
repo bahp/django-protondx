@@ -109,3 +109,24 @@ class PostcodeData(generics.ListAPIView):
         response = super(PostcodeData, self).list(request, args, kwargs)
         response.data['summary'] = get_postcode_data(postcode)
         return response
+
+
+from django.http import HttpResponse
+from django.core.serializers import serialize
+from rest_framework.views import APIView
+
+
+class GeoView(APIView):
+
+    def get(self, request):
+        result = serialize(
+            "geojson",
+            TestingCentre.objects.all(),
+            srid=4326,
+            geometry_field="coordinates",
+            fields=(
+                "postcode", "centre_type",
+            ),
+        )
+
+        return HttpResponse(result)

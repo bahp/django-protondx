@@ -23,11 +23,16 @@
             "esri/renderers/DotDensityRenderer",
             "esri/renderers/SimpleRenderer",
             "esri/Graphic",
+            "esri/widgets/Feature",
+            "esri/popup/content/BarChartMediaInfo",
+            "esri/popup/content/support/ChartMediaInfoValue",
+            "esri/popup/content/MediaContent",
             "esri/widgets/Home",
             "esri/widgets/Legend",
             "esri/widgets/Expand",
             "esri/widgets/Fullscreen",
             "esri/widgets/Search",
+            "esri/widgets/BasemapGallery",
         ], function(Map,
                     MapView,
                     Extent,
@@ -36,11 +41,16 @@
                     DotDensityRenderer,
                     SimpleRenderer,
                     Graphic,
+                    Feature,
+                    BarChartMediaInfo,
+                    ChartMediaInfoValue,
+                    MediaContent,
                     Home,
                     Legend,
                     Expand,
                     Fullscreen,
-                    Search,) {
+                    Search,
+                    BasemapGallery,) {
 
             // Map view
             const map = new Map({
@@ -61,18 +71,18 @@
                 type: "heatmap",
                 colorStops: [
                     { color: "rgba(63, 40, 102, 0)", ratio: 0 },
-                    { color: "#472b77", ratio: 0.083 },
-                    { color: "#4e2d87", ratio: 0.166 },
-                    { color: "#563098", ratio: 0.249 },
-                    { color: "#5d32a8", ratio: 0.332 },
-                    { color: "#6735be", ratio: 0.415 },
-                    { color: "#7139d4", ratio: 0.498 },
-                    { color: "#7b3ce9", ratio: 0.581 },
-                    { color: "#853fff", ratio: 0.664 },
-                    { color: "#a46fbf", ratio: 0.747 },
-                    { color: "#c29f80", ratio: 0.83 },
-                    { color: "#e0cf40", ratio: 0.913 },
-                    { color: "#ffff00", ratio: 1 }
+                    { color: "#e5ff00", ratio: 0.083 },
+                    { color: "#fff700", ratio: 0.166 },
+                    { color: "#ffdd00", ratio: 0.249 },
+                    { color: "#ffd500", ratio: 0.332 },
+                    { color: "#ffc400", ratio: 0.415 },
+                    { color: "#ffb300", ratio: 0.498 },
+                    { color: "#ff9d00", ratio: 0.581 },
+                    { color: "#ff8400", ratio: 0.664 },
+                    { color: "#ff5e00", ratio: 0.747 },
+                    { color: "#ff3c00", ratio: 0.83 },
+                    { color: "#ff2200", ratio: 0.913 },
+                    { color: "#ff0000", ratio: 1 }
                 ],
                 maxPixelIntensity: 25,
                 minPixelIntensity: 0,
@@ -90,18 +100,9 @@
                 label: "Individual case",
             };
 
-            const renderer = {
-                type: "simple",
-                label: "Individual case",
-                symbol: {
-                    type: "simple-marker",
-                    size: 6,
-                    color: "red",
-                },
-            };
             const template = {
                 title: "Centre Info",
-                content: "Centre type: {centre_type} <br> Postcode:{postcode}",
+                content: "Centre type: {centre_type} <br> <br> Postcode: {postcode}",
                 // fieldInfos: [
                 //     {
                 //         fieldName: "time",
@@ -115,13 +116,10 @@
             const geoJSONLayer = new GeoJSONLayer({
                 url: "http://localhost:8000/dashboard/api/get-points/",
                 copyright: "Add copyright for COVID data if needed",
-                renderer: renderer,
+                renderer: heatRenderer,
                 title: "COVID-19 spread",
                 popupTemplate: template,
             });
-            map.add(geoJSONLayer);
-
-
 
             //renderer selection w/ radio
             let radios = document.getElementsByName("renderer");
@@ -136,6 +134,34 @@
                     }
                 });
             }
+
+            let barChartValue = new ChartMediaInfoValue({
+                fields: ["centre_type"],
+                normalizeField: null,
+                tooltipField: "Centre Type"
+            });
+
+
+            let barChart = new BarChartMediaInfo({
+                title: "<b>Count by type</b>",
+                caption: "Per block",
+                value: barChartValue
+            });
+
+
+            let mediaElement = new MediaContent({
+                mediaInfos: [barChart]
+            });
+
+
+            let feature = new Feature({
+                graphic: mediaElement,
+                container: "feature-node-right-top",
+                view: geoJSONLayer
+
+            });
+
+
 
 
             ///////////////////////////
@@ -280,8 +306,23 @@
             });
 
 
+
+            new BasemapGallery({
+                view: baseMap,
+                container: "feature-node-right-top"
+            });
+
+
+            const PostcodeToggle = document.getElementById("postcodeLayer");
+
+            PostcodeToggle.addEventListener("change", function() {
+                postcodes.visible = PostcodeToggle.checked;
+            });
+
             // add views and widgets
             map.add(postcodes);
+            map.add(geoJSONLayer);
+
             baseMap.ui.add(fullscreen, "bottom-right");
             baseMap.ui.add(homeWidget, "top-left");
             baseMap.ui.add(search, "top-right");
@@ -305,7 +346,9 @@
 
 <div id="feature-node-right-top" class="esri-widget"></div>
 
-<div id="feature-node-right-mid" class="esri-widget"></div>
+<div id="feature-node-right-mid" class="esri-widget">
+
+</div>
 
 <div id="feature-node-left-bottom" class="esri-widget">
     <p>Visualise COVID-19 spread using:</p>
@@ -318,6 +361,11 @@
         <input type="radio" name="renderer" value="DOTS" />
         Dots
     </label> <br />
+    <br />
+
+    <label>
+        <input type="checkbox" id="postcodeLayer" checked> Postcode Boundaries
+    </label>
 
 </div>
 

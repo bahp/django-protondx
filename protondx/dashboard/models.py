@@ -37,36 +37,6 @@ class Patient(models.Model):
         return self.last_name + ", " + self.first_name
 
 
-class TestingCentre(geomodels.Model):
-    """
-    This class contains testing centre information
-    """
-
-    # -----------------------
-    # Definitions
-    # -----------------------
-    HOSPITAL = 'HOSP'
-    CLINIC = 'CLIN'
-    DRIVE_THROUGH = 'DRIV'
-    HOME_TEST_SITE = 'HOME'
-    OTHER_TEST_SITE = 'OTHR'
-
-    CENTRE_TYPE = [
-        (HOSPITAL, 'Hospital'),
-        (CLINIC, 'GP clinic'),
-        (DRIVE_THROUGH, 'Drive through centre'),
-        (HOME_TEST_SITE, 'Home'),
-        (OTHER_TEST_SITE, 'Other'),
-    ]
-
-    centre_type = models.CharField(max_length=4, choices=CENTRE_TYPE, verbose_name='Centre type')
-    # lon = models.FloatField(verbose_name='Longitude')
-    # lat = models.FloatField(verbose_name='Latitude')
-    coordinates = geomodels.PointField(verbose_name='Coordinates')
-    postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
-    # postcode. If other countries are to be added the max_length must be revised
-
-
 class DiagnosticTest(models.Model):
     """
     This class contains information for diagnostic tests
@@ -82,7 +52,6 @@ class DiagnosticTest(models.Model):
 
     # Foreign Keys
     # ------------
-    testing_centre = models.ForeignKey(TestingCentre, on_delete=models.CASCADE)
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
 
     # Parameters
@@ -96,6 +65,25 @@ class DiagnosticTest(models.Model):
         (NEG, 'Negative'),
     ]
     test_result = models.BooleanField(choices=DIAGNOSIS, verbose_name='Test result')
+
+    HOSPITAL = 'HOSP'
+    CLINIC = 'CLIN'
+    DRIVE_THROUGH = 'DRIV'
+    HOME_TEST_SITE = 'HOME'
+    OTHER_TEST_SITE = 'OTHR'
+
+    CENTRE_TYPE = [
+        (HOSPITAL, 'Hospital'),
+        (CLINIC, 'GP clinic'),
+        (DRIVE_THROUGH, 'Drive through centre'),
+        (HOME_TEST_SITE, 'Home'),
+        (OTHER_TEST_SITE, 'Other'),
+    ]
+
+    centre_type = models.CharField(max_length=4, choices=CENTRE_TYPE, verbose_name='Centre type')
+    coordinates = geomodels.PointField(verbose_name='Coordinates', null=True)
+    postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
+    # postcode. If other countries are to be added the max_length must be revised
 
     def __str__(self):
         return self.patient.last_name + ", " + self.patient.first_name + ": " + str(self.date_test)

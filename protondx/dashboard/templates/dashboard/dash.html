@@ -151,8 +151,49 @@
                         dataSrc: "features",
                     },
                     "columns": [
-                        { data: "properties.centre_type" },
+                        {
+                            data: "properties.date_test",
+                            render: function ( data, type, row ) {
+                                const dateSplit = data.split('T')[0].split('-');
+                                return type === "display" || type === "filter" ?
+                                    dateSplit[2] +'-'+ dateSplit[1] +'-'+ dateSplit[0] :
+                                    data;
+                            }
+                        },
+                        {
+                            data: "properties.test_result",
+                            render: function (data, type, row){
+                                switch(data) {
+                                    case true:
+                                        return "Positive";
+                                    case false:
+                                        return "Negative";
+                                    default:
+                                        return "n/a";
+                                }
+                            }
+                        },
+                        {
+                            data: "properties.centre_type",
+                            render: function (data, type, row){
+                                switch(data) {
+                                    case "HOSP":
+                                        return "Hospital";
+                                    case "CLIN":
+                                        return "GP Clinic";
+                                    case "DRIV":
+                                        return "Drive through";
+                                    case "HOME":
+                                        return "Home test";
+                                    case "OTHR":
+                                        return "Other";
+                                    default:
+                                        return "n/a";
+                                }
+                            }
+                        },
                         { data: "properties.postcode" },
+
                     ],
                     pageResize: true,
                 });
@@ -447,6 +488,8 @@
     <table id="side-table" class="display" cellspacing="0" width="100%">
         <thead>
         <tr>
+            <th>Test Date</th>
+            <th>Result</th>
             <th>Centre Type</th>
             <th>Postcode</th>
 

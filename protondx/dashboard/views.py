@@ -1,7 +1,7 @@
 from django.shortcuts import render
 from django.views.generic import TemplateView
 
-from .models import Patient, TestingCentre, DiagnosticTest
+from .models import Patient, DiagnosticTest
 from .forms import PostcodeForm
 from .queries import *
 

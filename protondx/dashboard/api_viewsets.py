@@ -8,8 +8,8 @@ from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 
 from rest_framework import views
 from rest_framework.response import Response
-from .api_serializers import PatientSerializer, TestingCentreSerializer, DiagnosticTestSerializer, PostcodeSerializer
-from .models import Patient, TestingCentre, DiagnosticTest
+from .api_serializers import PatientSerializer, DiagnosticTestSerializer, PostcodeSerializer
+from .models import Patient, DiagnosticTest
 from .queries import get_postcode_data
 
 
@@ -39,37 +39,11 @@ class PatientViewSet(viewsets.ModelViewSet):
     ordering = ('last_name', 'first_name')
 
 
-# This viewset and the associated serializer may not be needed. Here now for testing purposes
-class TestingCentreViewSet(viewsets.ModelViewSet):
-    queryset = TestingCentre.objects.all().order_by('centre_type')
-    serializer_class = TestingCentreSerializer
-    permission_classes = [permissions.IsAuthenticated]
-
-    # -------
-    #  Filters
-    # -------
-    #  Filters
-    # search_fields = ('comments', )
-    filter_fields = '__all__'
-    ordering_fields = '__all__'
-
-    #  Set backends
-    filter_backends = (DjangoFilterBackend,
-                       SearchFilter,
-                       OrderingFilter)
-
-    # Enable further filtering
-    # filter_class =
-
-    # Define default ordering
-    ordering = ('postcode',)
-
-
 class PostcodeFilter(FilterSet):
     class Meta:
         model = DiagnosticTest
         fields = {
-            'testing_centre__postcode': ['startswith'],
+            'postcode': ['startswith'],
             'date_test': ['date__lt'],
             'test_result': ['exact'],
         }
@@ -121,11 +95,11 @@ class GeoView(APIView):
     def get(self, request):
         result = serialize(
             "geojson",
-            TestingCentre.objects.all(),
+            DiagnosticTest.objects.all(),
             srid=4326,
             geometry_field="coordinates",
             fields=(
-                "postcode", "centre_type",
+                "postcode", "centre_type", "date_test", "test_result", "centre_type",
             ),
         )
 

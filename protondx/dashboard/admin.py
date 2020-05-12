@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.contrib.gis import forms
 
 # Register your models here.
-from .models import Patient, TestingCentre, DiagnosticTest
+from .models import Patient, DiagnosticTest
 
 
 class TestInLine(admin.TabularInline):
@@ -21,25 +21,18 @@ class PatientAdmin(admin.ModelAdmin):
     search_fields = ['first_name', 'last_name']
 
 
-class DiagnosticTestAdmin(admin.ModelAdmin):
-    list_display = ['patient', 'date_test', 'test_result']
-    fieldsets = [
-        ('Test Information', {'fields': ['patient', 'testing_centre', 'date_test', 'test_result']}),
-    ]
-
-
-class TestingCentreAdminForm(forms.ModelForm):
+class LocationAdminForm(forms.ModelForm):
     coordinates = forms.PointField(widget=forms.OSMWidget(attrs={
         'display_raw': False}))
 
 
-class CentreAdmin(admin.ModelAdmin):
-    inlines = [TestInLine]
-    list_display = ['centre_type', 'postcode']
-    search_fields = ['centre_type', 'postcode']
-    form = TestingCentreAdminForm
+class DiagnosticTestAdmin(admin.ModelAdmin):
+    list_display = ['patient', 'date_test', 'test_result', 'postcode']
+    fieldsets = [
+        ('Test Information', {'fields': ['patient', 'date_test', 'test_result', 'coordinates', 'postcode', 'centre_type']}),
+    ]
+    form = LocationAdminForm
 
 
 admin.site.register(Patient, PatientAdmin)
 admin.site.register(DiagnosticTest, DiagnosticTestAdmin)
-admin.site.register(TestingCentre, CentreAdmin)

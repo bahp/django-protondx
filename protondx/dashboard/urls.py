@@ -7,7 +7,6 @@ from . import api_viewsets
 router = routers.DefaultRouter()
 router.register('patients', api_viewsets.PatientViewSet)
 router.register('testing-centres', api_viewsets.TestingCentreViewSet)
-#router.register('diagnostic-tests', api_viewsets.DiagnosticTestViewSet)
 
 app_name = 'dashboard'
 urlpatterns = [

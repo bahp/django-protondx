@@ -28,9 +28,6 @@ class DiagnosticTestAdmin(admin.ModelAdmin):
     ]
 
 
-
-
-
 class TestingCentreAdminForm(forms.ModelForm):
     coordinates = forms.PointField(widget=forms.OSMWidget(attrs={
         'display_raw': False}))

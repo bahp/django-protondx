@@ -130,3 +130,30 @@ class GeoView(APIView):
         )
 
         return HttpResponse(result)
+
+
+    # POSSIBLE QUERY FOR TESTS
+    #
+    # def get(self, request):
+    #     geojson_data = DiagnosticTest.objects.raw('SELECT   diagnostic.id AS id,'
+    #                                               '         postcode,'
+    #                                               '         coordinates,'
+    #                                               '         centre_type,'
+    #                                               '         date_test,'
+    #                                               '         test_result'
+    #                                               ' FROM    dashboard_diagnostictest AS diagnostic'
+    #                                               '         JOIN    dashboard_testingcentre AS centre'
+    #                                               '         ON      diagnostic.testing_centre_id=centre.id'
+    #                                               )
+    #     print(geojson_data)
+    #     result = serialize(
+    #         "json",
+    #         geojson_data,
+    #         srid=4326,
+    #         geometry_field="coordinates",
+    #         fields=(
+    #             "postcode", "date_test", "test_result", "testing_centre__centre_type"
+    #         ),
+    #     )
+    #
+    #     return HttpResponse(result)

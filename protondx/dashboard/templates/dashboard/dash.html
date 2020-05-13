@@ -24,6 +24,7 @@
 
 
     <script>
+        let table;
         require([
             "esri/Map",
             "esri/views/MapView",
@@ -39,7 +40,6 @@
             "esri/widgets/Fullscreen",
             "esri/widgets/Search",
             "esri/widgets/BasemapGallery",
-            "esri/widgets/FeatureTable",
         ], function(Map,
                     MapView,
                     Extent,
@@ -53,8 +53,7 @@
                     Expand,
                     Fullscreen,
                     Search,
-                    BasemapGallery,
-                    FeatureTable,) {
+                    BasemapGallery,) {
 
             // //////////
             // DATA fetch
@@ -85,7 +84,8 @@
             // /////////////////
 
             function populateDataTable(data) {
-                $('#side-table').DataTable( {
+
+                table = $('#side-table').DataTable( {
                     data: data.features,
                     columns: [
                         {
@@ -133,7 +133,11 @@
 
                     ],
                     pageResize: true,
+                    rowId: 'properties.pk',
                 });
+
+
+
             };
 
 
@@ -195,7 +199,7 @@
 
                 // POPUP FOR DATA LAYER
                 const template = {
-                    title: "Test Information",
+                    title: "Test Information: {OBJECTID}",
                     content: "Test result: {test_result} <br> Test date: {date_test} <br> Centre type: {testing_centre__centre_type} <br> Postcode: {testing_centre__postcode}",
                     fieldInfos: [
                         {
@@ -365,76 +369,57 @@
                 map.add(geoJSONLayer);
 
 
-                // // side table
-                // const featureTable = new FeatureTable({
-                //     layer: geoJSONLayer,
-                //     container: "feature-node-right-top",
-                //     visibleElements: {
-                //         header: true,
-                //         menu: true,
-                //         menuItems: {
-                //             clearSelection: true,
-                //             refreshData: false,
-                //             toggleColumns: true,
-                //         },
-                //     },
-                // });
-                //
-                // const highlights = [];
-                // baseMap.whenLayerView(geoJSONLayer).then(function(layerView) {
-                //     featureTable.on("selection-change", function (changes) {
-                //         // If the selection is removed remove its highlighted feature from the layerView
-                //         changes.removed.forEach(function (item) {
-                //             const data = highlights.find(function (data) {
-                //                 return data.feature === item.feature;
-                //             });
-                //             if (data) {
-                //                 highlights.splice(highlights.indexOf(data), 1);
-                //                 data.highlight.remove();
-                //             }
-                //         });
-                //
-                //         // If the selection is added, push all added selections to array and highlight on layerView
-                //         changes.added.forEach(function (item) {
-                //             const feature = item.feature;
-                //             let highlight = layerView.highlight(item.feature);
-                //             highlights.push({
-                //                 feature: feature,
-                //                 highlight: highlight
-                //             });
-                //         });
-                //     });
-                //
-                //     const zoomBtn = document.getElementById("zoom");
-                //     zoomBtn.addEventListener("click", zoomToSelectedFeature);
-                //
-                //     // fires when "Zoom to selected feature" button is clicked
-                //     function zoomToSelectedFeature() {
-                //         // Create a query off of the feature layer
-                //         const query = geoJSONLayer.createQuery();
-                //         // Iterate through the highlights and grab the feature's objectID
-                //         const featureIds = highlights.map(function(result) {
-                //             return result.feature.getAttribute(geoJSONLayer.objectIdField);
-                //         });
-                //         // Set the query's objectId
-                //         query.objectIds = featureIds;
-                //         // Make sure to return the geometry to zoom to
-                //         query.returnGeometry = true;
-                //         // Call queryFeatures on the feature layer and zoom to the resulting features
-                //         geoJSONLayer.queryFeatures(query).then(function(results) {
-                //             results.features.zoom = 12;
-                //             baseMap.goTo(results.features).catch(function(error) {
-                //                 if (error.name != "AbortError") {
-                //                     console.error(error);
-                //                 }
-                //             });
-                //         });
-                //     }
-                // });
+                //////////////
+                // Highlight map on table select
+
+                let highlightSelect;
+                baseMap.whenLayerView(geoJSONLayer).then(function(layerView) {
+                    let queryLayer = geoJSONLayer.createQuery();
+
+                    $('#side-table tbody').on( 'click', 'tr', function () {
+                        $(this).addClass('selected').siblings().removeClass('selected');
+                        const id = table.row( this ).id();
+                        queryLayer.where = "pk='" + id + "'";
+                        geoJSONLayer.queryFeatures(queryLayer).then(function(result) {
+                            // if a feature is already highlighted, then remove the highlight
+                            if (highlightSelect) {
+                                highlightSelect.remove();
+                            }
+
+                            // the feature to be highlighted
+                            const feature = result.features[0];
+
+                            // use the objectID to highlight the feature
+                            highlightSelect = layerView.highlight(
+                                feature.attributes["OBJECTID"]
+                            );
+
+                            // center the feature
+                            baseMap
+                                .goTo(
+                                    {
+                                        target: feature.geometry,
+                                        zoom: 15
+                                    },
+                                    {
+                                        duration: 1000,
+                                        easing: "in-out-expo"
+                                    }
+                                )
+                                .catch(function(error) {
+                                    if (error.name != "AbortError") {
+                                        console.log(error);
+                                    }
+                                });
+                        });
+
+                    });
+                });
 
 
                 ///////
                 // add views and widgets
+                baseMap.ui.add("selectionPaneDiv", "bottom-left");
                 baseMap.ui.add(fullscreen, "bottom-right");
                 baseMap.ui.add(homeWidget, "top-left");
                 baseMap.ui.add(search, "top-right");
@@ -469,6 +454,23 @@
 <body>
 
 <div id="viewDiv"></div>
+<div id="selectionPaneDiv" class="esri-widget">
+    <p>Visualise COVID-19 spread using:</p>
+    <label>
+        <input type="radio" name="renderer" value="HEAT" checked />
+        Heatmap
+    </label> <br />
+
+    <label>
+        <input type="radio" name="renderer" value="DOTS" />
+        Dots
+    </label> <br />
+    <br />
+
+    <label>
+        <input type="checkbox" id="postcodeLayer" checked> Postcode Boundaries
+    </label>
+</div>
 
 <div id="feature-node-right-top" class="esri-widget">
     <!--    <button class="esri-button" id="zoom">Zoom to selected feature</button>-->
@@ -488,21 +490,7 @@
 <!--<div id="feature-node-right-mid" class="esri-widget"></div>-->
 
 <div id="feature-node-left-bottom" class="esri-widget">
-    <p>Visualise COVID-19 spread using:</p>
-    <label>
-        <input type="radio" name="renderer" value="HEAT" checked />
-        Heatmap
-    </label> <br />
 
-    <label>
-        <input type="radio" name="renderer" value="DOTS" />
-        Dots
-    </label> <br />
-    <br />
-
-    <label>
-        <input type="checkbox" id="postcodeLayer" checked> Postcode Boundaries
-    </label>
 
 </div>
 

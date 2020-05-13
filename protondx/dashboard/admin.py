@@ -42,7 +42,7 @@ class TestingCentreAdminForm(forms.ModelForm):
 # Testing Centre admin view
 class CentreAdmin(admin.ModelAdmin):
     inlines = [TestInLine]
-    list_display = ['centre_type', 'postcode']
+    list_display = ['centre_type', 'postcode', 'latitude', 'longitude']
     search_fields = ['centre_type', 'postcode']
     form = TestingCentreAdminForm
 

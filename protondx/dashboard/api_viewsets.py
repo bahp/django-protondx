@@ -128,7 +128,8 @@ class GeoView(APIView):
         data = DiagnosticTest.objects.all()
         response = serializers.serialize(data,
                                          geometry_field='testing_centre__coordinates',
-                                         fields=('date_test',
+                                         fields=('pk',
+                                                 'date_test',
                                                  'test_result',
                                                  'testing_centre__postcode',
                                                  'testing_centre__centre_type',

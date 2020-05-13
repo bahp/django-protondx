@@ -64,6 +64,16 @@ class TestingCentre(geomodels.Model):
     postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
     # postcode. If other countries are to be added the max_length must be revised
 
+    @property
+    def latitude(self):
+        if self.coordinates:
+            return self.coordinates.y
+
+    @property
+    def longitude(self):
+        if self.coordinates:
+            return self.coordinates.x
+
 
 # Diagnostic Test model (contains all information related to the test, i.e. date, result, patient, testing_centre...)
 class DiagnosticTest(models.Model):

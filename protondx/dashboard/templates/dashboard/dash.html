@@ -197,9 +197,10 @@
                     label: "Individual case",
                 };
 
+
                 // POPUP FOR DATA LAYER
                 const template = {
-                    title: "Test Information: {OBJECTID}",
+                    title: "Test Information:",
                     content: "Test result: {test_result} <br> Test date: {date_test} <br> Centre type: {testing_centre__centre_type} <br> Postcode: {testing_centre__postcode}",
                     fieldInfos: [
                         {
@@ -220,7 +221,10 @@
                     popupTemplate: template,
                     // featureReduction : {
                     //     type: "cluster",
-                    //     clusterRadius: 10
+                    //     clusterRadius: 10,
+                    //     popupTemplate: {
+                    //         content: "This cluster represents {cluster_count} diagnostic tests."
+                    //     }
                     // },
                 });
 
@@ -376,43 +380,52 @@
                 baseMap.whenLayerView(geoJSONLayer).then(function(layerView) {
                     let queryLayer = geoJSONLayer.createQuery();
 
+
                     $('#side-table tbody').on( 'click', 'tr', function () {
-                        $(this).addClass('selected').siblings().removeClass('selected');
-                        const id = table.row( this ).id();
-                        queryLayer.where = "pk='" + id + "'";
-                        geoJSONLayer.queryFeatures(queryLayer).then(function(result) {
-                            // if a feature is already highlighted, then remove the highlight
+                        if ( table.row(this).node().className.includes('selected')){
+                            $(this).removeClass('selected');
                             if (highlightSelect) {
                                 highlightSelect.remove();
                             }
+                        }
+                        else{
+                            $(this).addClass('selected').siblings().removeClass('selected');
+                            const id = table.row( this ).id();
 
-                            // the feature to be highlighted
-                            const feature = result.features[0];
+                            queryLayer.where = "pk='" + id + "'";
+                            geoJSONLayer.queryFeatures(queryLayer).then(function(result) {
+                                // if a feature is already highlighted, then remove the highlight
+                                if (highlightSelect) {
+                                    highlightSelect.remove();
+                                }
 
-                            // use the objectID to highlight the feature
-                            highlightSelect = layerView.highlight(
-                                feature.attributes["OBJECTID"]
-                            );
+                                // the feature to be highlighted
+                                const feature = result.features[0];
 
-                            // center the feature
-                            baseMap
-                                .goTo(
-                                    {
-                                        target: feature.geometry,
-                                        zoom: 15
-                                    },
-                                    {
-                                        duration: 1000,
-                                        easing: "in-out-expo"
-                                    }
-                                )
-                                .catch(function(error) {
-                                    if (error.name != "AbortError") {
-                                        console.log(error);
-                                    }
-                                });
-                        });
+                                // use the objectID to highlight the feature
+                                highlightSelect = layerView.highlight(
+                                    feature.attributes["OBJECTID"]
+                                );
 
+                                // center the feature
+                                baseMap
+                                    .goTo(
+                                        {
+                                            target: feature.geometry,
+                                            zoom: 15
+                                        },
+                                        {
+                                            duration: 1000,
+                                            easing: "in-out-expo"
+                                        }
+                                    )
+                                    .catch(function(error) {
+                                        if (error.name != "AbortError") {
+                                            console.log(error);
+                                        }
+                                    });
+                            });
+                        }
                     });
                 });
 

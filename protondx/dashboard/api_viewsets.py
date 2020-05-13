@@ -1,15 +1,27 @@
+# Django Http Response
+from django.http import HttpResponse
+
+# Django Rest Framework
 from rest_framework import viewsets
 from rest_framework import permissions, generics
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import OrderingFilter
+from rest_framework.views import APIView
 
 # Django filters
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
 
-from rest_framework import views
-from rest_framework.response import Response
-from .api_serializers import PatientSerializer, DiagnosticTestSerializer, PostcodeSerializer
-from .models import Patient, DiagnosticTest
+# Serializers
+from .api_serializers import TestingCentreSerializer
+from .api_serializers import PatientSerializer
+from .api_serializers import DiagnosticTestSerializer
+from .api_serializers import PostcodeSerializer
+from .api_serializers import CustomGeoJSONSerializer
+
+# Models
+from .models import Patient, TestingCentre, DiagnosticTest
+
+# Queries to get postcode specific information (i.e. number of tests, positive cases, ...)
 from .queries import get_postcode_data
 
 
@@ -19,50 +31,71 @@ class PatientViewSet(viewsets.ModelViewSet):
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    # -------
-    #  Filters
-    # -------
-    #  Filters
-    # search_fields = ('comments', )
+    # --------------------------
+    #  Filter fields and options
+    # --------------------------
+
+    #  Filters
     filter_fields = '__all__'
     ordering_fields = '__all__'
 
-    #  Set backends
+    #  Set backends
     filter_backends = (DjangoFilterBackend,
                        SearchFilter,
                        OrderingFilter)
-
-    # Enable further filtering
-    # filter_class =
 
     # Define default ordering
     ordering = ('last_name', 'first_name')
 
 
+# This viewset and the associated serializer may not be needed. Here now for testing purposes
+class TestingCentreViewSet(viewsets.ModelViewSet):
+    queryset = TestingCentre.objects.all().order_by('centre_type')
+    serializer_class = TestingCentreSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    # --------------------------
+    #  Filter fields and options
+    # --------------------------
+
+    #  Filters
+    filter_fields = '__all__'
+    ordering_fields = '__all__'
+
+    #  Set backends
+    filter_backends = (DjangoFilterBackend,
+                       SearchFilter,
+                       OrderingFilter)
+
+    # Define default ordering
+    ordering = ('postcode',)
+
+
+# Postcode filter rules
 class PostcodeFilter(FilterSet):
     class Meta:
         model = DiagnosticTest
         fields = {
-            'postcode': ['startswith'],
+            'testing_centre__postcode': ['startswith'],
             'date_test': ['date__lt'],
             'test_result': ['exact'],
         }
 
 
-class DiagnosticTestViewSet(generics.ListAPIView):
+# This viewset and the associated serializer may not be needed. Here now for testing purposes
+class DiagnosticTestView(generics.ListAPIView):
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = DiagnosticTestSerializer
     # permission_classes = [permissions.IsAuthenticated]
 
-    # -------
-    #  Filters
-    # -------
-    #  Filters
-    # search_fields = ('testing_centre__postcode',)
-    # filter_fields = ('testing_centre__postcode', 'test_result', 'date_test')
+    # --------------------------
+    #  Filter fields and options
+    # --------------------------
+
+    #  Filters
     ordering_fields = '__all__'
 
-    #  Set backends
+    #  Set backends
     filter_backends = (DjangoFilterBackend,
                        SearchFilter,
                        OrderingFilter)
@@ -74,6 +107,7 @@ class DiagnosticTestViewSet(generics.ListAPIView):
     ordering = ('date_test',)
 
 
+# Used to load data for one specific postcode specified as an argument in the URL
 class PostcodeData(generics.ListAPIView):
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = PostcodeSerializer
@@ -85,49 +119,20 @@ class PostcodeData(generics.ListAPIView):
         return response
 
 
-from django.http import HttpResponse
-from django.core.serializers import serialize
-from rest_framework.views import APIView
-
-
+# Used to load all testing data with associated coordinates and
+# information using a geoJSON format
 class GeoView(APIView):
 
     def get(self, request):
-        result = serialize(
-            "geojson",
-            DiagnosticTest.objects.all(),
-            srid=4326,
-            geometry_field="coordinates",
-            fields=(
-                "postcode", "centre_type", "date_test", "test_result", "centre_type",
-            ),
-        )
+        serializers = CustomGeoJSONSerializer()
+        data = DiagnosticTest.objects.all()
+        response = serializers.serialize(data,
+                                         geometry_field='testing_centre__coordinates',
+                                         fields=('date_test',
+                                                 'test_result',
+                                                 'testing_centre__postcode',
+                                                 'testing_centre_centre_type',
+                                                 )
+                                         )
 
-        return HttpResponse(result)
-
-
-    # POSSIBLE QUERY FOR TESTS
-    #
-    # def get(self, request):
-    #     geojson_data = DiagnosticTest.objects.raw('SELECT   diagnostic.id AS id,'
-    #                                               '         postcode,'
-    #                                               '         coordinates,'
-    #                                               '         centre_type,'
-    #                                               '         date_test,'
-    #                                               '         test_result'
-    #                                               ' FROM    dashboard_diagnostictest AS diagnostic'
-    #                                               '         JOIN    dashboard_testingcentre AS centre'
-    #                                               '         ON      diagnostic.testing_centre_id=centre.id'
-    #                                               )
-    #     print(geojson_data)
-    #     result = serialize(
-    #         "json",
-    #         geojson_data,
-    #         srid=4326,
-    #         geometry_field="coordinates",
-    #         fields=(
-    #             "postcode", "date_test", "test_result", "testing_centre__centre_type"
-    #         ),
-    #     )
-    #
-    #     return HttpResponse(result)
+        return HttpResponse(response)

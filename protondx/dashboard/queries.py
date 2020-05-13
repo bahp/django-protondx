@@ -1,4 +1,4 @@
-from .models import Patient, DiagnosticTest
+from .models import Patient, DiagnosticTest, TestingCentre
 
 
 # --------------
@@ -22,22 +22,22 @@ def get_individuals_tested():
 
 
 def get_postcode_total_experiments(postcode):
-    return DiagnosticTest.objects.filter(postcode__startswith=postcode).count()
+    return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode).count()
 
 
 def get_postcode_negative_experiments(postcode):
-    return DiagnosticTest.objects.filter(postcode__startswith=postcode, test_result=False).count()
+    return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode, test_result=False).count()
 
 
 def get_postcode_positive_experiments(postcode):
-    return DiagnosticTest.objects.filter(postcode__startswith=postcode, test_result=True).count()
+    return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode, test_result=True).count()
 
 
 def get_postcode_individuals_tested(postcode):
     return DiagnosticTest \
         .objects \
         .select_related('patient') \
-        .filter(postcode__startswith=postcode) \
+        .filter(testing_centre__postcode__startswith=postcode) \
         .values('patient_id') \
         .distinct() \
         .count()

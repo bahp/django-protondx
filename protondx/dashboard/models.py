@@ -1,10 +1,9 @@
 from django.db import models
 from django.contrib.gis.db import models as geomodels
 
-# Create your models here.
-from django.contrib.gis.geos import Point
 
-
+# Patient model (can contain any information related to the patient)
+# Patient has 0 or more tests
 class Patient(models.Model):
     """
     This class contains basic patient information.
@@ -16,7 +15,7 @@ class Patient(models.Model):
     FEMALE = 'F'
     MALE = 'M'
     OTHER = 'O'
-    PREFER_NOT_SAY = ''
+    PREFER_NOT_SAY = 'X'
 
     GENDER = [
         (FEMALE, 'Female'),
@@ -30,42 +29,22 @@ class Patient(models.Model):
     gender = models.CharField(max_length=1, null=True, choices=GENDER, verbose_name='Gender')
     dob = models.DateField(null=True, verbose_name='Date of birth')
     postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
-
     # postcode. If other countries are to be added the max_length must be revised
 
     def __str__(self):
         return self.last_name + ", " + self.first_name
 
 
-class DiagnosticTest(models.Model):
+# Testing Centre model (can contain any information related to the centre/area where a Diagnostic test may be held)
+# has 0 or more tests associated to it
+class TestingCentre(geomodels.Model):
     """
-    This class contains information for diagnostic tests
+    This class contains testing centre information
     """
 
     # -----------------------
     # Definitions
     # -----------------------
-
-    # Dates
-    # -----
-    date_test = models.DateTimeField(verbose_name='Test date')
-
-    # Foreign Keys
-    # ------------
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
-
-    # Parameters
-    #  ----------
-
-    POS = True
-    NEG = False
-
-    DIAGNOSIS = [
-        (POS, 'Positive'),
-        (NEG, 'Negative'),
-    ]
-    test_result = models.BooleanField(choices=DIAGNOSIS, verbose_name='Test result')
-
     HOSPITAL = 'HOSP'
     CLINIC = 'CLIN'
     DRIVE_THROUGH = 'DRIV'
@@ -81,9 +60,42 @@ class DiagnosticTest(models.Model):
     ]
 
     centre_type = models.CharField(max_length=4, choices=CENTRE_TYPE, verbose_name='Centre type')
-    coordinates = geomodels.PointField(verbose_name='Coordinates', null=True)
+    coordinates = geomodels.PointField(verbose_name='Coordinates')
     postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
     # postcode. If other countries are to be added the max_length must be revised
+
+
+# Diagnostic Test model (contains all information related to the test, i.e. date, result, patient, testing_centre...)
+class DiagnosticTest(models.Model):
+    """
+    This class contains information for diagnostic tests
+    """
+
+    # -----------------------
+    # Definitions
+    # -----------------------
+
+    # Dates
+    # -----
+    date_test = models.DateTimeField(verbose_name='Test date')
+
+    # Foreign Keys
+    # ------------
+    testing_centre = models.ForeignKey(TestingCentre, on_delete=models.CASCADE)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
+
+    # Parameters
+    #  ----------
+
+    POS = True
+    NEG = False
+
+    DIAGNOSIS = [
+        (POS, 'Positive'),
+        (NEG, 'Negative'),
+    ]
+
+    test_result = models.BooleanField(choices=DIAGNOSIS, verbose_name='Test result')
 
     def __str__(self):
         return self.patient.last_name + ", " + self.patient.first_name + ": " + str(self.date_test)

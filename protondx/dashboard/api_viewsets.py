@@ -131,7 +131,7 @@ class GeoView(APIView):
                                          fields=('date_test',
                                                  'test_result',
                                                  'testing_centre__postcode',
-                                                 'testing_centre_centre_type',
+                                                 'testing_centre__centre_type',
                                                  )
                                          )
 

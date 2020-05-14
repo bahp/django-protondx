@@ -99,16 +99,16 @@
                         },
                         {
                             data: "properties.test_result",
-                            render: function (data, type, row){
-                                switch(data) {
-                                    case true:
-                                        return "Positive";
-                                    case false:
-                                        return "Negative";
-                                    default:
-                                        return "n/a";
-                                }
-                            }
+                            // render: function (data, type, row){
+                            //     switch(data) {
+                            //         case "True":
+                            //             return "Positive";
+                            //         case "False":
+                            //             return "Negative";
+                            //         default:
+                            //             return "n/a";
+                            //     }
+                            // }
                         },
                         {
                             data: "properties.testing_centre__centre_type",
@@ -186,17 +186,45 @@
                     minPixelIntensity: 0,
                 };
 
-                // dot renderer
-                const dotRenderer = {
-                    type: "simple",
-                    symbol: {
+                var dotRenderer = {
+                    type: "unique-value",
+                    field: "test_result",
+                    defaultSymbol: {
                         type: "simple-marker",
-                        size: 6,
-                        color: "red",
+                        color: "orange",
+                        size: 8,
+                        outline:{
+                            style: "none",
+                        },
                     },
-                    label: "Individual case",
+                    defaultLabel: "n/a",
+                    uniqueValueInfos: [{
+                        value: "Positive",
+                        symbol: {
+                            type: "simple-marker",
+                            color: "rgba(255, 0, 0, 1)",
+                            size: 8,
+                            outline:{
+                                style: "none",
+                            },
+                        },
+                        label: "Positive"
+                    }, {
+                        value: "Negative",
+                        symbol: {
+                            type: "simple-marker",
+                            color: "rgba(0, 255, 0, 1)",
+                            size: 8,
+                            outline: {
+                                style: "none",
+                            },
+                        },
+                        label: "Negative",
+                    },],
+                    outline:{
+                        style: "none",
+                    },
                 };
-
 
                 // POPUP FOR DATA LAYER
                 const template = {
@@ -228,16 +256,50 @@
                     // },
                 });
 
+                /////////
+                // Select which dots to display
+                function updateRenderer(color, index) {
+                    let renderer = geoJSONLayer.renderer.clone();
+                    if (index === -1) {
+                        renderer.defaultSymbol.color = color;
+                    }
+                    else{
+                        renderer.uniqueValueInfos[index].symbol.color = color;
+                    }
+                    geoJSONLayer.renderer = renderer;
+                }
+
+                const PositiveToggle = document.getElementById("positiveDots");
+                const NegativeToggle = document.getElementById("negativeDots");
+                const OtherToggle = document.getElementById("otherDots");
+                PositiveToggle.addEventListener("change", function () {
+                    if (PositiveToggle.checked) updateRenderer("rgba(255, 0, 0, 1)", 0);
+                    else updateRenderer("rgba(255, 0, 0, 0)", 0);
+                });
+                NegativeToggle.addEventListener("change", function () {
+                    if (NegativeToggle.checked) updateRenderer("rgba(0, 255, 0, 1)", 1);
+                    else updateRenderer("rgba(0, 255, 0, 0)", 1);
+                });
+                OtherToggle.addEventListener("change", function () {
+                    if (OtherToggle.checked) updateRenderer("rgba(255, 165, 0, 1)", -1);
+                    else updateRenderer("rgba(255, 165, 0, 0)", -1);
+                });
+
                 //renderer selection w/ radio
                 let radios = document.getElementsByName("renderer");
+                let renderArray = [heatRenderer, dotRenderer];
                 for (let i = 0; i < radios.length; i++) {
                     radios[i].addEventListener("change", function (event) {
                         const fieldName = event.target.value;
                         if (fieldName === "HEAT") {
-                            geoJSONLayer.renderer = heatRenderer;
+                            renderArray[1] = geoJSONLayer.renderer.clone();
+                            $("#dotsCheckboxSettings").hide('slow');
+                            geoJSONLayer.renderer = renderArray[0];
                         }
                         if (fieldName === "DOTS") {
-                            geoJSONLayer.renderer = dotRenderer;
+                            renderArray[0] = geoJSONLayer.renderer.clone();
+                            $("#dotsCheckboxSettings").show('slow');
+                            geoJSONLayer.renderer = renderArray[1];
                         }
                     });
                 }
@@ -503,7 +565,19 @@
 <!--<div id="feature-node-right-mid" class="esri-widget"></div>-->
 
 <div id="feature-node-left-bottom" class="esri-widget">
-
+    <div id="dotsCheckboxSettings" style="display: none">
+        <label>
+            <input type="checkbox" id="positiveDots" checked>Show positive test results
+        </label>
+        <br>
+        <label>
+            <input type="checkbox" id="negativeDots" checked>Show negative tests results
+        </label>
+        <br>
+        <label>
+            <input type="checkbox" id="otherDots" checked>Show inconclusive tests
+        </label>
+    </div>
 
 </div>
 

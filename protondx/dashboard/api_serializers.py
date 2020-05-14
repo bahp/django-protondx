@@ -1,6 +1,7 @@
 #  Serializer imports
 from rest_framework import serializers
 from django.contrib.gis.serializers.geojson import Serializer as GeoJSONSerializer
+from django.utils.encoding import is_protected_type
 
 #  Models
 from .models import Patient, DiagnosticTest, TestingCentre
@@ -57,4 +58,17 @@ class CustomGeoJSONSerializer(GeoJSONSerializer):
 
                 except AttributeError:
                     pass
+
         super(CustomGeoJSONSerializer, self).end_object(obj)
+
+    def _value_from_field(self, obj, field):
+        value = field.value_from_object(obj)
+        # Protected types (i.e., primitives like None, numbers, dates,
+        # and Decimals) are passed through as is. All other values are
+        # converted to string first.
+        if str(field) == "dashboard.DiagnosticTest.test_result":
+            return obj.get_test_result_display()
+        elif is_protected_type(value):
+            return value
+        else:
+            return field.value_to_string(obj)

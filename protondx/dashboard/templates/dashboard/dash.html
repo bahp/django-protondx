@@ -24,6 +24,12 @@
 
 
     <script>
+        function isMobileDevice() {
+            return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+        }
+
+
+
         let table;
         require([
             "esri/Map",
@@ -535,10 +541,21 @@
                             view: baseMap,
                             content: new Legend({view: baseMap}),
                             group: "top-left",
-                            expanded: true
+                            expanded: !(isMobileDevice()),
                         }),
                     ],
                     "top-left"
+                );
+                baseMap.ui.add(
+                    [
+                        new Expand({
+                            view: baseMap,
+                            content: document.getElementById("selectionPaneDiv"),
+                            group: "bottom-left",
+                            expanded: !(isMobileDevice()),
+                        }),
+                    ],
+                    "bottom-left"
                 );
 
             };
@@ -577,7 +594,6 @@
             <th>Result</th>
             <th>Centre Type</th>
             <th>Postcode</th>
-
         </tr>
         </thead>
     </table>

@@ -55,11 +55,16 @@
                     Search,
                     BasemapGallery,) {
 
+
+            const HOST_NAME = "http://10.1.1.170:8000"
+            // const HOST_NAME = "http://localhost:8000"
+
+
             // //////////
             // DATA fetch
             // //////////
 
-            const urlGeoJSON = "http://localhost:8000/dashboard/api/get-points/"
+            const urlGeoJSON = HOST_NAME + "/dashboard/api/get-points/"
             const QuerySettings = {
                 url: urlGeoJSON,
                 method: "GET",
@@ -159,6 +164,26 @@
                     center: [-2.89479, 54.093409],
                     zoom: 5
                 });
+
+
+                baseMap
+                    .when(function() {
+                        // View successfully loaded, show viewDiv
+                        document.getElementById("viewDiv").style.display = "flex";
+                    })
+                    .catch(function(error) {
+                        if (error.name.includes("webgl")) {
+                            // View was rejected, show webgl unsupported message and turn off the viewDiv
+                            const divs = document.getElementsByTagName("div");
+                            for (let i = 0; i < divs.length; i++) {
+                                divs[i].style.display = 'none';
+                            }
+                            const webglDiv = document.getElementById("webglNotSupportedDiv");
+                            webglDiv.innerHTML = error.message;
+                            webglDiv.style.display = "flex";
+                            webglDiv.style.visibility = "visible";
+                        }
+                    });
 
 
                 /////////////
@@ -325,7 +350,7 @@
                 // postcode map and popup
                 function queryPopup(target) {
 
-                    const url = "http://localhost:8000/dashboard/api/get-postcode-data/?postcode="
+                    const url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
                         + encodeURIComponent((target.graphic.attributes.POSTCODE_1).trim())
 
                     // Should try and not use async: false
@@ -395,7 +420,7 @@
                 // Search widget
                 const search = new Search({
                     view: baseMap,
-                    locationEnabled: true,
+                    locationEnabled: false,
                 });
 
 
@@ -515,6 +540,7 @@
                     ],
                     "top-left"
                 );
+
             };
         });
 
@@ -598,6 +624,10 @@
         </tbody>
     </table>
 </div>
+
+
+<div id="webglNotSupportedDiv"></div>
+
 
 </body>
 </html>

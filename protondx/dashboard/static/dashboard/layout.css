@@ -107,6 +107,12 @@ html, body {
     /*border:1px solid black;*/
 }
 
+#webglNotSupportedDiv {
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+}
+
 #feature-node-right-top {
     float: left;
     width: 35%;

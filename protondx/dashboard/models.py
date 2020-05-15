@@ -45,11 +45,11 @@ class TestingCentre(geomodels.Model):
     # -----------------------
     # Definitions
     # -----------------------
-    HOSPITAL = 'HOSP'
-    CLINIC = 'CLIN'
-    DRIVE_THROUGH = 'DRIV'
-    HOME_TEST_SITE = 'HOME'
-    OTHER_TEST_SITE = 'OTHR'
+    HOSPITAL = 'Hospital'
+    CLINIC = 'GP clinic'
+    DRIVE_THROUGH = 'Drive through centre'
+    HOME_TEST_SITE = 'Home'
+    OTHER_TEST_SITE = 'Other'
 
     CENTRE_TYPE = [
         (HOSPITAL, 'Hospital'),
@@ -59,7 +59,7 @@ class TestingCentre(geomodels.Model):
         (OTHER_TEST_SITE, 'Other'),
     ]
 
-    centre_type = models.CharField(max_length=4, choices=CENTRE_TYPE, verbose_name='Centre type')
+    centre_type = models.CharField(max_length=20, choices=CENTRE_TYPE, verbose_name='Centre type')
     coordinates = geomodels.PointField(verbose_name='Coordinates')
     postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
     # postcode. If other countries are to be added the max_length must be revised

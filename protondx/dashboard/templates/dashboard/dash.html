@@ -112,22 +112,22 @@
                         },
                         {
                             data: "properties.testing_centre__centre_type",
-                            render: function (data, type, row){
-                                switch(data) {
-                                    case "HOSP":
-                                        return "Hospital";
-                                    case "CLIN":
-                                        return "GP Clinic";
-                                    case "DRIV":
-                                        return "Drive through";
-                                    case "HOME":
-                                        return "Home test";
-                                    case "OTHR":
-                                        return "Other";
-                                    default:
-                                        return "n/a";
-                                }
-                            }
+                            // render: function (data, type, row){
+                            //     switch(data) {
+                            //         case "HOSP":
+                            //             return "Hospital";
+                            //         case "CLIN":
+                            //             return "GP Clinic";
+                            //         case "DRIV":
+                            //             return "Drive through";
+                            //         case "HOME":
+                            //             return "Home test";
+                            //         case "OTHR":
+                            //             return "Other";
+                            //         default:
+                            //             return "n/a";
+                            //     }
+                            // }
                         },
                         { data: "properties.testing_centre__postcode" },
 
@@ -230,14 +230,6 @@
                 const template = {
                     title: "Test Information:",
                     content: "Test result: {test_result} <br> Test date: {date_test} <br> Centre type: {testing_centre__centre_type} <br> Postcode: {testing_centre__postcode}",
-                    fieldInfos: [
-                        {
-                            fieldName: "date_test",
-                            format: {
-                                dateFormat: "short-date"
-                            }
-                        }
-                    ]
                 };
 
                 // create data layer
@@ -245,7 +237,7 @@
                     url: geoJSONLayerURL,
                     copyright: "Add copyright for COVID data if needed",
                     renderer: heatRenderer,
-                    title: "COVID-19 spread",
+                    title: "COVID-19 testing",
                     popupTemplate: template,
                     // featureReduction : {
                     //     type: "cluster",
@@ -255,6 +247,14 @@
                     //     }
                     // },
                 });
+
+                geoJSONLayer.popup = {
+                    dockEnabled: true,
+                    dockOptions: {
+                        buttonEnabled: false,
+                        breakpoint: false
+                    },
+                };
 
                 /////////
                 // Select which dots to display
@@ -304,7 +304,6 @@
                     });
                 }
 
-
                 // ////////////
                 // Postcode Map
 
@@ -329,39 +328,30 @@
                     const url = "http://localhost:8000/dashboard/api/get-postcode-data/?postcode="
                         + encodeURIComponent((target.graphic.attributes.POSTCODE_1).trim())
 
-                    //////
-                    // WORKING BUT...
-                    // DO NOT USE ASYNC: FALSE
-                    // CHANGE TO PROPER AJAX GOOD PRACTICE
-                    //////
-                    let popupQuerySettings = {
-                        "url": url,
-                        "async": false,
-                        "method": "GET",
-                        "timeout": 0,
+                    // Should try and not use async: false
+                    let tmp;
+                    const QuerySettings = {
+                        url: url,
+                        method: "GET",
+                        async: false,
+                        success: function (data) {
+                            tmp = ("<table> <tbody>" +
+                                "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" + (data.summary.total) + "</td> </tr>" +
+                                "<tr> <td>Positive:</td> <td>" + (data.summary.positive) + "</td> </tr>" +
+                                "<tr> <td>Negative:</td> <td>" + (data.summary.negative) + "</td> </tr>" +
+                                "<tr> <td>Patients:</td> <td>" + (data.summary.patients) + "</td> </tr>" +
+                                "</tbody> </table>");
+                        },
+                        error: function (e) {
+                            console.log("There was an error with your request...");
+                            console.log("error: " + JSON.stringify(e));
+                        }
                     };
 
-                    let postcodeData;
-                    $.ajax(popupQuerySettings).done(function (response) {
-                        console.log(response)
-                        postcodeData = response.summary;
-                    });
+                    $.ajax(QuerySettings);
 
+                    return tmp;
 
-                    ///////
-                    // Change postcodeData.count to postcodeData.total
-                    // and  " + 0 + " to postcodeData.positive, ...
-                    // once the backend has been implemented
-                    ///////
-
-                    return (
-                        "<table> <tbody>" +
-                        "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" + (postcodeData.total) + "</td> </tr>" +
-                        "<tr> <td>Positive:</td> <td>" + (postcodeData.positive) + "</td> </tr>" +
-                        "<tr> <td>Negative:</td> <td>" + (postcodeData.negative) + "</td> </tr>" +
-                        "<tr> <td>Patients:</td> <td>" + (postcodeData.patients) + "</td> </tr>" +
-                        "</tbody> </table>"
-                    );
                 }
 
                 // postcode popup
@@ -373,7 +363,7 @@
                 // postcode layer
                 let postcodes = new FeatureLayer({
                     url: "https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer",
-                    outFields: ["POSTCODE_1", "NAME_1",], // "OBJECTID"],
+                    outFields: ["POSTCODE_1", "NAME_1",],
                     popupTemplate: popupPostcode,
                     renderer: lineRenderer,
                     title: "Map features",
@@ -442,14 +432,16 @@
                 baseMap.whenLayerView(geoJSONLayer).then(function(layerView) {
                     let queryLayer = geoJSONLayer.createQuery();
 
-
                     $('#side-table tbody').on( 'click', 'tr', function () {
+
+                        // remove selection if clicking on a selected row
                         if ( table.row(this).node().className.includes('selected')){
                             $(this).removeClass('selected');
                             if (highlightSelect) {
                                 highlightSelect.remove();
                             }
                         }
+                        // remove old selection and add selection on new row
                         else{
                             $(this).addClass('selected').siblings().removeClass('selected');
                             const id = table.row( this ).id();
@@ -468,6 +460,9 @@
                                 highlightSelect = layerView.highlight(
                                     feature.attributes["OBJECTID"]
                                 );
+                                // baseMap.popup.selectedFeatureIndex = feature.attributes["OBJECTID"];
+                                // baseMap.popup.open(template);
+
 
                                 // center the feature
                                 baseMap

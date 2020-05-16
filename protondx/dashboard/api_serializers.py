@@ -35,7 +35,7 @@ class PostcodeSerializer(serializers.ModelSerializer):
         fields = ''
 
 
-# Serializer for all testing data and associated coordinates
+# Serializer for all diagnostic test data and associated coordinates
 class CustomGeoJSONSerializer(GeoJSONSerializer):
 
     def end_object(self, obj):

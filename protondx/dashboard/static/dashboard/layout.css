@@ -77,15 +77,14 @@
     for the dashboard divs
     ____________________
     |            |     |
-    |       1    |  2  |
-    |            |     |
-    |____________|_____|
-    |_______3____|__4__|
+    |            |  2  |
+    |      1     |     |
+    |            |_____|
+    |____________|__3__|
 
     1. viewDiv
     2. feature-node-right-side
-    3. feature-node-left-bottom
-    4. feature-node-right-bottom
+    3. feature-node-right-bottom
 
     Divs must be added to HTML body in the above order
 
@@ -96,15 +95,14 @@ html, body {
     margin: 0;
     height: 100%;
     width: 100%;
+    background-color: black;
 }
 
 #viewDiv {
     float: left;
-    padding: 0;
     margin: 0;
-    height: 80%;
+    height: 100%;
     width: 65%;
-    /*border:1px solid black;*/
 }
 
 #webglNotSupportedDiv {
@@ -118,7 +116,9 @@ html, body {
     width: 35%;
     height: 80%;
     padding: 1em;
-    border:3px solid black;
+    border: 1vw solid black;
+    border-bottom: 0.5vw solid black;
+    border-radius: 2vw;
 }
 
 #feature-node-right-bottom {
@@ -126,16 +126,11 @@ html, body {
     width: 35%;
     height: 20%;
     padding: 1em;
-    border:3px solid black;
+    border: 1vw solid black;
+    border-top: 0.5vw solid black;
+    border-radius: 2vw;
 }
 
-#feature-node-left-bottom {
-    float: left;
-    width: 65%;
-    height: 20%;
-    padding: 1em;
-    border:3px solid black;
-}
 
 #selectionPaneDiv {
     border-radius: 10px;

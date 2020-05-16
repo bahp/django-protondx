@@ -452,6 +452,10 @@
                     postcodes.queryFeatures(query)
                         .then(function(feature) {
 
+                            // filter by postcode in datatables
+                            // comment out if feature not needed
+                            table.search(feature.features[0].attributes.POSTCODE_1).draw();
+
                             // open popup of query result
                             baseMap.popup.open({
                                 features: feature.features

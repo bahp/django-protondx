@@ -40,6 +40,7 @@
             "esri/renderers/DotDensityRenderer",
             "esri/renderers/SimpleRenderer",
             "esri/Graphic",
+            "esri/geometry/support/webMercatorUtils",
             "esri/widgets/Home",
             "esri/widgets/Legend",
             "esri/widgets/Expand",
@@ -54,6 +55,7 @@
                     DotDensityRenderer,
                     SimpleRenderer,
                     Graphic,
+                    webMercatorUtils,
                     Home,
                     Legend,
                     Expand,
@@ -427,6 +429,34 @@
                 const search = new Search({
                     view: baseMap,
                     locationEnabled: false,
+                });
+
+
+                // Display postcode popup on search
+                search.on("select-result", function(event){
+                    // get coordinates of searched address
+                    const coordinates = webMercatorUtils.xyToLngLat(event.result.feature.geometry.x, event.result.feature.geometry.y);
+
+                    // make apoint out of them
+                    let point = {
+                        type: "point",
+                        x: coordinates[0],
+                        y: coordinates[1]
+                    };
+
+
+                    // query the postcode layer to see which poscodes intersect with the point
+                    let query = postcodes.createQuery();
+                    query.geometry = point;
+                    query.spatialRelationship = "intersects";
+                    postcodes.queryFeatures(query)
+                        .then(function(feature) {
+
+                            // open popup of query result
+                            baseMap.popup.open({
+                                features: feature.features
+                            });
+                        });
                 });
 
 

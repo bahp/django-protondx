@@ -64,8 +64,8 @@
                     BasemapGallery,) {
 
 
-            const HOST_NAME = "http://10.1.1.170:8000"
-            // const HOST_NAME = "http://localhost:8000"
+            // const HOST_NAME = "http://192.168.0.37:8000"
+            const HOST_NAME = "http://localhost:8000"
 
 
             // //////////
@@ -461,6 +461,11 @@
                                 features: feature.features
                             });
                         });
+                });
+
+                // clear datatables search when map search is cleared
+                search.on("search-clear", function(event){
+                    table.search('').draw();
                 });
 
 

@@ -1,7 +1,9 @@
 from django.db import models
+from django.contrib.gis.db import models as geomodels
 
 
-# Create your models here.
+# Patient model (can contain any information related to the patient)
+# Patient has 0 or more tests
 class Patient(models.Model):
     """
     This class contains basic patient information.
@@ -13,7 +15,7 @@ class Patient(models.Model):
     FEMALE = 'F'
     MALE = 'M'
     OTHER = 'O'
-    PREFER_NOT_SAY = ''
+    PREFER_NOT_SAY = 'X'
 
     GENDER = [
         (FEMALE, 'Female'),
@@ -27,14 +29,15 @@ class Patient(models.Model):
     gender = models.CharField(max_length=1, null=True, choices=GENDER, verbose_name='Gender')
     dob = models.DateField(null=True, verbose_name='Date of birth')
     postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
-
     # postcode. If other countries are to be added the max_length must be revised
 
     def __str__(self):
         return self.last_name + ", " + self.first_name
 
 
-class TestingCentre(models.Model):
+# Testing Centre model (can contain any information related to the centre/area where a Diagnostic test may be held)
+# has 0 or more tests associated to it
+class TestingCentre(geomodels.Model):
     """
     This class contains testing centre information
     """
@@ -42,11 +45,11 @@ class TestingCentre(models.Model):
     # -----------------------
     # Definitions
     # -----------------------
-    HOSPITAL = 'HOSP'
-    CLINIC = 'CLIN'
-    DRIVE_THROUGH = 'DRIV'
-    HOME_TEST_SITE = 'HOME'
-    OTHER_TEST_SITE = 'OTHR'
+    HOSPITAL = 'Hospital'
+    CLINIC = 'GP clinic'
+    DRIVE_THROUGH = 'Drive through centre'
+    HOME_TEST_SITE = 'Home'
+    OTHER_TEST_SITE = 'Other'
 
     CENTRE_TYPE = [
         (HOSPITAL, 'Hospital'),
@@ -56,13 +59,23 @@ class TestingCentre(models.Model):
         (OTHER_TEST_SITE, 'Other'),
     ]
 
-    centre_type = models.CharField(max_length=4, choices=CENTRE_TYPE, verbose_name='Centre type')
-    lon = models.FloatField(verbose_name='Longitude')
-    lat = models.FloatField(verbose_name='Latitude')
+    centre_type = models.CharField(max_length=20, choices=CENTRE_TYPE, verbose_name='Centre type')
+    coordinates = geomodels.PointField(verbose_name='Coordinates')
     postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
     # postcode. If other countries are to be added the max_length must be revised
 
+    @property
+    def latitude(self):
+        if self.coordinates:
+            return self.coordinates.y
 
+    @property
+    def longitude(self):
+        if self.coordinates:
+            return self.coordinates.x
+
+
+# Diagnostic Test model (contains all information related to the test, i.e. date, result, patient, testing_centre...)
 class DiagnosticTest(models.Model):
     """
     This class contains information for diagnostic tests
@@ -82,7 +95,7 @@ class DiagnosticTest(models.Model):
     patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
 
     # Parameters
-    #  ----------
+    #  ----------
 
     POS = True
     NEG = False
@@ -91,6 +104,7 @@ class DiagnosticTest(models.Model):
         (POS, 'Positive'),
         (NEG, 'Negative'),
     ]
+
     test_result = models.BooleanField(choices=DIAGNOSIS, verbose_name='Test result')
 
     def __str__(self):

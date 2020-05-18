@@ -41,6 +41,23 @@ Then, lets create a virtual environment for our project (e.g. virtualenv)
 Then, go to the corresponding folder and install the requirements
 
     $ pip install -r requirements.txt   # Install requirements
+    
+  
+
+##### Spatial database Linux (Ubuntu) install guide:
+Install Spatialite
+
+    $ sudo apt install libsqlite3-mod-spatialite 
+
+Install geospatial libraries
+
+    $ sudo apt install binutils libproj-dev gdal-bin
+
+If getting issues when migrating clear dashboard/migrations directory and then
+
+    $ python manage.py flush
+    $ python manage.py makemigrations
+    $ python manage.py migrate
 
 
 ## Usage

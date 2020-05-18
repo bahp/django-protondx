@@ -125,10 +125,21 @@ html, body {
     float: left;
     width: 35%;
     height: 20%;
-    padding: 1em;
     border: 1vw solid black;
     border-top: 0.5vw solid black;
     border-radius: 2vw;
+}
+
+#general-information-heading{
+    width: 100%;
+    float: top;
+}
+
+
+#general-information{
+    width: 100%;
+    float: top;
+    padding-bottom: 1em;
 }
 
 

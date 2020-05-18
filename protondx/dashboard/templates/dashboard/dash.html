@@ -24,13 +24,15 @@
 
 
     <script>
+
+        const HOST_NAME = "http://localhost:8000"
+
         function isMobileDevice() {
             return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
         }
 
-
-
         let table;
+
         require([
             "esri/Map",
             "esri/views/MapView",
@@ -62,10 +64,6 @@
                     Fullscreen,
                     Search,
                     BasemapGallery,) {
-
-
-            // const HOST_NAME = "http://192.168.0.37:8000"
-            const HOST_NAME = "http://localhost:8000"
 
 
             // //////////
@@ -215,7 +213,7 @@
                         {color: "#ff2200", ratio: 0.913},
                         {color: "#ff0000", ratio: 1}
                     ],
-                    maxPixelIntensity: 25,
+                    maxPixelIntensity: 1000,
                     minPixelIntensity: 0,
                 };
 
@@ -606,6 +604,7 @@
 <body>
 
 <div id="viewDiv"></div>
+
 <div id="selectionPaneDiv" class="esri-widget">
     <p>Visualise COVID-19 spread using:</p>
     <label>
@@ -643,7 +642,6 @@
 </div>
 
 <div id="feature-node-right-top" class="esri-widget">
-    <!--    <button class="esri-button" id="zoom">Zoom to selected feature</button>-->
     <table id="side-table" class="display" cellspacing="0" width="100%">
         <thead>
         <tr>
@@ -657,26 +655,33 @@
 </div>
 
 <div id="feature-node-right-bottom" class="esri-widget">
-    <table>
-        <tbody>
-        <tr>
-            <td>Total tests (UK):</td>
-            <td>{{ count_total_exp }}</td>
-        </tr>
-        <tr>
-            <td>Total positive (UK):</td>
-            <td>{{ count_pos_exp }}</td>
-        </tr>
-        <tr>
-            <td>Total negative (UK):</td>
-            <td>{{ count_neg_exp }}</td>
-        </tr>
-        <tr>
-            <td>Total patients tested (UK):</td>
-            <td>{{ count_indiv_patients }}</td>
-        </tr>
-        </tbody>
-    </table>
+    <div id="general-information-heading">
+        <h3 style="margin-top: 0">United Kingdom testing data</h3>
+    </div>
+
+    <div id="general-information">
+        <table>
+            <tbody>
+            <tr>
+                <td>Diagnostic tests:</td>
+                <td>{{ count_total_exp }}</td>
+            </tr>
+            <tr>
+                <td>Total positive:</td>
+                <td>{{ count_pos_exp }}</td>
+            </tr>
+            <tr>
+                <td>Total negative:</td>
+                <td>{{ count_neg_exp }}</td>
+            </tr>
+            <tr>
+                <td>Total patients tested:</td>
+                <td>{{ count_indiv_patients }}</td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
 </div>
 
 

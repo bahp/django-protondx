@@ -59,8 +59,8 @@ class TestingCentreViewSet(viewsets.ModelViewSet):
     # --------------------------
 
     #  Filters
-    filter_fields = '__all__'
-    ordering_fields = '__all__'
+    filter_fields = ['centre_type', 'postcode']
+    ordering_fields = ['centre_type', 'postcode']
 
     #  Set backends
     filter_backends = (DjangoFilterBackend,

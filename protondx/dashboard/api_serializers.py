@@ -25,7 +25,7 @@ class DiagnosticTestSerializer(serializers.ModelSerializer):
 class TestingCentreSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestingCentre
-        fields = '__all__'
+        fields = ['centre_type', 'postcode']
 
 
 # Serializer for Postcode Popup

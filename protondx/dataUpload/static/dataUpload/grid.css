@@ -16,6 +16,7 @@ html, body, .grid-container {
     border: 2px solid #ccc;
     border-radius: 20px;
     padding: 20px;
+    overflow: auto;
 }
 
 .upload-panel {

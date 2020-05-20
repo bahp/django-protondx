@@ -37,52 +37,81 @@ function handleDrop(e) {
 
 function handleFiles(fileList) {
     for (const file of fileList) {
-        const name = file.name ? file.name : 'NOT SUPPORTED';
-        const type = file.type ? file.type : 'NOT SUPPORTED';
-        const size = file.size ? file.size : 'NOT SUPPORTED';
-        console.log({name, type, size});
         readFile(file);
     }
 }
 
+// switch tabs when button is pressed
+function openTab(evt, fileName) {
+    let i, tabcontent, tablinks;
+    tabcontent = document.getElementsByClassName("tabcontent");
+    for (i = 0; i < tabcontent.length; i++) {
+        tabcontent[i].style.display = "none";
+    }
 
+    tablinks = document.getElementsByClassName("tablinks");
+    for (i = 0; i < tablinks.length; i++) {
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+    }
+    document.getElementById(fileName + '-tab').style.display = "block";
+    document.getElementById(fileName + '-button').classList.add('active');
+}
 let uploadList = document.getElementById('upload-list');
 let viewPanel = document.getElementById('view-panel');
 
 function readFile(file) {
-    const reader = new FileReader();
+
+    // create a new Div which contains a button/loading bar and file name
     let newDiv = document.createElement('div');
-    uploadList.appendChild( newDiv );
     let newBar = document.createElement('button');
-    let content = document.createTextNode(file.name)
+    let file_name = file.name;
+    let content = document.createTextNode(file_name);
+    newBar.classList.add('tablinks');
+    newBar.id = file_name + '-button';
     newBar.appendChild(content);
     newDiv.appendChild(newBar);
+    uploadList.appendChild( newDiv );
 
-
-    newBar.addEventListener('click', function () {
-        let content = document.createTextNode(file.name);
-        viewPanel.appendChild(content);
-    });
-
+    // Open the file, exception if not .zip
+    // Create a new tab linked to button in list
+    // to display any relevant content
+    const reader = new FileReader();
     reader.addEventListener('load', (event) => {
+        newBar.addEventListener('click', function () {
+            openTab(event, file.name);
+        });
+
         const result = event.target.result;
-        viewPanel.appendChild( document.createTextNode(result.toString()));
         JSZipUtils.getBinaryContent(result, function(err, data) {
             if(err) {
                 throw err; // or handle err
             }
 
             JSZip.loadAsync(data).then(function (contents) {
+                let newTab = document.createElement('div');
+                newTab.classList.add('tabcontent');
+                newTab.id = file.name + '-tab';
+
+                let list = document.createElement('ul');
                 Object.keys(contents.files).forEach(function(filename) {
-                    console.log(filename)
+                    let item = document.createElement('li');
+                    item.appendChild(document.createTextNode(filename));
+                    list.appendChild(item);
                 });
+                newTab.appendChild(list);
+
+                // ADD things to the TAB HERE
+
+                // ...
+
+
+                newTab.style.display = "none";
+                viewPanel.appendChild(newTab);
             });
         });
-        // Do something with result
-
     });
 
-
+    // used to update progress bar inside buttons
     reader.addEventListener('progress', (event) => {
         if (event.loaded && event.total) {
             const percent = (event.loaded / event.total) * 100;

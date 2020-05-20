@@ -6,12 +6,22 @@
     border: none;
     white-space: nowrap;
     overflow-x: visible;
+    outline: none;
+
 }
 
 .upload-list button:hover {
     background-color: #5b5b5b;
     border: none;
 }
+
+.upload-list button.active {
+    background-color: #5b5b5b;
+    border: none;
+}
+
+
+
 
 .upload-list div {
     padding: 0px;
@@ -24,3 +34,4 @@
     display: flex;
     align-items: center;
 }
+

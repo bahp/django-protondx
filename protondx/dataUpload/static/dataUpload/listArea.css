@@ -15,6 +15,12 @@
     border: none;
 }
 
+.upload-list button:disabled {
+    background-color: orangered;
+    border: none;
+    color: black;
+}
+
 .upload-list button.active {
     background-color: #5b5b5b;
     border: none;

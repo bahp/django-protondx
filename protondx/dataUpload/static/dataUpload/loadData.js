@@ -107,6 +107,8 @@ function readFile(file) {
 
                 newTab.style.display = "none";
                 viewPanel.appendChild(newTab);
+            }).catch(function (e) {
+                newBar.disabled = true;
             });
         });
     });

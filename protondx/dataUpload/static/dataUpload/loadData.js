@@ -59,25 +59,50 @@ function openTab(evt, fileName) {
 let uploadList = document.getElementById('upload-list');
 let viewPanel = document.getElementById('view-panel');
 
-function displayJSON(obj) {
-    let out = "<ul>";
-    let i;
+// function displayJSON(obj) {
+//     let out = "<ul>";
+//     let i;
+//
+//     for (let key in obj) {
+//         if (obj.hasOwnProperty(key)) {
+//             if(typeof(obj[key]) === "string"){
+//                 out += '<li>' +
+//                     key + ": " + obj[key] + '</li><br>';
+//             }
+//             else {
+//                 out += '<li>' +
+//                     key + ": " + '</li><br>' + displayJSON(obj[key]);
+//             }
+//
+//         }
+//     }
+//     return out + "</ul>";
+// }
+
+function displayJSON(obj, form) {
+    let out = "";
+    let end = "";
+    if (form){
+        out = "<form>";
+        end = "</form>";
+    }
 
     for (let key in obj) {
         if (obj.hasOwnProperty(key)) {
-            // if(obj[key] === "string"){
-                out += '<li>' +
-                    key + ": " + obj[key] + '</li><br>';
-            //     console.log(key + " -> " + obj[key]);
-            // }
-            // else {
-            //     out += '<li>' +
-            //         key + ": " + '</li><br>' + displayJSON(obj[key]);
-            // }
+            if(typeof(obj[key]) === "string"){
+                out += '<label for="' +
+                    key + '">' + key + ': </label><br>' +
+                    '<input type="text" id="' + key + '" name="' +
+                    key + '" value="' + obj[key] + '"><br><br>'
+            }
+            else {
+                out += '<fieldset><legend>' + key + '</legend>' +
+                    displayJSON(obj[key], false) + '</fieldset>'
+            }
 
         }
     }
-    return out + "</ul>";
+    return out + end;
 }
 
 
@@ -123,13 +148,17 @@ function readFile(file) {
 
                     if (filename.endsWith('.json')){
                         zip.file(filename).async("string").then(function (data) {
-                            console.log(data);
-                            let jsonobj =JSON.parse(data);
-                            console.log(jsonobj);
-
+                            newTab.appendChild(document.createElement('hr'))
+                            let jsonobj = JSON.parse(data);
                             let newDiv = document.createElement('div');
-                            newDiv.innerHTML = displayJSON(jsonobj);
+                            newDiv.innerHTML = displayJSON(jsonobj, true);
                             newTab.appendChild(newDiv);
+                            // ADD things to the TAB/JSON file HERE
+
+                            // ...
+
+
+
                         });
                     }
 

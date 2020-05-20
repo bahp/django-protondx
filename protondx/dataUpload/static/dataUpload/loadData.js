@@ -59,6 +59,28 @@ function openTab(evt, fileName) {
 let uploadList = document.getElementById('upload-list');
 let viewPanel = document.getElementById('view-panel');
 
+function displayJSON(obj) {
+    let out = "<ul>";
+    let i;
+
+    for (let key in obj) {
+        if (obj.hasOwnProperty(key)) {
+            // if(obj[key] === "string"){
+                out += '<li>' +
+                    key + ": " + obj[key] + '</li><br>';
+            //     console.log(key + " -> " + obj[key]);
+            // }
+            // else {
+            //     out += '<li>' +
+            //         key + ": " + '</li><br>' + displayJSON(obj[key]);
+            // }
+
+        }
+    }
+    return out + "</ul>";
+}
+
+
 function readFile(file) {
 
     // create a new Div which contains a button/loading bar and file name
@@ -87,7 +109,8 @@ function readFile(file) {
                 throw err; // or handle err
             }
 
-            JSZip.loadAsync(data).then(function (contents) {
+            let zip = new JSZip();
+            zip.loadAsync(data).then(function (contents) {
                 let newTab = document.createElement('div');
                 newTab.classList.add('tabcontent');
                 newTab.id = file.name + '-tab';
@@ -97,6 +120,19 @@ function readFile(file) {
                     let item = document.createElement('li');
                     item.appendChild(document.createTextNode(filename));
                     list.appendChild(item);
+
+                    if (filename.endsWith('.json')){
+                        zip.file(filename).async("string").then(function (data) {
+                            console.log(data);
+                            let jsonobj =JSON.parse(data);
+                            console.log(jsonobj);
+
+                            let newDiv = document.createElement('div');
+                            newDiv.innerHTML = displayJSON(jsonobj);
+                            newTab.appendChild(newDiv);
+                        });
+                    }
+
                 });
                 newTab.appendChild(list);
 
@@ -108,6 +144,8 @@ function readFile(file) {
                 newTab.style.display = "none";
                 viewPanel.appendChild(newTab);
             }).catch(function (e) {
+                console.log(e);
+                alert("Please upload a file with a .zip extension");
                 newBar.disabled = true;
             });
         });

@@ -129,6 +129,7 @@ html, body {
     border-top: 0.5vw solid rgb(0,59,115);
     border-radius: 2vw;
     padding: 1em;
+    color: rgb(0,59,115);
 }
 
 #general-information-heading{

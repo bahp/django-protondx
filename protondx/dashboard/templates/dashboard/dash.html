@@ -404,8 +404,17 @@
                     chart.data.datasets[0].data = dataValues;
                     chart.update();
                 }
+
+
+                const selection_name = document.getElementById("selection-name");
+                const selection_stats = document.getElementById("selection-stats");
                 // postcode map and popup
                 function queryPopup(target) {
+                    //set overview name
+
+                    selection_name.innerHTML = target.graphic.attributes.NAME || (target.graphic.attributes.NAME_1 + ", " + target.graphic.attributes.POSTCODE_1);
+
+
                     const query = geoJSONLayer.createQuery();
                     query.geometry = target.graphic.geometry;
                     query.outStatistics = [
@@ -455,7 +464,8 @@
 
                     ];
 
-                    let tmp=geoJSONLayer.queryFeatures(query).then(function(response) {
+
+                    let tmp = geoJSONLayer.queryFeatures(query).then(function(response) {
                         let data = response.features[0].attributes;
 
 
@@ -471,14 +481,15 @@
 
 
                         console.log("Statistics: ", response.features[0].attributes)
-                        let  tmp = ("<table> <tbody>" +
+                        let  tmp = "<table> <tbody>" +
                             "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" +  ((data.positive + data.negative) || 0) + "</td> </tr>" +
                             "<tr> <td>Positive:</td> <td>" + (data.positive || 0) + "</td> </tr>" +
                             "<tr> <td>Negative:</td> <td>" + (data.negative || 0) + "</td> </tr>" +
-                            "</tbody> </table>");
+                            "</tbody> </table>";
+
                         return tmp;
                     });
-
+                    //selection_stats.setInnerHtml(tmp);
                     return tmp;
                 }
 
@@ -504,9 +515,10 @@
                 baseMap.popup = {
                     dockEnabled: true,
                     dockOptions: {
-                        buttonEnabled: false,
+                        buttonEnabled: true,
                         breakpoint: false
                     },
+                    collapsed: true,
                 };
 
                 // add postcode layer to map
@@ -724,8 +736,6 @@
                 });
 
 
-                // graphs!
-
                 ///////
                 // add views and widgets
                 baseMap.ui.add("selectionPaneDiv", "bottom-left");
@@ -826,8 +836,8 @@
 </div>
 
 <div id="feature-node-right-bottom" class="esri-widget">
-
-
+    <h3 style="display: inline">Overview: </h3><h3 style="display: inline" id="selection-name"></h3>
+    <div id="selection-stats"></div>
 </div>
 
 

@@ -168,7 +168,12 @@
                     container: "viewDiv",
                     map: map,
                     center: [-2.89479, 54.093409],
-                    zoom: 5
+                    zoom: 5,
+                    highlightOptions: {
+                        color: [255, 255, 0, 1],
+                        haloOpacity: 0.9,
+                        fillOpacity: 0.2
+                    },
                 });
 
 
@@ -364,6 +369,10 @@
                         url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
                             + encodeURIComponent((target.graphic.attributes.ID).trim())
                     }
+                    else if (target.graphic.attributes.ISO_A3){
+                        url = HOST_NAME + "/dashboard/api/get-postcode-data/?country="
+                            + encodeURIComponent((target.graphic.attributes.ISO_A3).trim())
+                    }
                     else{
                         url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
                     }
@@ -426,15 +435,30 @@
 
 
                 const countryPopup = {
-                    title: "{CNTRY_NAME}",
+                    title: "{NAME}",
                     content: queryPopup,
                 };
 
-                let countries = new FeatureLayer({
-                    url: "https://services.arcgis.com/B7NI2jUD81lCgSpx/arcgis/rest/services/Assignment_6_Spatial_Reference_Systems/FeatureServer/1/",
+                //renderer
+                const countryRenderer = {
+                    type: "simple",
+
+                    symbol: {
+                        type: "simple-fill",
+                        style: "none",
+                        outline: {
+                            width: 0.1,
+                            color: "none",
+                        },
+                    },
+                };
+
+
+                let countries = new GeoJSONLayer({
+                    url:"{% static 'dashboard/countries.geojson' %}",
                     outFields:["*"],
                     popupTemplate: countryPopup,
-                    renderer: lineRenderer,
+                    renderer: countryRenderer,
                     title: "Country",
                     minScale: 0,
                     maxScale: 8000000,

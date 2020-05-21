@@ -6,7 +6,8 @@
 
     <title>COVID-19 Dashboard</title>
 
-
+    <!-- Load the Chart.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
     <!--DATATABLES-->
     <script src="https://code.jquery.com/jquery-1.12.3.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
@@ -21,6 +22,8 @@
     <!--ARCGIS-->
     <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css">
     <script src="https://js.arcgis.com/4.15/"></script>
+
+
 
 
     <script>
@@ -357,51 +360,126 @@
                     },
                     label: "Postcode Sector Boundaries"
                 };
+                let centreChart;
+                function createCentreChart() {
+                    const centreCanvas = document.getElementById("centre-chart");
+                    centreChart = new Chart(centreCanvas.getContext("2d"), {
+                        type: "doughnut",
+                        data: {
+                            labels: ["Home", "Hospital", "GP Clinic", "Drive Through", "Other"],
+                            datasets: [
+                                {
+                                    backgroundColor: [
+                                        "#FD7F6F",
+                                        "#7EB0D5",
+                                        "#B2E061",
+                                        "#BD7EBE",
+                                        "#FFB55A"
+                                    ],
+                                    borderWidth: 0,
+                                    data: [0, 0, 0, 0, 0]
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: false,
+                            cutoutPercentage: 35,
+                            legend: {
+                                position: "bottom"
+                            },
+                            title: {
+                                display: true,
+                                text: "Centre Type"
+                            }
+                        }
+                    });
+                }
 
+
+                createCentreChart();
+
+
+
+                function updateChart(chart, dataValues) {
+                    chart.data.datasets[0].data = dataValues;
+                    chart.update();
+                }
                 // postcode map and popup
                 function queryPopup(target) {
-                    let url;
-                    if (target.graphic.attributes.POSTCODE_1){
-                        url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
-                            + encodeURIComponent((target.graphic.attributes.POSTCODE_1).trim())
-                    }
-                    else if (target.graphic.attributes.ID){
-                        url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
-                            + encodeURIComponent((target.graphic.attributes.ID).trim())
-                    }
-                    else if (target.graphic.attributes.ISO_A3){
-                        url = HOST_NAME + "/dashboard/api/get-postcode-data/?country="
-                            + encodeURIComponent((target.graphic.attributes.ISO_A3).trim())
-                    }
-                    else{
-                        url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
-                    }
+                    const query = geoJSONLayer.createQuery();
+                    query.geometry = target.graphic.geometry;
+                    query.outStatistics = [
 
-
-                    // Should try and not use async: false
-                    let tmp;
-                    const QuerySettings = {
-                        url: url,
-                        method: "GET",
-                        async: false,
-                        success: function (data) {
-                            tmp = ("<table> <tbody>" +
-                                "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" + (data.summary.total) + "</td> </tr>" +
-                                "<tr> <td>Positive:</td> <td>" + (data.summary.positive) + "</td> </tr>" +
-                                "<tr> <td>Negative:</td> <td>" + (data.summary.negative) + "</td> </tr>" +
-                                "<tr> <td>Patients:</td> <td>" + (data.summary.patients) + "</td> </tr>" +
-                                "</tbody> </table>");
+                        {
+                            onStatisticField:
+                                "CASE WHEN test_result = 'Positive' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "positive",
+                            statisticType: "sum"
                         },
-                        error: function (e) {
-                            console.log("There was an error with your request...");
-                            console.log("error: " + JSON.stringify(e));
-                        }
-                    };
+                        {
+                            onStatisticField:
+                                "CASE WHEN test_result = 'Negative' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "negative",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN testing_centre__centre_type = 'Hospital' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "hospital",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN testing_centre__centre_type = 'Other' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "other",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN testing_centre__centre_type = 'GP clinic' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "clinic",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN testing_centre__centre_type = 'Drive through centre' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "drive_through",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN testing_centre__centre_type = 'Home' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "home",
+                            statisticType: "sum"
+                        },
 
-                    $.ajax(QuerySettings);
+                    ];
+
+                    let tmp=geoJSONLayer.queryFeatures(query).then(function(response) {
+                        let data = response.features[0].attributes;
+
+
+                        updateChart(centreChart, [
+                            data.home,
+                            data.other,
+                            data.hospital,
+                            data.clinic,
+                            data.drive_through,
+                        ]);
+
+
+
+
+                        console.log("Statistics: ", response.features[0].attributes)
+                        let  tmp = ("<table> <tbody>" +
+                            "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" +  ((data.positive + data.negative) || 0) + "</td> </tr>" +
+                            "<tr> <td>Positive:</td> <td>" + (data.positive || 0) + "</td> </tr>" +
+                            "<tr> <td>Negative:</td> <td>" + (data.negative || 0) + "</td> </tr>" +
+                            "</tbody> </table>");
+                        return tmp;
+                    });
 
                     return tmp;
-
                 }
 
                 // postcode popup
@@ -419,6 +497,7 @@
                     title: "Map features",
                     minScale: 300000,
                     maxScale: 0,
+                    legendEnabled: false,
                 });
 
                 // popup location
@@ -462,6 +541,8 @@
                     title: "Country",
                     minScale: 0,
                     maxScale: 8000000,
+                    legendEnabled: false,
+
                 });
 
                 map.add(countries);
@@ -643,6 +724,8 @@
                 });
 
 
+                // graphs!
+
                 ///////
                 // add views and widgets
                 baseMap.ui.add("selectionPaneDiv", "bottom-left");
@@ -685,7 +768,6 @@
 
             };
         });
-
 
     </script>
 </head>
@@ -730,45 +812,21 @@
 </div>
 
 <div id="feature-node-right-top" class="esri-widget">
-    <table id="side-table" class="display" cellspacing="0" width="100%">
-        <thead>
-        <tr>
-            <th>Test Date</th>
-            <th>Result</th>
-            <th>Centre Type</th>
-            <th>Postcode</th>
-        </tr>
-        </thead>
-    </table>
+    <!--    <table id="side-table" class="display" cellspacing="0" width="100%">-->
+    <!--        <thead>-->
+    <!--        <tr>-->
+    <!--            <th>Test Date</th>-->
+    <!--            <th>Result</th>-->
+    <!--            <th>Centre Type</th>-->
+    <!--            <th>Postcode</th>-->
+    <!--        </tr>-->
+    <!--        </thead>-->
+    <!--    </table>-->
+    <canvas id="centre-chart" width="250" height="300"></canvas>
 </div>
 
 <div id="feature-node-right-bottom" class="esri-widget">
-    <div id="general-information-heading">
-        <h3 style="margin-top: 0">United Kingdom testing data</h3>
-    </div>
 
-    <div id="general-information">
-        <table>
-            <tbody>
-            <tr>
-                <td>Diagnostic tests:</td>
-                <td>{{ count_total_exp }}</td>
-            </tr>
-            <tr>
-                <td>Total positive:</td>
-                <td>{{ count_pos_exp }}</td>
-            </tr>
-            <tr>
-                <td>Total negative:</td>
-                <td>{{ count_neg_exp }}</td>
-            </tr>
-            <tr>
-                <td>Total patients tested:</td>
-                <td>{{ count_indiv_patients }}</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
 
 </div>
 

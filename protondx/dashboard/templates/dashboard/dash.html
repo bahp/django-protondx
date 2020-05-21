@@ -19,7 +19,7 @@
     <link rel="stylesheet" type="text/css" href="{% static 'dashboard/datatables.css' %}">
 
     <!--ARCGIS-->
-    <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/dark/main.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css">
     <script src="https://js.arcgis.com/4.15/"></script>
 
 
@@ -161,7 +161,7 @@
                 // Map view
 
                 const map = new Map({
-                    basemap: "dark-gray-vector"
+                    basemap: "gray-vector"
                 });
 
                 const baseMap = new MapView({
@@ -355,9 +355,19 @@
 
                 // postcode map and popup
                 function queryPopup(target) {
+                    let url;
+                    if (target.graphic.attributes.POSTCODE_1){
+                        url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
+                            + encodeURIComponent((target.graphic.attributes.POSTCODE_1).trim())
+                    }
+                    else if (target.graphic.attributes.ID){
+                        url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
+                            + encodeURIComponent((target.graphic.attributes.ID).trim())
+                    }
+                    else{
+                        url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
+                    }
 
-                    const url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
-                        + encodeURIComponent((target.graphic.attributes.POSTCODE_1).trim())
 
                     // Should try and not use async: false
                     let tmp;
@@ -398,11 +408,11 @@
                     popupTemplate: popupPostcode,
                     renderer: lineRenderer,
                     title: "Map features",
-                    minScale: 3000000,
+                    minScale: 300000,
                     maxScale: 0,
                 });
 
-                //postcode popup
+                // popup location
                 baseMap.popup = {
                     dockEnabled: true,
                     dockOptions: {
@@ -413,6 +423,60 @@
 
                 // add postcode layer to map
                 map.add(postcodes);
+
+
+                const countryPopup = {
+                    title: "{CNTRY_NAME}",
+                    content: queryPopup,
+                };
+
+                let countries = new FeatureLayer({
+                    url: "https://services.arcgis.com/B7NI2jUD81lCgSpx/arcgis/rest/services/Assignment_6_Spatial_Reference_Systems/FeatureServer/1/",
+                    outFields:["*"],
+                    popupTemplate: countryPopup,
+                    renderer: lineRenderer,
+                    title: "Country",
+                    minScale: 0,
+                    maxScale: 8000000,
+                });
+
+                map.add(countries);
+
+
+                // const areaPopup = {
+                //     title: "{NAME}",
+                //     content: queryPopup,
+                // };
+                //
+                // let area = new FeatureLayer({
+                //     url: "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/GBR_Boundaries_2017/FeatureServer/3",
+                //     outFields:["OBJECTID","ID","NAME"],
+                //     popupTemplate: areaPopup,
+                //     renderer: lineRenderer,
+                //     title: "Region",
+                //     minScale: 8000000,
+                //     maxScale: 300000,
+                // });
+                //
+                // map.add(area);
+
+                // const RegionPopupSco = {
+                //     title: "{spr16nm}",
+                //     content: "{OBJECTID}",
+                // };
+                //
+                // let regionsSco = new FeatureLayer({
+                //     url: "https://ons-inspire.esriuk.com/arcgis/rest/services/Electoral_Boundaries/Scottish_Parliamentray_Regions_May_2016_Boundaries/MapServer/0/",
+                //     outFields:["OBJECTID","spr16nm"],
+                //     popupTemplate: RegionPopupSco,
+                //     renderer: lineRenderer,
+                //     minScale: 8000000,
+                //     maxScale: 300000,
+                // });
+                //
+                // map.add(regionsSco);
+
+
 
 
                 ///////

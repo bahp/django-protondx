@@ -68,6 +68,8 @@ class CustomGeoJSONSerializer(GeoJSONSerializer):
         # converted to string first.
         if str(field) == "dashboard.DiagnosticTest.test_result":
             return obj.get_test_result_display()
+        elif str(field) == "dashboard.DiagnosticTest.date_test":
+            return int(obj.date_test.timestamp()) * 1000
         elif is_protected_type(value):
             return value
         else:

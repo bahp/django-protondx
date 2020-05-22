@@ -133,6 +133,7 @@ class GeoView(APIView):
                                                  'test_result',
                                                  'testing_centre__postcode',
                                                  'testing_centre__centre_type',
+                                                 'patient__gender',
                                                  )
                                          )
 

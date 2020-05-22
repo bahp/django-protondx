@@ -237,7 +237,7 @@
                         color: "orange",
                         size: 8,
                         outline:{
-                            style: "none",
+                            color: "none",
                         },
                     },
                     defaultLabel: "n/a",
@@ -248,7 +248,7 @@
                             color: "rgba(255, 0, 0, 1)",
                             size: 8,
                             outline:{
-                                style: "none",
+                                color: "none",
                             },
                         },
                         label: "Positive"
@@ -259,13 +259,13 @@
                             color: "rgba(0, 255, 0, 1)",
                             size: 8,
                             outline: {
-                                style: "none",
+                                color: "none",
                             },
                         },
                         label: "Negative",
                     },],
                     outline:{
-                        style: "none",
+                        color: "none",
                     },
                 };
 
@@ -282,20 +282,20 @@
                     renderer: heatRenderer,
                     title: "COVID-19 testing",
                     popupTemplate: template,
-                    featureReduction : {
-                        type: "cluster",
-                        clusterRadius: 10,
-                        popupTemplate: {
-                            content: "This cluster represents {cluster_count} diagnostic tests."
-                        }
-                    },
+                    // featureReduction : {
+                    //     type: "cluster",
+                    //     clusterRadius: 10,
+                    //     popupTemplate: {
+                    //         content: "This cluster represents {cluster_count} diagnostic tests."
+                    //     }
+                    // },
                     timeInfo: {
                         startField: "date_test", // name of the date field
-                        endField: new Date(),
+                        endField: new Date().getTime(),
                         interval: {
                             // set time interval to one day
                             unit: "days",
-                            value: 1
+                            value: 1,
                         }
                     },
 
@@ -525,7 +525,9 @@
 
 
                 const selection_name = document.getElementById("selection-name");
-                const selection_stats = document.getElementById("selection-stats");
+                const selection_total = document.getElementById("selection-total");
+                const selection_pos = document.getElementById("selection-pos");
+                const selection_neg = document.getElementById("selection-neg");
                 // postcode map and popup
                 function queryPopup(target) {
                     //set overview name
@@ -607,7 +609,7 @@
                     ];
 
 
-                    let tmp = geoJSONLayer.queryFeatures(query).then(function(response) {
+                    geoJSONLayer.queryFeatures(query).then(function(response) {
                         let data = response.features[0].attributes;
 
 
@@ -626,16 +628,12 @@
                             data.gen_na,
                         ]);
 
-                        let  tmp = "<table> <tbody>" +
-                            "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" +  ((data.positive + data.negative) || 0) + "</td> </tr>" +
-                            "<tr> <td>Positive:</td> <td>" + (data.positive || 0) + "</td> </tr>" +
-                            "<tr> <td>Negative:</td> <td>" + (data.negative || 0) + "</td> </tr>" +
-                            "</tbody> </table>";
-
-                        return tmp;
+                        selection_total.innerText = ((data.positive + data.negative) || 0);
+                        selection_pos.innerText = (data.positive || 0);
+                        selection_neg.innerText = (data.negative || 0);
                     });
-                    //selection_stats.setInnerHtml(tmp);
-                    return tmp;
+
+                    return "";
                 }
 
                 // postcode popup
@@ -699,17 +697,16 @@
                     minScale: 0,
                     maxScale: 8000000,
                     legendEnabled: false,
-
                 });
 
                 map.add(countries);
 
 
-                // const areaPopup = {
-                //     title: "{NAME}",
-                //     content: queryPopup,
-                // };
-                //
+                const areaPopup = {
+                    title: "{NAME}",
+                    content: queryPopup,
+                };
+
                 // let area = new FeatureLayer({
                 //     url: "https://services.arcgis.com/P3ePLMYs2RVChkJx/arcgis/rest/services/GBR_Boundaries_2017/FeatureServer/3",
                 //     outFields:["OBJECTID","ID","NAME"],
@@ -718,6 +715,8 @@
                 //     title: "Region",
                 //     minScale: 8000000,
                 //     maxScale: 300000,
+                //     legendEnabled: false,
+                //
                 // });
                 //
                 // map.add(area);
@@ -734,6 +733,8 @@
                 //     renderer: lineRenderer,
                 //     minScale: 8000000,
                 //     maxScale: 300000,
+                //     legendEnabled: false,
+                //
                 // });
                 //
                 // map.add(regionsSco);
@@ -818,81 +819,26 @@
                 // add geoJSON layer to map
                 map.add(geoJSONLayer);
 
+
                 const timeSlider = new TimeSlider({
                     container: "timeSlider",
                     mode: "cumulative-from-start",
                     view: baseMap
                 });
+
                 baseMap.ui.add(timeSlider, "manual");
+
                 baseMap.whenLayerView(geoJSONLayer).then(function(lv) {
                     console.log(geoJSONLayer);
                     const fullTimeExtent = geoJSONLayer.timeInfo.fullTimeExtent;
 
                     // set up time slider properties
                     timeSlider.fullTimeExtent = fullTimeExtent;
+                    timeSlider.playRate = 200;
+
                     timeSlider.stops = {
-                        interval: geoJSONLayer.timeInfo.interval
+                        interval: geoJSONLayer.timeInfo.interval,
                     };
-                });
-                //////////////
-                // Highlight map on table select
-
-                let highlightSelect;
-                baseMap.whenLayerView(geoJSONLayer).then(function(layerView) {
-                    let queryLayer = geoJSONLayer.createQuery();
-
-                    $('#side-table tbody').on( 'click', 'tr', function () {
-
-                        // remove selection if clicking on a selected row
-                        if ( table.row(this).node().className.includes('selected')){
-                            $(this).removeClass('selected');
-                            if (highlightSelect) {
-                                highlightSelect.remove();
-                            }
-                        }
-                        // remove old selection and add selection on new row
-                        else{
-                            $(this).addClass('selected').siblings().removeClass('selected');
-                            const id = table.row( this ).id();
-
-                            queryLayer.where = "pk='" + id + "'";
-                            geoJSONLayer.queryFeatures(queryLayer).then(function(result) {
-                                // if a feature is already highlighted, then remove the highlight
-                                if (highlightSelect) {
-                                    highlightSelect.remove();
-                                }
-
-                                // the feature to be highlighted
-                                const feature = result.features[0];
-
-                                // use the objectID to highlight the feature
-                                highlightSelect = layerView.highlight(
-                                    feature.attributes["OBJECTID"]
-                                );
-                                // baseMap.popup.selectedFeatureIndex = feature.attributes["OBJECTID"];
-                                // baseMap.popup.open(template);
-
-
-                                // center the feature
-                                baseMap
-                                    .goTo(
-                                        {
-                                            target: feature.geometry,
-                                            zoom: 15
-                                        },
-                                        {
-                                            duration: 1000,
-                                            easing: "in-out-expo"
-                                        }
-                                    )
-                                    .catch(function(error) {
-                                        if (error.name != "AbortError") {
-                                            console.log(error);
-                                        }
-                                    });
-                            });
-                        }
-                    });
                 });
 
 
@@ -1006,7 +952,14 @@
 
 <div id="feature-node-right-bottom" class="esri-widget">
     <h3 style="display: inline">Overview: </h3><h3 style="display: inline" id="selection-name"></h3>
-    <div id="selection-stats"></div>
+    <hr>
+    <table id="selection-table">
+        <tbody>
+        <tr> <td style="padding:0 15px 0 0;">Total tests:</td> <td id="selection-total"></td> </tr>
+        <tr> <td>Positive:</td> <td id="selection-pos"></td> </tr>
+        <tr> <td>Negative:</td> <td id="selection-neg"></td> </tr>
+        </tbody>
+    </table>
 </div>
 
 

@@ -73,8 +73,8 @@ html, body {
 }
 
 #timeSlider {
-        position: absolute;
-        left: 100px;
-        right: 100px;
-        bottom: 20px;
-      }
+    position: absolute;
+    left: 100px;
+    right: 100px;
+    bottom: 20px;
+}

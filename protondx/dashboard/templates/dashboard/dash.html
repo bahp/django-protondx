@@ -19,8 +19,6 @@
     <script src="https://js.arcgis.com/4.15/"></script>
 
 
-
-
     <script>
 
         const HOST_NAME = "http://localhost:8000"
@@ -29,7 +27,6 @@
             return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
         }
 
-        let table;
 
         require([
             "esri/Map",
@@ -132,7 +129,7 @@
                 minPixelIntensity: 0,
             };
 
-            var dotRenderer = {
+            const dotRenderer = {
                 type: "unique-value",
                 field: "test_result",
                 defaultSymbol: {
@@ -172,11 +169,6 @@
                 },
             };
 
-            // POPUP FOR DATA LAYER
-            const template = {
-                title: "Test Information:",
-                content: "Test result: {test_result} <br> Test date: {date_test} <br> Centre type: {testing_centre__centre_type} <br> Postcode: {testing_centre__postcode}",
-            };
 
             // create data layer
             const geoJSONLayer = new GeoJSONLayer({
@@ -184,7 +176,6 @@
                 copyright: "Add copyright for COVID data if needed",
                 renderer: heatRenderer,
                 title: "COVID-19 testing",
-                popupTemplate: template,
                 // featureReduction : {
                 //     type: "cluster",
                 //     clusterRadius: 10,
@@ -193,15 +184,12 @@
                 //     }
                 // },
                 timeInfo: {
-                    startField: "date_test", // name of the date field
-                    endField: new Date().getTime(),
+                    startField: "date_test",
                     interval: {
-                        // set time interval to one day
                         unit: "days",
                         value: 1,
                     }
                 },
-
             });
 
             geoJSONLayer.popup = {
@@ -212,10 +200,13 @@
                 },
             };
 
+            // add geoJSON layer to map
+            map.add(geoJSONLayer);
 
 
             /////////
             // Select which dots to display
+
             function updateRenderer(color, index) {
                 let renderer = geoJSONLayer.renderer.clone();
                 if (index === -1) {
@@ -243,6 +234,7 @@
                 else updateRenderer("rgba(255, 165, 0, 0)", -1);
             });
 
+
             //renderer selection w/ radio
             let radios = document.getElementsByName("renderer");
             let renderArray = [heatRenderer, dotRenderer];
@@ -262,23 +254,10 @@
                 });
             }
 
-            // ////////////
-            // Postcode Map
 
-            //renderer
-            const lineRenderer = {
-                type: "simple",
+            ///////
+            // add charts
 
-                symbol: {
-                    type: "simple-fill",
-                    style: "none",
-                    outline: {
-                        width: 0.1,
-                        color: [0, 0, 0, 0.4],
-                    },
-                },
-                label: "Postcode Sector Boundaries"
-            };
             let centreChart;
             function createCentreChart() {
                 const centreCanvas = document.getElementById("centre-chart");
@@ -414,27 +393,25 @@
                 });
             }
 
-
             createCentreChart();
             createGenderChart();
             createDateChart();
 
-
-
+            // used to update charts
             function updateChart(chart, dataValues) {
                 chart.data.datasets[0].data = dataValues;
                 chart.update();
             }
 
 
+
             const selection_name = document.getElementById("selection-name");
             const selection_total = document.getElementById("selection-total");
             const selection_pos = document.getElementById("selection-pos");
             const selection_neg = document.getElementById("selection-neg");
-            // postcode map and popup
+
             function queryPopup(target) {
                 //set overview name
-
                 selection_name.innerHTML = (target.graphic.attributes.nuts118nm || target.graphic.attributes.NAME) || (target.graphic.attributes.NAME_1 + ", " + target.graphic.attributes.POSTCODE_1) ;
 
                 const query = geoJSONLayer.createQuery();
@@ -538,6 +515,23 @@
                 return "";
             }
 
+            //////
+            // add postcode layer
+
+            //renderer
+            const lineRenderer = {
+                type: "simple",
+
+                symbol: {
+                    type: "simple-fill",
+                    style: "none",
+                    outline: {
+                        width: 0.1,
+                        color: [0, 0, 0, 0.4],
+                    },
+                },
+            };
+
             // postcode popup
             const popupPostcode = {
                 title: "{NAME_1}, {POSTCODE_1}",
@@ -570,6 +564,9 @@
             map.add(postcodes);
 
 
+            ////////
+            // Add countries layer
+
             const countryPopup = {
                 title: "{NAME}",
                 content: queryPopup,
@@ -578,7 +575,6 @@
             //renderer
             const countryRenderer = {
                 type: "simple",
-
                 symbol: {
                     type: "simple-fill",
                     style: "none",
@@ -592,7 +588,7 @@
 
             let countries = new GeoJSONLayer({
                 url:"{% static 'dashboard/countries.geojson' %}",
-                outFields:["*"],
+                outFields:["NAME"],
                 popupTemplate: countryPopup,
                 renderer: countryRenderer,
                 title: "Country",
@@ -603,6 +599,9 @@
 
             map.add(countries);
 
+
+            ////////
+            // Add UK regions layer
 
             const regionPopup = {
                 title: "{nuts118nm}",
@@ -622,26 +621,6 @@
 
             map.add(region);
 
-            // const RegionPopupSco = {
-            //     title: "{spr16nm}",
-            //     content: "{OBJECTID}",
-            // };
-            //
-            // let regionsSco = new FeatureLayer({
-            //     url: "https://ons-inspire.esriuk.com/arcgis/rest/services/Electoral_Boundaries/Scottish_Parliamentray_Regions_May_2016_Boundaries/MapServer/0/",
-            //     outFields:["OBJECTID","spr16nm"],
-            //     popupTemplate: RegionPopupSco,
-            //     renderer: lineRenderer,
-            //     minScale: 8000000,
-            //     maxScale: 300000,
-            //     legendEnabled: false,
-            //
-            // });
-            //
-            // map.add(regionsSco);
-
-
-
 
             ///////
             //Home button widget to reset view
@@ -655,43 +634,6 @@
             const search = new Search({
                 view: baseMap,
                 locationEnabled: false,
-            });
-
-
-            // Display postcode popup on search
-            search.on("select-result", function(event){
-                // get coordinates of searched address
-                const coordinates = webMercatorUtils.xyToLngLat(event.result.feature.geometry.x, event.result.feature.geometry.y);
-
-                // make apoint out of them
-                let point = {
-                    type: "point",
-                    x: coordinates[0],
-                    y: coordinates[1]
-                };
-
-
-                // query the postcode layer to see which poscodes intersect with the point
-                let query = postcodes.createQuery();
-                query.geometry = point;
-                query.spatialRelationship = "intersects";
-                postcodes.queryFeatures(query)
-                    .then(function(feature) {
-
-                        // filter by postcode in datatables
-                        // comment out if feature not needed
-                        table.search(feature.features[0].attributes.POSTCODE_1).draw();
-
-                        // open popup of query result
-                        baseMap.popup.open({
-                            features: feature.features
-                        });
-                    });
-            });
-
-            // clear datatables search when map search is cleared
-            search.on("search-clear", function(event){
-                table.search('').draw();
             });
 
 
@@ -717,10 +659,8 @@
             });
 
 
-            // add geoJSON layer to map
-            map.add(geoJSONLayer);
-
-
+            /////////
+            // time slider
             const timeSlider = new TimeSlider({
                 container: "timeSlider",
                 mode: "cumulative-from-start",
@@ -781,8 +721,6 @@
                 ],
                 "bottom-left"
             );
-
-
         });
 
     </script>
@@ -822,22 +760,9 @@
     <label>
         <input type="checkbox" id="postcodeLayer" checked> Postcode Boundaries
     </label>
-
-
-
 </div>
 
 <div id="feature-node-right-top" class="esri-widget">
-    <!--    <table id="side-table" class="display" cellspacing="0" width="100%">-->
-    <!--        <thead>-->
-    <!--        <tr>-->
-    <!--            <th>Test Date</th>-->
-    <!--            <th>Result</th>-->
-    <!--            <th>Centre Type</th>-->
-    <!--            <th>Postcode</th>-->
-    <!--        </tr>-->
-    <!--        </thead>-->
-    <!--    </table>-->
     <h3>Detailed View:</h3>
     <div id="centre-chart-div" style="height:45%; width:48%; float: left">
         <canvas id="centre-chart" width="500" height="500"></canvas>
@@ -862,9 +787,7 @@
     </table>
 </div>
 
-
 <div id="webglNotSupportedDiv"></div>
-
 
 </body>
 </html>

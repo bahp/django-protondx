@@ -80,7 +80,7 @@
                 center: [-2.89479, 54.093409],
                 zoom: 5,
                 highlightOptions: {
-                    color: [255, 255, 0, 1],
+                    color: [0, 62, 116, 1],
                     haloOpacity: 0.9,
                     fillOpacity: 0.2
                 },
@@ -491,7 +491,7 @@
                 ];
 
 
-                geoJSONLayer.queryFeatures(query).then(function(response) {
+                let popup = geoJSONLayer.queryFeatures(query).then(function(response) {
                     let data = response.features[0].attributes;
 
 
@@ -510,12 +510,18 @@
                         data.gen_na,
                     ]);
 
-                    selection_total.innerText = ((data.positive + data.negative) || 0);
-                    selection_pos.innerText = (data.positive || 0);
-                    selection_neg.innerText = (data.negative || 0);
+                    // selection_total.innerText = ((data.positive + data.negative) || 0);
+                    // selection_pos.innerText = (data.positive || 0);
+                    // selection_neg.innerText = (data.negative || 0);
+
+                    return ( "<table> <tbody>" +
+                        "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" +  ((data.positive + data.negative) || 0) + "</td> </tr>" +
+                        "<tr> <td>Positive:</td> <td>" + (data.positive || 0) + "</td> </tr>" +
+                        "<tr> <td>Negative:</td> <td>" + (data.negative || 0) + "</td> </tr>" +
+                        "</tbody> </table>" );
                 });
 
-                return "";
+                return popup;
             }
 
             //////
@@ -730,8 +736,45 @@
 </head>
 <body>
 
-<div id="viewDiv"></div>
-<div id="timeSlider"></div>
+<div class="grid-container">
+    <div class="header-container">
+
+        <img src="{% static 'dashboard/images/logo.svg' %}">
+
+
+        <h2>
+            Centre for Bio-Inspired Technology
+        </h2>
+
+    </div>
+    <div class="body-container">
+        <div id="viewDiv" class="mapView"></div>
+        <div class="side-view">
+            <div class="graph-container">
+                <div class="side-header">
+                    <h2 style="display: inline">Overview: </h2><h2 style="display: inline" id="selection-name"></h2>
+                </div>
+                <div class="pie-container">
+                    <div id="centre-chart-div" class="left-pie">
+                        <canvas id="centre-chart" width="0" height="0"></canvas>
+                    </div>
+                    <div id="gender-chart-div" class="right-pie">
+                        <canvas id="gender-chart" width="0" height="0"></canvas>
+                    </div>
+                </div>
+                <div id="date-chart-div" class="line-graph-container">
+                    <canvas id="date-chart" width="0" height="0"></canvas>
+                </div>
+            </div>
+            <div class="table-container"></div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--<div id="viewDiv"></div>-->
+<!--<div id="timeSlider"></div>-->
 <div id="selectionPaneDiv" class="esri-widget">
     <p>Visualise COVID-19 spread using:</p>
     <label>
@@ -765,32 +808,32 @@
     </label>
 </div>
 
-<div id="feature-node-right-top" class="esri-widget">
-    <h3>Detailed View:</h3>
-    <div id="centre-chart-div" style="height:45%; width:48%; float: left">
-        <canvas id="centre-chart" width="500" height="500"></canvas>
-    </div>
-    <div id="gender-chart-div" style="height:45%; width:48%; float: right">
-        <canvas id="gender-chart" width="500" height="500"></canvas>
-    </div>
-    <div id="date-chart-div" style="height:40%; width:100%;">
-        <canvas id="date-chart" width="0" height="0"></canvas>
-    </div>
-</div>
+<!--<div id="feature-node-right-top" class="esri-widget">-->
+<!--    <h3>Detailed View:</h3>-->
+<!--    <div id="centre-chart-div" style="height:45%; width:48%; float: left">-->
+<!--        <canvas id="centre-chart" width="500" height="500"></canvas>-->
+<!--    </div>-->
+<!--    <div id="gender-chart-div" style="height:45%; width:48%; float: right">-->
+<!--        <canvas id="gender-chart" width="500" height="500"></canvas>-->
+<!--    </div>-->
+<!--    <div id="date-chart-div" style="height:40%; width:100%;">-->
+<!--        <canvas id="date-chart" width="0" height="0"></canvas>-->
+<!--    </div>-->
+<!--</div>-->
 
-<div id="feature-node-right-bottom" class="esri-widget">
-    <h3 style="display: inline">Overview: </h3><h3 style="display: inline" id="selection-name"></h3>
-    <hr>
-    <table id="selection-table">
-        <tbody>
-        <tr> <td style="padding:0 15px 0 0;">Total tests:</td> <td id="selection-total"></td> </tr>
-        <tr> <td>Positive:</td> <td id="selection-pos"></td> </tr>
-        <tr> <td>Negative:</td> <td id="selection-neg"></td> </tr>
-        </tbody>
-    </table>
-</div>
+<!--<div id="feature-node-right-bottom" class="esri-widget">-->
+<!--    <h3 style="display: inline">Overview: </h3><h3 style="display: inline" id="selection-name"></h3>-->
+<!--    <hr>-->
+<!--    <table id="selection-table">-->
+<!--        <tbody>-->
+<!--        <tr> <td style="padding:0 15px 0 0;">Total tests:</td> <td id="selection-total"></td> </tr>-->
+<!--        <tr> <td>Positive:</td> <td id="selection-pos"></td> </tr>-->
+<!--        <tr> <td>Negative:</td> <td id="selection-neg"></td> </tr>-->
+<!--        </tbody>-->
+<!--    </table>-->
+<!--</div>-->
 
-<div id="webglNotSupportedDiv"></div>
+<!--<div id="webglNotSupportedDiv"></div>-->
 
 </body>
 </html>

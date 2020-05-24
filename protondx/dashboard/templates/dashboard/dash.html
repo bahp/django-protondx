@@ -15,6 +15,10 @@
 
     <!--DATATABLES-->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+<!--    add these imports-->
+<!--    https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css-->
+<!--https://cdn.datatables.net/1.10.21/css/dataTables.jqueryui.min.css-->
+<!--https://cdn.datatables.net/scroller/2.0.2/css/scroller.jqueryui.min.css-->
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.21/features/pageResize/dataTables.pageResize.min.js"></script>
 
@@ -22,7 +26,9 @@
     <!--CSS templates-->
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'dashboard/layout.css' %}">
-<!--    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/datatable.css' %}">-->
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/modal-grid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/main-grid.css' %}">
+    <!--    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/datatable.css' %}">-->
 
     <!--ARCGIS-->
     <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css">
@@ -37,7 +43,7 @@
             return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
         }
 
-
+        let table;
         require([
             "esri/Map",
             "esri/views/MapView",
@@ -100,7 +106,7 @@
             // /////////////////
             // Create data table
             // /////////////////
-            let table;
+
             function populateDataTable(data) {
 
                 table = $('#side-table').DataTable( {
@@ -124,14 +130,84 @@
                         { data: "properties.testing_centre__postcode" },
 
                     ],
-                    pageResize: true,
-                    rowId: 'properties.pk',
-                    // scrollY:        '20vh',
-                    //scrollCollapse: true,
-                    paging:         true,
-                    bInfo : false,
-                    bLengthChange: false
+                    // pageResize: true,
+                    // rowId: 'properties.pk',
+                    // // scrollY:        '20vh',
+                    // //scrollCollapse: true,
+                    paging:         false,
+                    // bInfo : false,
+                     bLengthChange: false,
+                    deferRender:    true,
+                    scrollY:        200,
+                    scrollCollapse: true,
+                    scroller:       true
                 });
+
+
+                // Get the modal
+                const modal = document.getElementById("myModal");
+                const modal_patient_name = document.getElementById("modal-patient-name");
+                // Get the <span> element that closes the modal
+                const span = document.getElementsByClassName("close")[0];
+
+                $('#side-table tbody').on( 'click', 'tr', function () {
+                    let patient_id = table.row( this ).data().properties.patient;
+                    const patientURL = HOST_NAME + "/dashboard/api/patient/" + patient_id;
+                    const QuerySettings = {
+                        url: patientURL,
+                        method: "GET",
+                        success: function (data) {
+                            console.log(data);
+
+                            // add patient name
+                            modal_patient_name.innerHTML = data.first_name + " " + data.last_name;
+
+                            // add patient diagnostic test table
+                            // $('#patient-table').DataTable( {
+                            //     data: data.features,
+                            //     columns: [
+                            //         {
+                            //             data: "properties.date_test",
+                            //         },
+                            //         {
+                            //             data: "properties.test_result",
+                            //         },
+                            //         {
+                            //             data: "properties.testing_centre__centre_type",
+                            //         },
+                            //         { data: "properties.testing_centre__postcode" },
+                            //
+                            //     ],
+                            //     pageResize: true,
+                            //     rowId: 'properties.pk',
+                            //     paging:         true,
+                            //     bLengthChange: false
+                            // });
+
+
+
+                            modal.style.display = "block";
+                        },
+                        error: function (e) {
+                            console.log("There was an error when requesting patient information...");
+                            console.log("error: " + JSON.stringify(e));
+                        }
+                    };
+
+                    $.ajax(QuerySettings);
+                });
+
+                // When the user clicks on <span> (x), close the modal
+                span.onclick = function() {
+                    modal.style.display = "none";
+                }
+
+                // When the user clicks anywhere outside of the modal, close it
+                window.onclick = function(event) {
+                    if (event.target == modal) {
+                        modal.style.display = "none";
+                    }
+                }
             }
 
 
@@ -808,6 +884,7 @@
             }
         });
 
+
     </script>
 
 
@@ -848,7 +925,7 @@
                 </div>
             </div>
             <div class="table-container">
-                <table id="side-table" class="display compact" cellspacing="0" width="100%">
+                <table id="side-table" class="display compact nowrap" cellspacing="0" width="100%">
                     <thead>
                     <tr>
                         <th>Test Date</th>
@@ -905,39 +982,33 @@
 <div id="myModal" class="modal">
 
     <!-- Modal content -->
-    <div class="modal-content">
-        <span class="close">&times;</span>
-        <p>Some text in the Modal..</p>
+    <div id="modal-content" class="modal-content">
+        <div class="md-grid-container">
+            <div class="md-modal-heading">
+                <h2 id="modal-patient-name"></h2>
+                <div class="close">&times;</div>
+            </div>
+            <div class="md-modal-body">
+                <div class="md-modal-pcr"></div>
+                <div class="md-modal-table">
+                    <table id="patient-table" class="display compact" cellspacing="0" width="100%">
+                        <thead>
+                        <tr>
+                            <th>Test Date</th>
+                            <th>Result</th>
+                            <th>Centre Type</th>
+                            <th>Postcode</th>
+                        </tr>
+                        </thead>
+                    </table>
+                </div>
+                <div class="md-modal-patient-info"></div>
+                <div class="md-modal-comments"></div>
+            </div>
+        </div>
     </div>
 
 </div>
-
-
-
-<script>
-    // Get the modal
-    const modal = document.getElementById("myModal");
-
-    // Get the <span> element that closes the modal
-    const span = document.getElementsByClassName("close")[0];
-
-    $('#side-table').on( 'click', 'tr', function () {
-        modal.style.display = "block";
-    });
-
-    // When the user clicks on <span> (x), close the modal
-    span.onclick = function() {
-        modal.style.display = "none";
-    }
-
-    // When the user clicks anywhere outside of the modal, close it
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-    }
-</script>
-
 
 </body>
 </html>

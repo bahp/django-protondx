@@ -79,6 +79,7 @@ class PostcodeFilter(FilterSet):
             'testing_centre__postcode': ['startswith'],
             'date_test': ['date__lt'],
             'test_result': ['exact'],
+            'patient': ['exact'],
         }
 
 
@@ -134,6 +135,7 @@ class GeoView(APIView):
                                                  'testing_centre__postcode',
                                                  'testing_centre__centre_type',
                                                  'patient__gender',
+                                                 'patient'
                                                  )
                                          )
 

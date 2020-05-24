@@ -1,0 +1,96 @@
+.md-grid-container {
+    height: 100%;
+    margin: 0;
+    font-family: Arial;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 0.2fr 1.8fr;
+    gap: 0px 0px;
+    grid-template-areas: "md-modal-heading" "md-modal-body";
+}
+
+.md-modal-heading {
+    grid-area: md-modal-heading;
+    display: flex;
+    align-items: center;
+    padding: 15px;
+}
+
+.md-modal-heading h2{
+    float: left;
+    width: 90%;
+}
+
+.md-modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0px 0px;
+    grid-template-areas: "md-modal-pcr md-comments" "md-modal-patient-info md-modal-table";
+    grid-area: md-modal-body;
+}
+
+.md-modal-pcr {
+    grid-area: md-modal-pcr;
+    background-color: #aaaaaa;
+}
+
+.md-modal-table {
+    grid-area: md-modal-table;
+    background-color: #5b5b5b;
+}
+
+.md-modal-patient-info {
+    grid-area: md-modal-patient-info;
+    background-color: #000000;
+}
+
+.md-modal-comments {
+    grid-area: md-modal-comments;
+    background-color: #e0e0e0;
+}
+
+.modal {
+    display: none;
+    z-index: 1;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.5);
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: white;
+    color: #002147;
+    margin: auto;
+    border: 1px solid #002147;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 80%;
+    width: 80%;
+}
+
+/* The Close Button */
+.close {
+    width: 10%;
+    color: #aaaaaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}

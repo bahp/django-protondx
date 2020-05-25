@@ -5,50 +5,72 @@
     overflow: auto;
     display: grid;
     grid-template-columns: 1fr;
-    grid-template-rows: 0.2fr 1.8fr;
-    gap: 0px 0px;
+    grid-template-rows: 0.15fr 1.85fr;
+    gap: 0 0;
     grid-template-areas: "md-modal-heading" "md-modal-body";
 }
 
 .md-modal-heading {
     grid-area: md-modal-heading;
-    display: flex;
-    align-items: center;
-    padding: 15px;
+    padding: 16px;
+    background-color: #002147;
+    color: white;
 }
 
 .md-modal-heading h2{
-    float: left;
-    width: 90%;
+    margin: 0;
+    height: 100%;
+
 }
+
 
 .md-modal-body {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    grid-template-rows: 1fr 1fr;
-    gap: 0px 0px;
-    grid-template-areas: "md-modal-pcr md-comments" "md-modal-patient-info md-modal-table";
+    grid-template-rows: 1fr;
+    gap: 0 0;
+    grid-template-areas: "md-modal-diagnostic md-modal-patient";
     grid-area: md-modal-body;
+    background-color: #003E74;
+}
+
+.md-modal-diagnostic {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0 0;
+    grid-template-areas: "md-modal-pcr" "md-modal-comments";
+    grid-area: md-modal-diagnostic;
 }
 
 .md-modal-pcr {
     grid-area: md-modal-pcr;
-    background-color: #aaaaaa;
+    background-color: white;
+    padding: 15px;
+    border: 16px solid #003E74;
+    border-bottom: 8px solid #003E74;
+    border-right: 8px solid #003E74;
 }
 
-.md-modal-table {
-    grid-area: md-modal-table;
-    background-color: #5b5b5b;
-}
-
-.md-modal-patient-info {
-    grid-area: md-modal-patient-info;
-    background-color: #000000;
+.md-modal-patient {
+    grid-area: md-modal-patient;
+    background-color: white;
+    padding: 15px;
+    border: 16px solid #003E74;
+    border-left: 8px solid #003E74;
 }
 
 .md-modal-comments {
     grid-area: md-modal-comments;
-    background-color: #e0e0e0;
+    background-color: white;
+    padding: 15px;
+    border: 16px solid #003E74;
+    border-top: 8px solid #003E74;
+    border-right: 8px solid #003E74;
+}
+
+#patient-table-div {
+    float: bottom;
 }
 
 .modal {
@@ -70,7 +92,6 @@
     background-color: white;
     color: #002147;
     margin: auto;
-    border: 1px solid #002147;
     position: fixed;
     top: 50%;
     left: 50%;
@@ -81,9 +102,7 @@
 
 /* The Close Button */
 .close {
-    width: 10%;
     color: #aaaaaa;
-    float: right;
     font-size: 28px;
     font-weight: bold;
 }
@@ -94,3 +113,19 @@
     text-decoration: none;
     cursor: pointer;
 }
+
+.right{
+    float:right;
+}
+
+.left{
+    float:left;
+
+}
+
+.vertical-middle {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+

@@ -85,6 +85,7 @@ class PostcodeFilter(FilterSet):
 
 # This viewset and the associated serializer may not be needed. Here now for testing purposes
 class DiagnosticTestView(generics.ListAPIView):
+    pagination_class = None
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = DiagnosticTestSerializer
     # permission_classes = [permissions.IsAuthenticated]

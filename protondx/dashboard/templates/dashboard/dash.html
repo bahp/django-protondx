@@ -11,14 +11,13 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
 
     <!--Jquery-->
-    <script src="https://code.jquery.com/jquery-1.12.3.js"></script>
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 
     <!--DATATABLES-->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
-<!--    add these imports-->
-<!--    https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css-->
-<!--https://cdn.datatables.net/1.10.21/css/dataTables.jqueryui.min.css-->
-<!--https://cdn.datatables.net/scroller/2.0.2/css/scroller.jqueryui.min.css-->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.jqueryui.min.css">
+
+
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.21/features/pageResize/dataTables.pageResize.min.js"></script>
 
@@ -44,6 +43,7 @@
         }
 
         let table;
+        let patientTable;
         require([
             "esri/Map",
             "esri/views/MapView",
@@ -130,17 +130,34 @@
                         { data: "properties.testing_centre__postcode" },
 
                     ],
-                    // pageResize: true,
                     // rowId: 'properties.pk',
-                    // // scrollY:        '20vh',
-                    // //scrollCollapse: true,
                     paging:         false,
-                    // bInfo : false,
-                     bLengthChange: false,
+                    bLengthChange: false,
                     deferRender:    true,
                     scrollY:        200,
-                    scrollCollapse: true,
-                    scroller:       true
+                });
+
+                patientTable = $('#patient-table').DataTable( {
+                    data: {
+                        date_test: "",
+                        test_result: "",
+                        testing_centre: ""
+                    },
+                    columns: [
+                        {
+                            data: "date_test",
+                        },
+                        {
+                            data: "test_result",
+                        },
+                        {
+                            data: "testing_centre",
+                        },
+                    ],
+                    paging:         false,
+                    bLengthChange: false,
+                    deferRender:    true,
+                    scrollY:        200,
                 });
 
 
@@ -151,50 +168,44 @@
                 const span = document.getElementsByClassName("close")[0];
 
                 $('#side-table tbody').on( 'click', 'tr', function () {
-                    let patient_id = table.row( this ).data().properties.patient;
+                    const patient_id = table.row( this ).data().properties.patient;
                     const patientURL = HOST_NAME + "/dashboard/api/patient/" + patient_id;
-                    const QuerySettings = {
-                        url: patientURL,
-                        method: "GET",
-                        success: function (data) {
-                            console.log(data);
-
-                            // add patient name
-                            modal_patient_name.innerHTML = data.first_name + " " + data.last_name;
-
-                            // add patient diagnostic test table
-                            // $('#patient-table').DataTable( {
-                            //     data: data.features,
-                            //     columns: [
-                            //         {
-                            //             data: "properties.date_test",
-                            //         },
-                            //         {
-                            //             data: "properties.test_result",
-                            //         },
-                            //         {
-                            //             data: "properties.testing_centre__centre_type",
-                            //         },
-                            //         { data: "properties.testing_centre__postcode" },
-                            //
-                            //     ],
-                            //     pageResize: true,
-                            //     rowId: 'properties.pk',
-                            //     paging:         true,
-                            //     bLengthChange: false
-                            // });
+                    const diagnosticsURL = HOST_NAME + "/dashboard/api/diagnostic-test/?patient=" + patient_id;
 
 
 
-                            modal.style.display = "block";
-                        },
-                        error: function (e) {
-                            console.log("There was an error when requesting patient information...");
-                            console.log("error: " + JSON.stringify(e));
-                        }
-                    };
+                    let call1 =  $.get(patientURL);
+                    let call2 =  $.get(diagnosticsURL);
 
-                    $.ajax(QuerySettings);
+                    // catch error!!!
+                    $.when(call1, call2).then(function (response1, response2) {
+
+                        // add patient name
+                        modal_patient_name.innerHTML = response1[0].first_name + " " + response1[0].last_name;
+
+                        // add patient diagnostic test table
+
+                        patientTable.clear();
+                        patientTable.rows.add(response2[0]);
+                        patientTable.draw();
+
+
+
+                        modal.style.display = "block";
+                    });
+
+                    const pcr_id = document.getElementById("pcr-id");
+                    const comment_id = document.getElementById("comment-id");
+
+                    $('#patient-table tbody').on( 'click', 'tr', function () {
+                        console.log(patientTable.row( this ).data());
+                        const diagnostic_id = patientTable.row( this ).data().id;
+
+                        pcr_id.innerHTML = diagnostic_id;
+                        comment_id.innerHTML = diagnostic_id;
+
+
+                    });
                 });
 
                 // When the user clicks on <span> (x), close the modal
@@ -925,7 +936,7 @@
                 </div>
             </div>
             <div class="table-container">
-                <table id="side-table" class="display compact nowrap" cellspacing="0" width="100%">
+                <table id="side-table" class="display compact" cellspacing="0" width="100%">
                     <thead>
                     <tr>
                         <th>Test Date</th>
@@ -985,25 +996,36 @@
     <div id="modal-content" class="modal-content">
         <div class="md-grid-container">
             <div class="md-modal-heading">
-                <h2 id="modal-patient-name"></h2>
-                <div class="close">&times;</div>
+                <h2>
+                    <span class="right close vertical-middle">&times;</span><span class="left vertical-middle" id="modal-patient-name"></span>
+                </h2>
             </div>
             <div class="md-modal-body">
-                <div class="md-modal-pcr"></div>
-                <div class="md-modal-table">
-                    <table id="patient-table" class="display compact" cellspacing="0" width="100%">
-                        <thead>
-                        <tr>
-                            <th>Test Date</th>
-                            <th>Result</th>
-                            <th>Centre Type</th>
-                            <th>Postcode</th>
-                        </tr>
-                        </thead>
-                    </table>
+                <div class="md-modal-diagnostic">
+                    <div class="md-modal-pcr">
+                        <h3 style="display: inline">PCR Graph - Test ID: #</h3><h3 style="display: inline" id="pcr-id"></h3>
+                    </div>
+                    <div class="md-modal-comments">
+                        <h3 style="display: inline">Diagnostic comments - Test ID: #</h3><h3 style="display: inline" id="comment-id"></h3>
+                    </div>
                 </div>
-                <div class="md-modal-patient-info"></div>
-                <div class="md-modal-comments"></div>
+                <div class="md-modal-patient">
+                    <h3 style="display: inline">Patient Information</h3>
+                    <p>This is some patient information!</p>
+                    <hr>
+                    <div id="patient-table-div">
+                        <table id="patient-table" class="display" cellspacing="0" width="100%">
+                            <thead>
+                            <tr>
+                                <th>Test Date</th>
+                                <th>Result</th>
+                                <th>Centre Type</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+                </div>
             </div>
         </div>
     </div>

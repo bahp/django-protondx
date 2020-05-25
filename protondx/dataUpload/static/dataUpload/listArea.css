@@ -1,0 +1,43 @@
+.upload-list button {
+    padding: 10px;
+    width: 0%;
+    height: 100%;
+    background-color: darkgray;
+    border: none;
+    white-space: nowrap;
+    overflow-x: visible;
+    outline: none;
+
+}
+
+.upload-list button:hover {
+    background-color: #5b5b5b;
+    border: none;
+}
+
+.upload-list button:disabled {
+    background-color: orangered;
+    border: none;
+    color: black;
+}
+
+.upload-list button.active {
+    background-color: #5b5b5b;
+    border: none;
+}
+
+
+
+
+.upload-list div {
+    padding: 0px;
+    width: 100%;
+    height: 50px;
+    background-color: lightgrey;
+    border: none;
+    border-bottom: 1px solid black;
+    font-family: sans-serif;
+    display: flex;
+    align-items: center;
+}
+

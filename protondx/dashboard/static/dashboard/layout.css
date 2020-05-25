@@ -1,154 +1,61 @@
-/*
-
-    ### LAYOUT 1 ###
-
-    This file contains the layout and sizes
-    for the dashboard divs
-    ____________________
-    |              | 2 |
-    |       1      |___|
-    |              | 3 |
-    |______________|___|
-    |_______4______|_5_|
-
-    1. viewDiv
-    2. feature-node-right-top
-    3. feature-node-right-mid
-    4. feature-node-left-bottom
-    5. feature-node-right-bottom
-
-    Divs must be added to HTML body in the above order
-
- */
-
-/*html, body {*/
-/*    padding: 0;*/
-/*    margin: 0;*/
-/*    height: 100%;*/
-/*    width: 100%;*/
-/*}*/
-
-/*#viewDiv {*/
-/*    float: left;*/
-/*    padding: 0;*/
-/*    margin: 0;*/
-/*    height: 80%;*/
-/*    width: 75%;*/
-/*    !*border:1px solid black;*!*/
-/*}*/
-
-/*#feature-node-right-top {*/
-/*    float: left;*/
-/*    width: 25%;*/
-/*    height: 40%;*/
-/*    padding: 1em;*/
-/*    border:3px solid black;*/
-/*}*/
-
-/*#feature-node-right-mid {*/
-/*    float: left;*/
-/*    width: 25%;*/
-/*    height: 40%;*/
-/*    padding: 1em;*/
-/*    border:3px solid black;*/
-/*}*/
-
-/*#feature-node-right-bottom {*/
-/*    float: left;*/
-/*    width: 25%;*/
-/*    height: 20%;*/
-/*    padding: 1em;*/
-/*    border:3px solid black;*/
-/*}*/
-
-/*#feature-node-left-bottom {*/
-/*    float: left;*/
-/*    width: 75%;*/
-/*    height: 20%;*/
-/*    padding: 1em;*/
-/*    border:3px solid black;*/
-/*}*/
-
-/*
-
-    ### LAYOUT 2 ###
-
-    This file contains the layout and sizes
-    for the dashboard divs
-    ____________________
-    |            |     |
-    |            |  2  |
-    |      1     |     |
-    |            |_____|
-    |____________|__3__|
-
-    1. viewDiv
-    2. feature-node-right-side
-    3. feature-node-right-bottom
-
-    Divs must be added to HTML body in the above order
-
- */
-
-html, body {
-    padding: 0;
-    margin: 0;
-    height: 100%;
-    width: 100%;
-    background-color: black;
-}
-
-#viewDiv {
-    float: left;
-    margin: 0;
-    height: 100%;
-    width: 65%;
-}
-
 #webglNotSupportedDiv {
     position: absolute;
     top: 0;
     visibility: hidden;
 }
 
-#feature-node-right-top {
-    float: left;
-    width: 35%;
-    height: 80%;
-    padding: 1em;
-    border: 1vw solid black;
-    border-bottom: 0.5vw solid black;
-    border-radius: 2vw;
-}
-
-#feature-node-right-bottom {
-    float: left;
-    width: 35%;
-    height: 20%;
-    border: 1vw solid black;
-    border-top: 0.5vw solid black;
-    border-radius: 2vw;
-    padding: 1em;
-}
-
-#general-information-heading{
-    width: 100%;
-    float: top;
-}
-
-
-#general-information{
-    width: 100%;
-    float: top;
-    padding-bottom: 1em;
-}
-
-
 #selectionPaneDiv {
-    border-radius: 10px;
     padding: 6px;
-    background-color: rgba(36, 36, 36, 0.7);
-    color: white;
-    border: black 1px;
+    background-color: rgba(255, 255, 255, 0.7);
+    color: black;
+    border: none;
     white-space: nowrap;
 }
+
+/*#timeSlider {*/
+/*    position: absolute;*/
+/*    left: 100px;*/
+/*    right: 100px;*/
+/*    bottom: 20px;*/
+/*}*/
+
+.dropButton {
+    background-color: #002147;
+    color: white;
+    padding: 16px;
+    font-size: 16px;
+    border: none;
+    cursor: pointer;
+}
+
+.dropButton:hover, .dropButton:focus {
+    background-color: #006EAF;
+}
+
+.dropdown {
+  margin-left: auto;
+    height: 100%;
+
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 160px;
+    overflow: auto;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    right: 0;
+    z-index: 1;
+}
+
+.dropdown-content a {
+    color: black;
+    padding: 12px 16px;
+    text-decoration: none;
+    display: block;
+}
+
+.dropdown a:hover {background-color: #ddd;}
+
+.show {display: block;}

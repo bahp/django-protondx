@@ -6,20 +6,35 @@
 
     <title>COVID-19 Dashboard</title>
 
+    <!-- Load the Chart.js and moment.js libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+
+    <!--Jquery-->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
+
 
     <!--DATATABLES-->
-    <script src="https://code.jquery.com/jquery-1.12.3.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.4/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.jqueryui.min.css">
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.21/features/pageResize/dataTables.pageResize.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.4/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.colVis.min.js"></script>
 
     <!--CSS templates-->
     {% load static %}
     <link rel="stylesheet" type="text/css" href="{% static 'dashboard/layout.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/datatables.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/modal-grid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/main-grid.css' %}">
+    <!--    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/datatable.css' %}">-->
 
     <!--ARCGIS-->
-    <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/dark/main.css">
+    <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css">
     <script src="https://js.arcgis.com/4.15/"></script>
 
 
@@ -32,7 +47,7 @@
         }
 
         let table;
-
+        let patientTable;
         require([
             "esri/Map",
             "esri/views/MapView",
@@ -64,7 +79,6 @@
                     Fullscreen,
                     Search,
                     BasemapGallery,) {
-
 
             // //////////
             // DATA fetch
@@ -100,56 +114,148 @@
                     data: data.features,
                     columns: [
                         {
+                            data: "properties.patient",
+                        },
+                        {
                             data: "properties.date_test",
-                            render: function ( data, type, row ) {
-                                const dateSplit = data.split('T')[0].split('-');
-                                return type === "display" || type === "filter" ?
-                                    dateSplit[2] +'-'+ dateSplit[1] +'-'+ dateSplit[0] :
-                                    data;
-                            }
                         },
                         {
                             data: "properties.test_result",
-                            // render: function (data, type, row){
-                            //     switch(data) {
-                            //         case "True":
-                            //             return "Positive";
-                            //         case "False":
-                            //             return "Negative";
-                            //         default:
-                            //             return "n/a";
-                            //     }
-                            // }
                         },
                         {
                             data: "properties.testing_centre__centre_type",
-                            // render: function (data, type, row){
-                            //     switch(data) {
-                            //         case "HOSP":
-                            //             return "Hospital";
-                            //         case "CLIN":
-                            //             return "GP Clinic";
-                            //         case "DRIV":
-                            //             return "Drive through";
-                            //         case "HOME":
-                            //             return "Home test";
-                            //         case "OTHR":
-                            //             return "Other";
-                            //         default:
-                            //             return "n/a";
-                            //     }
-                            // }
                         },
-                        { data: "properties.testing_centre__postcode" },
-
+                        {
+                            data: "properties.testing_centre__postcode"
+                        },
+                        {
+                            data: "properties.testing_centre__county",
+                            visible: false,
+                        },
+                        {
+                            data: "properties.testing_centre__region",
+                            visible: false,
+                        },
+                        {
+                            data: "properties.testing_centre__country",
+                            visible: false,
+                        },
                     ],
-                    pageResize: true,
-                    rowId: 'properties.pk',
+                    buttons: [
+                        'colvis'
+                    ],
+                    dom: 'Bfrtip',
+                    // rowId: 'properties.pk',
+                    paging:         false,
+                    bLengthChange: false,
+                    bInfo: false,
+                    deferRender:    true,
+                    scrollY:        200,
+                    scrollX: "100%",
+                });
+
+                patientTable = $('#patient-table').DataTable( {
+                    data: {
+                        date_test: "",
+                        test_result: "",
+                        testing_centre: ""
+                    },
+                    columns: [
+                        {
+                            data: "date_test",
+                        },
+                        {
+                            data: "test_result",
+                        },
+                        {
+                            data: "centre_type",
+                        },
+                    ],
+                    paging:         false,
+                    bLengthChange: false,
+                    deferRender:    true,
+                    scrollY:        200,
+                    scrollX: "100%"
                 });
 
 
+                // Get the modal
+                const modal = document.getElementById("myModal");
+                const modal_patient_name = document.getElementById("modal-patient-name");
+                // Get the <span> element that closes the modal
+                const span = document.getElementsByClassName("close")[0];
 
-            };
+                const tr_patient_id = document.getElementById("tr-patient-id");
+                const tr_patient_gender = document.getElementById("tr-patient-gender");
+                const tr_patient_dob = document.getElementById("tr-patient-dob");
+                const tr_patient_postcode = document.getElementById("tr-patient-postcode");
+                const tr_patient_count = document.getElementById("tr-patient-count");
+
+                $('#side-table tbody').on( 'click', 'tr', function () {
+                    const patient_id = table.row( this ).data().properties.patient;
+                    const patientURL = HOST_NAME + "/dashboard/api/patient/" + patient_id;
+                    const diagnosticsURL = HOST_NAME + "/dashboard/api/diagnostic-test/?patient=" + patient_id;
+
+
+                    let call1 =  $.get(patientURL);
+                    let call2 =  $.get(diagnosticsURL);
+
+                    // catch error!!!
+                    $.when(call1, call2).then(function (response1, response2) {
+
+                        // add patient name
+                        modal_patient_name.innerHTML = response1[0].first_name + " " + response1[0].last_name;
+
+                        // add patient diagnostic test table
+                        patientTable.clear();
+                        patientTable.rows.add(response2[0]);
+
+                        // add patient information
+                        tr_patient_id.innerText = "# " + patient_id;
+                        tr_patient_gender.innerText = response1[0].gender;
+                        tr_patient_dob.innerText = response1[0].dob
+                            + " ("
+                            + moment().diff(moment(response1[0].dob,'DD-MM-YYYY').format('MM-DD-YYYY'), 'years')
+                            + ")";
+                        tr_patient_postcode.innerText = response1[0].postcode;
+                        tr_patient_count.innerText = response2[0].length;
+
+                        // make modal visible
+                        modal.style.display = "block";
+
+                        // display table
+                        // done after displaying modal for correct column width
+                        patientTable.draw();
+                    }).catch(function (e) {
+                        console.log(e);
+                    });
+                });
+
+                const pcr_id = document.getElementById("pcr-id");
+                const comment_id = document.getElementById("comment-id");
+
+                $('#patient-table tbody').on( 'click', 'tr', function () {
+                    $(this).addClass('selected').siblings().removeClass('selected');
+                    const diagnostic_id = patientTable.row( this ).data().id;
+
+                    pcr_id.innerHTML = diagnostic_id;
+                    comment_id.innerHTML = diagnostic_id;
+                });
+
+                // $("#filterbox").keyup(function() {
+                //     patientTable.search(this.value).draw();
+                // });
+
+                // When the user clicks on <span> (x), close the modal
+                span.onclick = function() {
+                    patientTable.search('').draw();
+                    pcr_id.innerHTML = '';
+                    comment_id.innerHTML = '';
+                    modal.style.display = "none";
+                }
+
+
+            }
 
 
             // /////////////////////
@@ -157,27 +263,33 @@
             // /////////////////////
 
             function createMap(geoJSONLayerURL) {
+
                 ///////////
                 // Map view
 
                 const map = new Map({
-                    basemap: "dark-gray-vector"
+                    basemap: "gray-vector"
                 });
 
                 const baseMap = new MapView({
                     container: "viewDiv",
                     map: map,
                     center: [-2.89479, 54.093409],
-                    zoom: 5
+                    zoom: 5,
+                    highlightOptions: {
+                        color: [0, 62, 116, 1],
+                        haloOpacity: 0.9,
+                        fillOpacity: 0.2
+                    },
                 });
 
 
                 baseMap
-                    .when(function() {
+                    .when(function () {
                         // View successfully loaded, show viewDiv
                         document.getElementById("viewDiv").style.display = "flex";
                     })
-                    .catch(function(error) {
+                    .catch(function (error) {
                         if (error.name.includes("webgl")) {
                             // View was rejected, show webgl unsupported message and turn off the viewDiv
                             const divs = document.getElementsByTagName("div");
@@ -217,15 +329,15 @@
                     minPixelIntensity: 0,
                 };
 
-                var dotRenderer = {
+                const dotRenderer = {
                     type: "unique-value",
                     field: "test_result",
                     defaultSymbol: {
                         type: "simple-marker",
                         color: "orange",
                         size: 8,
-                        outline:{
-                            style: "none",
+                        outline: {
+                            color: "none",
                         },
                     },
                     defaultLabel: "n/a",
@@ -235,8 +347,8 @@
                             type: "simple-marker",
                             color: "rgba(255, 0, 0, 1)",
                             size: 8,
-                            outline:{
-                                style: "none",
+                            outline: {
+                                color: "none",
                             },
                         },
                         label: "Positive"
@@ -247,21 +359,16 @@
                             color: "rgba(0, 255, 0, 1)",
                             size: 8,
                             outline: {
-                                style: "none",
+                                color: "none",
                             },
                         },
                         label: "Negative",
                     },],
-                    outline:{
-                        style: "none",
+                    outline: {
+                        color: "none",
                     },
                 };
 
-                // POPUP FOR DATA LAYER
-                const template = {
-                    title: "Test Information:",
-                    content: "Test result: {test_result} <br> Test date: {date_test} <br> Centre type: {testing_centre__centre_type} <br> Postcode: {testing_centre__postcode}",
-                };
 
                 // create data layer
                 const geoJSONLayer = new GeoJSONLayer({
@@ -269,7 +376,6 @@
                     copyright: "Add copyright for COVID data if needed",
                     renderer: heatRenderer,
                     title: "COVID-19 testing",
-                    popupTemplate: template,
                     // featureReduction : {
                     //     type: "cluster",
                     //     clusterRadius: 10,
@@ -287,14 +393,18 @@
                     },
                 };
 
+                // add geoJSON layer to map
+                map.add(geoJSONLayer);
+
+
                 /////////
                 // Select which dots to display
+
                 function updateRenderer(color, index) {
                     let renderer = geoJSONLayer.renderer.clone();
                     if (index === -1) {
                         renderer.defaultSymbol.color = color;
-                    }
-                    else{
+                    } else {
                         renderer.uniqueValueInfos[index].symbol.color = color;
                     }
                     geoJSONLayer.renderer = renderer;
@@ -316,6 +426,7 @@
                     else updateRenderer("rgba(255, 165, 0, 0)", -1);
                 });
 
+
                 //renderer selection w/ radio
                 let radios = document.getElementsByName("renderer");
                 let renderArray = [heatRenderer, dotRenderer];
@@ -335,8 +446,296 @@
                     });
                 }
 
-                // ////////////
-                // Postcode Map
+
+                ///////
+                // add charts
+
+                let centreChart;
+
+                function createCentreChart() {
+                    const centreCanvas = document.getElementById("centre-chart");
+                    centreChart = new Chart(centreCanvas.getContext("2d"), {
+                        type: "doughnut",
+                        data: {
+                            labels: ["Home", "Hospital", "GP Clinic", "Drive Through", "Other"],
+                            datasets: [
+                                {
+                                    backgroundColor: [
+                                        "#FD7F6F",
+                                        "#7EB0D5",
+                                        "#B2E061",
+                                        "#BD7EBE",
+                                        "#FFB55A"
+                                    ],
+                                    borderWidth: 0,
+                                    data: [0, 0, 0, 0, 0]
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            cutoutPercentage: 35,
+                            legend: {
+                                position: "bottom"
+                            },
+                            title: {
+                                display: true,
+                                text: "Centre Type"
+                            }
+                        }
+                    });
+                }
+
+                let genderChart;
+
+                function createGenderChart() {
+                    const genderCanvas = document.getElementById("gender-chart");
+                    genderChart = new Chart(genderCanvas.getContext("2d"), {
+                        type: "doughnut",
+                        data: {
+                            labels: ["Female", "Male", "Other", "Not provided"],
+                            datasets: [
+                                {
+                                    backgroundColor: [
+                                        "#FD7F6F",
+                                        "#7EB0D5",
+                                        "#B2E061",
+                                        "#BD7EBE",
+                                    ],
+                                    borderWidth: 0,
+                                    data: [0, 0, 0, 0]
+                                }
+                            ]
+                        },
+                        options: {
+                            responsive: true,
+                            cutoutPercentage: 35,
+                            legend: {
+                                position: "bottom"
+                            },
+                            title: {
+                                display: true,
+                                text: "Patient Gender"
+                            }
+                        }
+                    });
+                }
+
+                let dateChart;
+
+                function createDateChart() {
+                    const dateCanvas = document.getElementById("date-chart");
+                    dateChart = new Chart(dateCanvas.getContext("2d"), {
+                        type: "line",
+                        data: {
+                            datasets: [{
+                                label: 'Daily Tests',
+                                backgroundColor: "#FD7F6F",
+                                borderColor: "#B2E061",
+                                fill: false,
+                                data: [{
+                                    x: moment('2016-01-01T00:00:00Z').format(),
+                                    y: 1
+                                }, {
+                                    x: moment('2016-01-08T00:00:00Z').format(),
+                                    y: 2
+                                }, {
+                                    x: moment('2016-01-18T00:00:00Z').format(),
+                                    y: 3
+                                }, {
+                                    x: moment('2016-01-27T00:00:00Z').format(),
+                                    y: 4
+                                }],
+                            }, {
+                                label: 'Daily positive tests',
+                                backgroundColor: "#7EB0D5",
+                                borderColor: "#BD7EBE",
+                                fill: false,
+                                data: [{
+                                    x: moment('2016-01-01T00:00:00Z').format(),
+                                    y: 4
+                                }, {
+                                    x: moment('2016-01-08T00:00:00Z').format(),
+                                    y: 3
+                                }, {
+                                    x: moment('2016-01-18T00:00:00Z').format(),
+                                    y: 2
+                                }, {
+                                    x: moment('2016-01-27T00:00:00Z').format(),
+                                    y: 1
+                                }],
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+
+                            legend: {
+                                position: "bottom"
+                            },
+                            title: {
+                                display: true,
+                                text: "Testing trends"
+                            },
+                            scales: {
+                                xAxes: [{
+                                    type: 'time',
+                                    time: {
+                                        unit: 'day'
+                                    }
+                                }]
+                            }
+                        }
+                    });
+                }
+
+                createCentreChart();
+                createGenderChart();
+                createDateChart();
+
+                // used to update charts
+                function updateChart(chart, dataValues) {
+                    chart.data.datasets[0].data = dataValues;
+                    chart.update();
+                }
+
+
+                const selection_name = document.getElementById("selection-name");
+                const selection_total = document.getElementById("selection-total");
+                const selection_pos = document.getElementById("selection-pos");
+                const selection_neg = document.getElementById("selection-neg");
+
+                function queryPopup(target) {
+                    //set overview name
+                    const country = target.graphic.attributes.NAME;
+                    const region = target.graphic.attributes.nuts118nm;
+                    const postcode = [target.graphic.attributes.NAME_1, target.graphic.attributes.POSTCODE_1];
+
+                    if (country){
+                        selection_name.innerHTML = country;
+                        table.search(country).draw();
+                    }
+                    else if (region){
+                        selection_name.innerHTML = region;
+                        table.search(region.split('(')[0]).draw();
+                    }
+                    else if (postcode){
+                        selection_name.innerHTML = postcode[0] + ", " + postcode[1];
+                        table.search(postcode[1]).draw();
+                    }
+                    else{
+                        console.log("Invalid search geometry")
+                    }
+
+
+                    const query = geoJSONLayer.createQuery();
+                    query.geometry = target.graphic.geometry;
+                    query.outStatistics = [
+
+                        {
+                            onStatisticField:
+                                "CASE WHEN test_result = 'Positive' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "positive",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN test_result = 'Negative' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "negative",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN testing_centre__centre_type = 'Hospital' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "hospital",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN testing_centre__centre_type = 'Other' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "other",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN testing_centre__centre_type = 'GP clinic' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "clinic",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN testing_centre__centre_type = 'Drive through centre' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "drive_through",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN testing_centre__centre_type = 'Home' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "home",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN patient__gender = 'F' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "gen_female",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN patient__gender = 'M' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "gen_male",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN patient__gender = 'O' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "gen_other",
+                            statisticType: "sum"
+                        },
+                        {
+                            onStatisticField:
+                                "CASE WHEN patient__gender = 'X' THEN 1 ELSE 0 END",
+                            outStatisticFieldName: "gen_na",
+                            statisticType: "sum"
+                        },
+
+                    ];
+
+
+                    let popup = geoJSONLayer.queryFeatures(query).then(function (response) {
+                        let data = response.features[0].attributes;
+
+
+                        updateChart(centreChart, [
+                            data.home,
+                            data.hospital,
+                            data.clinic,
+                            data.drive_through,
+                            data.other,
+                        ]);
+
+                        updateChart(genderChart, [
+                            data.gen_female,
+                            data.gen_male,
+                            data.gen_other,
+                            data.gen_na,
+                        ]);
+
+                        // selection_total.innerText = ((data.positive + data.negative) || 0);
+                        // selection_pos.innerText = (data.positive || 0);
+                        // selection_neg.innerText = (data.negative || 0);
+
+                        return ("<table> <tbody>" +
+                            "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" + ((data.positive + data.negative) || 0) + "</td> </tr>" +
+                            "<tr> <td>Positive:</td> <td>" + (data.positive || 0) + "</td> </tr>" +
+                            "<tr> <td>Negative:</td> <td>" + (data.negative || 0) + "</td> </tr>" +
+                            "</tbody> </table>");
+                    });
+
+                    return popup;
+                }
+
+                //////
+                // add postcode layer
 
                 //renderer
                 const lineRenderer = {
@@ -350,40 +749,7 @@
                             color: [0, 0, 0, 0.4],
                         },
                     },
-                    label: "Postcode Sector Boundaries"
                 };
-
-                // postcode map and popup
-                function queryPopup(target) {
-
-                    const url = HOST_NAME + "/dashboard/api/get-postcode-data/?postcode="
-                        + encodeURIComponent((target.graphic.attributes.POSTCODE_1).trim())
-
-                    // Should try and not use async: false
-                    let tmp;
-                    const QuerySettings = {
-                        url: url,
-                        method: "GET",
-                        async: false,
-                        success: function (data) {
-                            tmp = ("<table> <tbody>" +
-                                "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" + (data.summary.total) + "</td> </tr>" +
-                                "<tr> <td>Positive:</td> <td>" + (data.summary.positive) + "</td> </tr>" +
-                                "<tr> <td>Negative:</td> <td>" + (data.summary.negative) + "</td> </tr>" +
-                                "<tr> <td>Patients:</td> <td>" + (data.summary.patients) + "</td> </tr>" +
-                                "</tbody> </table>");
-                        },
-                        error: function (e) {
-                            console.log("There was an error with your request...");
-                            console.log("error: " + JSON.stringify(e));
-                        }
-                    };
-
-                    $.ajax(QuerySettings);
-
-                    return tmp;
-
-                }
 
                 // postcode popup
                 const popupPostcode = {
@@ -398,21 +764,81 @@
                     popupTemplate: popupPostcode,
                     renderer: lineRenderer,
                     title: "Map features",
-                    minScale: 3000000,
+                    minScale: 300000,
                     maxScale: 0,
+                    legendEnabled: false,
                 });
 
-                //postcode popup
+                // popup location
                 baseMap.popup = {
                     dockEnabled: true,
                     dockOptions: {
-                        buttonEnabled: false,
+                        buttonEnabled: true,
                         breakpoint: false
                     },
+                    collapsed: true,
                 };
 
                 // add postcode layer to map
                 map.add(postcodes);
+
+
+                ////////
+                // Add countries layer
+
+                const countryPopup = {
+                    title: "{NAME}",
+                    content: queryPopup,
+                };
+
+                //renderer
+                const countryRenderer = {
+                    type: "simple",
+                    symbol: {
+                        type: "simple-fill",
+                        style: "none",
+                        outline: {
+                            width: 0.1,
+                            color: "none",
+                        },
+                    },
+                };
+
+
+                let countries = new GeoJSONLayer({
+                    url: "{% static 'dashboard/countries.geojson' %}",
+                    outFields: ["NAME"],
+                    popupTemplate: countryPopup,
+                    renderer: countryRenderer,
+                    title: "Country",
+                    minScale: 0,
+                    maxScale: 8000000,
+                    legendEnabled: false,
+                });
+
+                map.add(countries);
+
+
+                ////////
+                // Add UK regions layer
+
+                const regionPopup = {
+                    title: "{nuts118nm}",
+                    content: queryPopup,
+                };
+
+                let region = new GeoJSONLayer({
+                    url: "{% static 'dashboard/regions.geojson' %}",
+                    outFields: ["nuts118nm"],
+                    popupTemplate: regionPopup,
+                    renderer: lineRenderer,
+                    title: "Region",
+                    minScale: 8000000,
+                    maxScale: 300000,
+                    legendEnabled: false,
+                });
+
+                map.add(region);
 
 
                 ///////
@@ -427,43 +853,6 @@
                 const search = new Search({
                     view: baseMap,
                     locationEnabled: false,
-                });
-
-
-                // Display postcode popup on search
-                search.on("select-result", function(event){
-                    // get coordinates of searched address
-                    const coordinates = webMercatorUtils.xyToLngLat(event.result.feature.geometry.x, event.result.feature.geometry.y);
-
-                    // make apoint out of them
-                    let point = {
-                        type: "point",
-                        x: coordinates[0],
-                        y: coordinates[1]
-                    };
-
-
-                    // query the postcode layer to see which poscodes intersect with the point
-                    let query = postcodes.createQuery();
-                    query.geometry = point;
-                    query.spatialRelationship = "intersects";
-                    postcodes.queryFeatures(query)
-                        .then(function(feature) {
-
-                            // filter by postcode in datatables
-                            // comment out if feature not needed
-                            table.search(feature.features[0].attributes.POSTCODE_1).draw();
-
-                            // open popup of query result
-                            baseMap.popup.open({
-                                features: feature.features
-                            });
-                        });
-                });
-
-                // clear datatables search when map search is cleared
-                search.on("search-clear", function(event){
-                    table.search('').draw();
                 });
 
 
@@ -489,70 +878,27 @@
                 });
 
 
-                // add geoJSON layer to map
-                map.add(geoJSONLayer);
-
-
-                //////////////
-                // Highlight map on table select
-
-                let highlightSelect;
-                baseMap.whenLayerView(geoJSONLayer).then(function(layerView) {
-                    let queryLayer = geoJSONLayer.createQuery();
-
-                    $('#side-table tbody').on( 'click', 'tr', function () {
-
-                        // remove selection if clicking on a selected row
-                        if ( table.row(this).node().className.includes('selected')){
-                            $(this).removeClass('selected');
-                            if (highlightSelect) {
-                                highlightSelect.remove();
-                            }
-                        }
-                        // remove old selection and add selection on new row
-                        else{
-                            $(this).addClass('selected').siblings().removeClass('selected');
-                            const id = table.row( this ).id();
-
-                            queryLayer.where = "pk='" + id + "'";
-                            geoJSONLayer.queryFeatures(queryLayer).then(function(result) {
-                                // if a feature is already highlighted, then remove the highlight
-                                if (highlightSelect) {
-                                    highlightSelect.remove();
-                                }
-
-                                // the feature to be highlighted
-                                const feature = result.features[0];
-
-                                // use the objectID to highlight the feature
-                                highlightSelect = layerView.highlight(
-                                    feature.attributes["OBJECTID"]
-                                );
-                                // baseMap.popup.selectedFeatureIndex = feature.attributes["OBJECTID"];
-                                // baseMap.popup.open(template);
-
-
-                                // center the feature
-                                baseMap
-                                    .goTo(
-                                        {
-                                            target: feature.geometry,
-                                            zoom: 15
-                                        },
-                                        {
-                                            duration: 1000,
-                                            easing: "in-out-expo"
-                                        }
-                                    )
-                                    .catch(function(error) {
-                                        if (error.name != "AbortError") {
-                                            console.log(error);
-                                        }
-                                    });
-                            });
-                        }
-                    });
-                });
+                /////////
+                // time slider
+                // const timeSlider = new TimeSlider({
+                //     container: "timeSlider",
+                //     mode: "cumulative-from-start",
+                //     view: baseMap
+                // });
+                //
+                // baseMap.ui.add(timeSlider, "manual");
+                //
+                // baseMap.whenLayerView(geoJSONLayer).then(function(lv) {
+                //     const fullTimeExtent = geoJSONLayer.timeInfo.fullTimeExtent;
+                //
+                //     // set up time slider properties
+                //     timeSlider.fullTimeExtent = fullTimeExtent;
+                //     timeSlider.playRate = 200;
+                //
+                //     timeSlider.stops = {
+                //         interval: geoJSONLayer.timeInfo.interval,
+                //     };
+                // });
 
 
                 ///////
@@ -594,17 +940,83 @@
                     ],
                     "bottom-left"
                 );
-
-            };
+            }
         });
 
 
     </script>
+
+
+
 </head>
 <body>
 
-<div id="viewDiv"></div>
+<div class="grid-container">
+    <div class="header-container">
 
+        <img src="{% static 'dashboard/images/logo.svg' %}" style='max-height: 100%; width: auto; object-fit: contain'/>
+
+
+
+        <h2>
+            Centre for Bio-Inspired Technology
+        </h2>
+
+        <div class="dropdown">
+            <button onclick="openDropdown()" class="dropButton">Menu</button>
+            <div id="dropdown" class="dropdown-content">
+                <a href="http://localhost:8000/dataUpload/" target="_blank">Upload Data</a>
+                <a href="https://www.imperial.ac.uk/bio-inspired-technology/about/" target="_blank">About</a>
+                <a>Contact</a>
+                <a>Settings</a>
+            </div>
+        </div>
+
+
+    </div>
+    <div class="body-container">
+        <div id="viewDiv" class="mapView"></div>
+        <div class="side-view">
+            <div class="graph-container">
+                <div class="side-header">
+                    <h2 style="display: inline">Overview: </h2><h2 style="display: inline" id="selection-name"></h2>
+                </div>
+                <div class="pie-container">
+                    <div id="centre-chart-div" class="left-pie">
+                        <canvas id="centre-chart" width="0" height="0"></canvas>
+                    </div>
+                    <div id="gender-chart-div" class="right-pie">
+                        <canvas id="gender-chart" width="0" height="0"></canvas>
+                    </div>
+                </div>
+                <div id="date-chart-div" class="line-graph-container">
+                    <canvas id="date-chart" width="0" height="0"></canvas>
+                </div>
+            </div>
+            <div class="table-container">
+                <table id="side-table" class="display compact" cellspacing="0" width="100%" style="overflow-x: auto">
+                    <thead>
+                    <tr>
+                        <th>Patient ID</th>
+                        <th>Test Date</th>
+                        <th>Result</th>
+                        <th>Centre Type</th>
+                        <th>Postcode</th>
+                        <th>County</th>
+                        <th>Region</th>
+                        <th>Country</th>
+                    </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!--<div id="viewDiv"></div>-->
+<!--<div id="timeSlider"></div>-->
 <div id="selectionPaneDiv" class="esri-widget">
     <p>Visualise COVID-19 spread using:</p>
     <label>
@@ -636,57 +1048,97 @@
     <label>
         <input type="checkbox" id="postcodeLayer" checked> Postcode Boundaries
     </label>
-
-
-
 </div>
 
-<div id="feature-node-right-top" class="esri-widget">
-    <table id="side-table" class="display" cellspacing="0" width="100%">
-        <thead>
-        <tr>
-            <th>Test Date</th>
-            <th>Result</th>
-            <th>Centre Type</th>
-            <th>Postcode</th>
-        </tr>
-        </thead>
-    </table>
-</div>
 
-<div id="feature-node-right-bottom" class="esri-widget">
-    <div id="general-information-heading">
-        <h3 style="margin-top: 0">United Kingdom testing data</h3>
+<!-- The Modal -->
+<div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div id="modal-content" class="modal-content">
+        <div class="md-grid-container">
+            <div class="md-modal-heading">
+                <h2>
+                    <span class="right close vertical-middle">&times;</span><span class="left vertical-middle" id="modal-patient-name"></span>
+                </h2>
+            </div>
+            <div class="md-modal-body">
+                <div class="md-modal-diagnostic">
+                    <div class="md-modal-pcr">
+                        <h3 style="display: inline">PCR Graph - Test ID: #</h3><h3 style="display: inline" id="pcr-id"></h3>
+                        <hr>
+
+                    </div>
+                    <div class="md-modal-comments">
+                        <h3 style="display: inline">Diagnostic comments - Test ID: #</h3><h3 style="display: inline" id="comment-id"></h3>
+                        <hr>
+                    </div>
+                </div>
+                <div class="md-modal-patient">
+                    <h3 style="display: inline">Patient Information</h3>
+                    <hr>
+                    <table id="patient-information-table">
+                        <tbody>
+                        <tr> <td style="padding:0 15px 0 0;">Patient ID:</td> <td id="tr-patient-id"></td> </tr>
+                        <tr> <td>Gender:</td> <td id="tr-patient-gender"></td> </tr>
+                        <tr> <td>Date of Birth (Age):</td> <td id="tr-patient-dob"></td> </tr>
+                        <tr> <td>Postcode:</td> <td id="tr-patient-postcode"></td> </tr>
+                        <tr> <td>Diagnostic tests:</td> <td id="tr-patient-count"></td> </tr>
+                        </tbody>
+                    </table>
+                    <br/>
+                    <br/>
+                    <div id="patient-table-div">
+                        <h3 style="display: inline">Testing History</h3>
+                        <!--                        <input type="text" id="filterbox">-->
+                        <hr>
+                        <table id="patient-table" class="display nowrap" cellspacing="0" width="100%">
+                            <thead>
+                            <tr>
+                                <th>Test Date</th>
+                                <th>Result</th>
+                                <th>Centre Type</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
     </div>
 
-    <div id="general-information">
-        <table>
-            <tbody>
-            <tr>
-                <td>Diagnostic tests:</td>
-                <td>{{ count_total_exp }}</td>
-            </tr>
-            <tr>
-                <td>Total positive:</td>
-                <td>{{ count_pos_exp }}</td>
-            </tr>
-            <tr>
-                <td>Total negative:</td>
-                <td>{{ count_neg_exp }}</td>
-            </tr>
-            <tr>
-                <td>Total patients tested:</td>
-                <td>{{ count_indiv_patients }}</td>
-            </tr>
-            </tbody>
-        </table>
-    </div>
-
 </div>
 
 
-<div id="webglNotSupportedDiv"></div>
 
+<!--dropdown menu script-->
+<script>
+    function openDropdown() {
+        document.getElementById("dropdown").classList.toggle("show");
+    }
+    const modal = document.getElementById("myModal");
+
+
+    // When the user clicks anywhere outside of the modal, close it
+    // Close the dropdown if the user clicks outside of it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+        else if (!event.target.matches('.dropButton')) {
+            let dropdowns = document.getElementsByClassName("dropdown-content");
+            console.log(dropdowns)
+            let i;
+            for (i = 0; i < dropdowns.length; i++) {
+                let openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+</script>
 
 </body>
 </html>

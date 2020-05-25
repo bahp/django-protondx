@@ -58,6 +58,7 @@ INSTALLED_APPS = [
     # ----------------
     'diagnostics',
     'dashboard.apps.DashboardConfig',
+    'dataUpload.apps.DataUploadConfig',
 ]
 
 MIDDLEWARE = [
@@ -94,7 +95,7 @@ WSGI_APPLICATION = 'protondx.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
-
+#
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.spatialite',

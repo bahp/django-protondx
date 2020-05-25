@@ -1,0 +1,133 @@
+.md-grid-container {
+    height: 100%;
+    margin: 0;
+    font-family: Arial;
+    overflow: auto;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 0.15fr 1.85fr;
+    gap: 0 0;
+    grid-template-areas: "md-modal-heading" "md-modal-body";
+}
+
+.md-modal-heading {
+    grid-area: md-modal-heading;
+    padding: 16px;
+    background-color: #002147;
+    color: white;
+}
+
+.md-modal-heading h2{
+    margin: 0;
+    height: 100%;
+
+}
+
+
+.md-modal-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    gap: 0 0;
+    grid-template-areas: "md-modal-diagnostic md-modal-patient";
+    grid-area: md-modal-body;
+    background-color: #003E74;
+}
+
+.md-modal-diagnostic {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr 1fr;
+    gap: 0 0;
+    grid-template-areas: "md-modal-pcr" "md-modal-comments";
+    grid-area: md-modal-diagnostic;
+}
+
+.md-modal-pcr {
+    grid-area: md-modal-pcr;
+    background-color: white;
+    padding: 15px;
+    border: 16px solid #003E74;
+    border-bottom: 8px solid #003E74;
+    border-right: 8px solid #003E74;
+}
+
+.md-modal-patient {
+    grid-area: md-modal-patient;
+    background-color: white;
+    padding: 15px;
+    border: 16px solid #003E74;
+    border-left: 8px solid #003E74;
+}
+
+.md-modal-comments {
+    grid-area: md-modal-comments;
+    background-color: white;
+    padding: 15px;
+    border: 16px solid #003E74;
+    border-top: 8px solid #003E74;
+    border-right: 8px solid #003E74;
+}
+
+#patient-table-div {
+    float: bottom;
+    clear: both;
+}
+
+#patient-information-table td:first-child {
+    font-weight: bold
+}
+
+.modal {
+    display: none;
+    z-index: 1;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 100%;
+    height: 100%;
+    background-color: rgb(0,0,0);
+    background-color: rgba(0,0,0,0.5);
+}
+
+/* Modal Content */
+.modal-content {
+    background-color: white;
+    color: #002147;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    height: 80%;
+    width: 80%;
+}
+
+/* The Close Button */
+.close {
+    color: #aaaaaa;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.close:hover,
+.close:focus {
+    color: #000;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.right{
+    float:right;
+}
+
+.left{
+    float:left;
+
+}
+
+.vertical-middle {
+    display: flex;
+    align-items: center;
+    height: 100%;
+}

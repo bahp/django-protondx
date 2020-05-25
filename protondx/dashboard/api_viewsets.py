@@ -79,14 +79,16 @@ class PostcodeFilter(FilterSet):
             'testing_centre__postcode': ['startswith'],
             'date_test': ['date__lt'],
             'test_result': ['exact'],
+            'patient': ['exact'],
         }
 
 
 # This viewset and the associated serializer may not be needed. Here now for testing purposes
 class DiagnosticTestView(generics.ListAPIView):
+    pagination_class = None
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = DiagnosticTestSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     # --------------------------
     #  Filter fields and options
@@ -111,6 +113,7 @@ class DiagnosticTestView(generics.ListAPIView):
 class PostcodeData(generics.ListAPIView):
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = PostcodeSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         postcode = self.request.query_params.get('postcode', False)
@@ -122,6 +125,7 @@ class PostcodeData(generics.ListAPIView):
 # Used to load all testing data with associated coordinates and
 # information using a geoJSON format
 class GeoView(APIView):
+    permission_classes = []
 
     def get(self, request):
         serializers = CustomGeoJSONSerializer()
@@ -132,7 +136,12 @@ class GeoView(APIView):
                                                  'date_test',
                                                  'test_result',
                                                  'testing_centre__postcode',
+                                                 'testing_centre__county',
+                                                 'testing_centre__region',
+                                                 'testing_centre__country',
                                                  'testing_centre__centre_type',
+                                                 'patient__gender',
+                                                 'patient'
                                                  )
                                          )
 

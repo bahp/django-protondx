@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Data Upload</title>
+
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/grid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/displayArea.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/dragArea.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/listArea.css' %}">
+    <script src="{% static 'dataUpload/JSZip/jszip.js' %}"></script>
+    <script src="{% static 'dataUpload/JSZipUtils/jszip-utils.js' %}"></script>
+</head>
+<body>
+
+<div class="grid-container">
+    <div id="view-panel" class="view-panel"></div>
+    <div class="upload-panel">
+        <div id="upload-list" class="upload-list"></div>
+        <div id="drop-area" class="drop-area">
+            <form class="my-form">
+                <h2>Drag files here to upload</h2>
+                <input type="file" id="fileElem" multiple accept="*" onchange="handleFiles(this.files)">
+                <label class="button-link" for="fileElem">Choose your files</label>
+            </form>
+        </div>
+    </div>
+</div>
+
+<label class="button button-right">Upload Selected</label>
+<label class="button button-right">Upload all</label>
+
+<script src="{% static 'dataUpload/loadData.js' %}"></script>
+
+</body>
+</html>

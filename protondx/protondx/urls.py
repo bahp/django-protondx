@@ -40,6 +40,9 @@ urlpatterns = [
     # Add dashboard application
     path('dashboard/', include('dashboard.urls')),
 
+    # Add dataUpload application
+    path('dataUpload/', include('dataUpload.urls')),
+
     # ------------------------------------------
     # Adding full REST API
     # ------------------------------------------

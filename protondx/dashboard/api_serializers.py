@@ -9,16 +9,23 @@ from .models import Patient, DiagnosticTest, TestingCentre
 
 # Serializer for patient information (Not currently used)
 class PatientSerializer(serializers.ModelSerializer):
+    gender = serializers.CharField(source='get_gender_display')
+    dob = serializers.DateField(format="%d-%m-%Y", required=False, read_only=True)
+
     class Meta:
         model = Patient
-        fields = '__all__'
+        fields = ['gender', 'dob', 'postcode', 'first_name', 'last_name']
 
 
 # Serializer for Diagnostic tests (Not currently used)
 class DiagnosticTestSerializer(serializers.ModelSerializer):
+    test_result = serializers.CharField(source='get_test_result_display')
+    centre_type = serializers.CharField(source='testing_centre.centre_type')
+    date_test = serializers.DateTimeField(format="%d-%m-%Y", required=False, read_only=True)
+
     class Meta:
         model = DiagnosticTest
-        fields = '__all__'
+        fields = ['test_result', 'centre_type', 'date_test', 'id']
 
 
 # Serializer for Testing Centres (Not currently used)
@@ -68,6 +75,8 @@ class CustomGeoJSONSerializer(GeoJSONSerializer):
         # converted to string first.
         if str(field) == "dashboard.DiagnosticTest.test_result":
             return obj.get_test_result_display()
+        elif str(field) == "dashboard.DiagnosticTest.date_test":
+            return obj.date_test.strftime('%d-%m-%Y')
         elif is_protected_type(value):
             return value
         else:

@@ -13,11 +13,18 @@
     <!--Jquery-->
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 
+
+
     <!--DATATABLES-->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.2.4/css/responsive.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/1.6.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.jqueryui.min.css">
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.21/features/pageResize/dataTables.pageResize.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.2.4/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
+    <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.colVis.min.js"></script>
 
     <!--CSS templates-->
     {% load static %}
@@ -121,12 +128,30 @@
                         {
                             data: "properties.testing_centre__postcode"
                         },
+                        {
+                            data: "properties.testing_centre__county",
+                            visible: false,
+                        },
+                        {
+                            data: "properties.testing_centre__region",
+                            visible: false,
+                        },
+                        {
+                            data: "properties.testing_centre__country",
+                            visible: false,
+                        },
                     ],
+                    buttons: [
+                        'colvis'
+                    ],
+                    dom: 'Bfrtip',
                     // rowId: 'properties.pk',
                     paging:         false,
                     bLengthChange: false,
+                    bInfo: false,
                     deferRender:    true,
                     scrollY:        200,
+                    scrollX: "100%",
                 });
 
                 patientTable = $('#patient-table').DataTable( {
@@ -186,7 +211,7 @@
                         patientTable.rows.add(response2[0]);
 
                         // add patient information
-                        tr_patient_id.innerText = patient_id;
+                        tr_patient_id.innerText = "# " + patient_id;
                         tr_patient_gender.innerText = response1[0].gender;
                         tr_patient_dob.innerText = response1[0].dob
                             + " ("
@@ -229,12 +254,7 @@
                     modal.style.display = "none";
                 }
 
-                // When the user clicks anywhere outside of the modal, close it
-                window.onclick = function(event) {
-                    if (event.target == modal) {
-                        modal.style.display = "none";
-                    }
-                }
+
             }
 
 
@@ -596,7 +616,7 @@
                     }
                     else if (region){
                         selection_name.innerHTML = region;
-                        table.search(region).draw();
+                        table.search(region.split('(')[0]).draw();
                     }
                     else if (postcode){
                         selection_name.innerHTML = postcode[0] + ", " + postcode[1];
@@ -942,6 +962,16 @@
             Centre for Bio-Inspired Technology
         </h2>
 
+        <div class="dropdown">
+            <button onclick="openDropdown()" class="dropButton">Menu</button>
+            <div id="dropdown" class="dropdown-content">
+                <a href="http://localhost:8000/dataUpload/" target="_blank">Upload Data</a>
+                <a href="https://www.imperial.ac.uk/bio-inspired-technology/about/" target="_blank">About</a>
+                <a>Contact</a>
+                <a>Settings</a>
+            </div>
+        </div>
+
 
     </div>
     <div class="body-container">
@@ -964,7 +994,7 @@
                 </div>
             </div>
             <div class="table-container">
-                <table id="side-table" class="display compact" cellspacing="0" width="100%">
+                <table id="side-table" class="display compact" cellspacing="0" width="100%" style="overflow-x: auto">
                     <thead>
                     <tr>
                         <th>Patient ID</th>
@@ -972,6 +1002,9 @@
                         <th>Result</th>
                         <th>Centre Type</th>
                         <th>Postcode</th>
+                        <th>County</th>
+                        <th>Region</th>
+                        <th>Country</th>
                     </tr>
                     </thead>
                 </table>
@@ -1046,7 +1079,7 @@
                     <hr>
                     <table id="patient-information-table">
                         <tbody>
-                        <tr> <td style="padding:0 15px 0 0;">Patient ID: #</td> <td id="tr-patient-id"></td> </tr>
+                        <tr> <td style="padding:0 15px 0 0;">Patient ID:</td> <td id="tr-patient-id"></td> </tr>
                         <tr> <td>Gender:</td> <td id="tr-patient-gender"></td> </tr>
                         <tr> <td>Date of Birth (Age):</td> <td id="tr-patient-dob"></td> </tr>
                         <tr> <td>Postcode:</td> <td id="tr-patient-postcode"></td> </tr>
@@ -1076,6 +1109,36 @@
     </div>
 
 </div>
+
+
+
+<!--dropdown menu script-->
+<script>
+    function openDropdown() {
+        document.getElementById("dropdown").classList.toggle("show");
+    }
+                const modal = document.getElementById("myModal");
+
+
+    // When the user clicks anywhere outside of the modal, close it
+    // Close the dropdown if the user clicks outside of it
+    window.onclick = function(event) {
+        if (event.target == modal) {
+            modal.style.display = "none";
+        }
+        else if (!event.target.matches('.dropButton')) {
+            let dropdowns = document.getElementsByClassName("dropdown-content");
+            console.log(dropdowns)
+            let i;
+            for (i = 0; i < dropdowns.length; i++) {
+                let openDropdown = dropdowns[i];
+                if (openDropdown.classList.contains('show')) {
+                    openDropdown.classList.remove('show');
+                }
+            }
+        }
+    }
+</script>
 
 </body>
 </html>

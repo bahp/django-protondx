@@ -61,6 +61,9 @@ class TestingCentre(geomodels.Model):
 
     centre_type = models.CharField(max_length=20, choices=CENTRE_TYPE, verbose_name='Centre type')
     coordinates = geomodels.PointField(verbose_name='Coordinates')
+    country = models.CharField(max_length=255, null=True, verbose_name='Country')
+    region = models.CharField(max_length=255, null=True, verbose_name='Region')
+    county = models.CharField(max_length=255, null=True, verbose_name='County')
     postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
     # postcode. If other countries are to be added the max_length must be revised
 

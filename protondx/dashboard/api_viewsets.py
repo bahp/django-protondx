@@ -136,6 +136,9 @@ class GeoView(APIView):
                                                  'date_test',
                                                  'test_result',
                                                  'testing_centre__postcode',
+                                                 'testing_centre__county',
+                                                 'testing_centre__region',
+                                                 'testing_centre__country',
                                                  'testing_centre__centre_type',
                                                  'patient__gender',
                                                  'patient'

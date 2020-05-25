@@ -184,8 +184,6 @@
                         // add patient diagnostic test table
                         patientTable.clear();
                         patientTable.rows.add(response2[0]);
-                        patientTable.draw();
-
 
                         // add patient information
                         tr_patient_id.innerText = patient_id;
@@ -199,8 +197,12 @@
 
                         // make modal visible
                         modal.style.display = "block";
+
+                        // display table
+                        // done after displaying modal for correct column width
+                        patientTable.draw();
                     }).catch(function (e) {
-                        console.log(e.responseJSON.detail);
+                        console.log(e);
                     });
                 });
 

@@ -586,7 +586,26 @@
 
                 function queryPopup(target) {
                     //set overview name
-                    selection_name.innerHTML = (target.graphic.attributes.nuts118nm || target.graphic.attributes.NAME) || (target.graphic.attributes.NAME_1 + ", " + target.graphic.attributes.POSTCODE_1);
+                    const country = target.graphic.attributes.NAME;
+                    const region = target.graphic.attributes.nuts118nm;
+                    const postcode = [target.graphic.attributes.NAME_1, target.graphic.attributes.POSTCODE_1];
+
+                    if (country){
+                        selection_name.innerHTML = country;
+                        table.search(country).draw();
+                    }
+                    else if (region){
+                        selection_name.innerHTML = region;
+                        table.search(region).draw();
+                    }
+                    else if (postcode){
+                        selection_name.innerHTML = postcode[0] + ", " + postcode[1];
+                        table.search(postcode[1]).draw();
+                    }
+                    else{
+                        console.log("Invalid search geometry")
+                    }
+
 
                     const query = geoJSONLayer.createQuery();
                     query.geometry = target.graphic.geometry;

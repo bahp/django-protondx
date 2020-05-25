@@ -16,11 +16,8 @@
     <!--DATATABLES-->
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/jquery.dataTables.css">
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.21/css/dataTables.jqueryui.min.css">
-
-
     <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.21/js/jquery.dataTables.js"></script>
     <script src="https://cdn.datatables.net/plug-ins/1.10.21/features/pageResize/dataTables.pageResize.min.js"></script>
-
 
     <!--CSS templates-->
     {% load static %}
@@ -60,8 +57,6 @@
             "esri/widgets/Fullscreen",
             "esri/widgets/Search",
             "esri/widgets/BasemapGallery",
-            "esri/widgets/TimeSlider",
-
         ], function(Map,
                     MapView,
                     Extent,
@@ -76,8 +71,7 @@
                     Expand,
                     Fullscreen,
                     Search,
-                    BasemapGallery,
-                    TimeSlider,) {
+                    BasemapGallery,) {
 
             // //////////
             // DATA fetch
@@ -113,13 +107,10 @@
                     data: data.features,
                     columns: [
                         {
+                            data: "properties.patient",
+                        },
+                        {
                             data: "properties.date_test",
-                            // render: function ( data, type, row ) {
-                            //     const dateSplit = data.split('T')[0].split('-');
-                            //     return type === "display" || type === "filter" ?
-                            //         dateSplit[2] +'-'+ dateSplit[1] +'-'+ dateSplit[0] :
-                            //         data;
-                            // }
                         },
                         {
                             data: "properties.test_result",
@@ -127,8 +118,9 @@
                         {
                             data: "properties.testing_centre__centre_type",
                         },
-                        { data: "properties.testing_centre__postcode" },
-
+                        {
+                            data: "properties.testing_centre__postcode"
+                        },
                     ],
                     // rowId: 'properties.pk',
                     paging:         false,
@@ -151,13 +143,14 @@
                             data: "test_result",
                         },
                         {
-                            data: "testing_centre",
+                            data: "centre_type",
                         },
                     ],
                     paging:         false,
                     bLengthChange: false,
                     deferRender:    true,
                     scrollY:        200,
+                    scrollX: "100%"
                 });
 
 
@@ -167,11 +160,16 @@
                 // Get the <span> element that closes the modal
                 const span = document.getElementsByClassName("close")[0];
 
+                const tr_patient_id = document.getElementById("tr-patient-id");
+                const tr_patient_gender = document.getElementById("tr-patient-gender");
+                const tr_patient_dob = document.getElementById("tr-patient-dob");
+                const tr_patient_postcode = document.getElementById("tr-patient-postcode");
+                const tr_patient_count = document.getElementById("tr-patient-count");
+
                 $('#side-table tbody').on( 'click', 'tr', function () {
                     const patient_id = table.row( this ).data().properties.patient;
                     const patientURL = HOST_NAME + "/dashboard/api/patient/" + patient_id;
                     const diagnosticsURL = HOST_NAME + "/dashboard/api/diagnostic-test/?patient=" + patient_id;
-
 
 
                     let call1 =  $.get(patientURL);
@@ -184,32 +182,48 @@
                         modal_patient_name.innerHTML = response1[0].first_name + " " + response1[0].last_name;
 
                         // add patient diagnostic test table
-
                         patientTable.clear();
                         patientTable.rows.add(response2[0]);
                         patientTable.draw();
 
 
+                        // add patient information
+                        tr_patient_id.innerText = patient_id;
+                        tr_patient_gender.innerText = response1[0].gender;
+                        tr_patient_dob.innerText = response1[0].dob
+                            + " ("
+                            + moment().diff(moment(response1[0].dob,'DD-MM-YYYY').format('MM-DD-YYYY'), 'years')
+                            + ")";
+                        tr_patient_postcode.innerText = response1[0].postcode;
+                        tr_patient_count.innerText = response2[0].length;
 
+                        // make modal visible
                         modal.style.display = "block";
-                    });
-
-                    const pcr_id = document.getElementById("pcr-id");
-                    const comment_id = document.getElementById("comment-id");
-
-                    $('#patient-table tbody').on( 'click', 'tr', function () {
-                        console.log(patientTable.row( this ).data());
-                        const diagnostic_id = patientTable.row( this ).data().id;
-
-                        pcr_id.innerHTML = diagnostic_id;
-                        comment_id.innerHTML = diagnostic_id;
-
-
+                    }).catch(function (e) {
+                        console.log(e.responseJSON.detail);
                     });
                 });
 
+                const pcr_id = document.getElementById("pcr-id");
+                const comment_id = document.getElementById("comment-id");
+
+                $('#patient-table tbody').on( 'click', 'tr', function () {
+                    $(this).addClass('selected').siblings().removeClass('selected');
+                    const diagnostic_id = patientTable.row( this ).data().id;
+
+                    pcr_id.innerHTML = diagnostic_id;
+                    comment_id.innerHTML = diagnostic_id;
+                });
+
+                // $("#filterbox").keyup(function() {
+                //     patientTable.search(this.value).draw();
+                // });
+
                 // When the user clicks on <span> (x), close the modal
                 span.onclick = function() {
+                    patientTable.search('').draw();
+                    pcr_id.innerHTML = '';
+                    comment_id.innerHTML = '';
                     modal.style.display = "none";
                 }
 
@@ -347,13 +361,6 @@
                     //         content: "This cluster represents {cluster_count} diagnostic tests."
                     //     }
                     // },
-                    timeInfo: {
-                        startField: "date_test",
-                        interval: {
-                            unit: "days",
-                            value: 1,
-                        }
-                    },
                 });
 
                 geoJSONLayer.popup = {
@@ -939,6 +946,7 @@
                 <table id="side-table" class="display compact" cellspacing="0" width="100%">
                     <thead>
                     <tr>
+                        <th>Patient ID</th>
                         <th>Test Date</th>
                         <th>Result</th>
                         <th>Centre Type</th>
@@ -1004,17 +1012,33 @@
                 <div class="md-modal-diagnostic">
                     <div class="md-modal-pcr">
                         <h3 style="display: inline">PCR Graph - Test ID: #</h3><h3 style="display: inline" id="pcr-id"></h3>
+                        <hr>
+
                     </div>
                     <div class="md-modal-comments">
                         <h3 style="display: inline">Diagnostic comments - Test ID: #</h3><h3 style="display: inline" id="comment-id"></h3>
+                        <hr>
                     </div>
                 </div>
                 <div class="md-modal-patient">
                     <h3 style="display: inline">Patient Information</h3>
-                    <p>This is some patient information!</p>
                     <hr>
+                    <table id="patient-information-table">
+                        <tbody>
+                        <tr> <td style="padding:0 15px 0 0;">Patient ID: #</td> <td id="tr-patient-id"></td> </tr>
+                        <tr> <td>Gender:</td> <td id="tr-patient-gender"></td> </tr>
+                        <tr> <td>Date of Birth (Age):</td> <td id="tr-patient-dob"></td> </tr>
+                        <tr> <td>Postcode:</td> <td id="tr-patient-postcode"></td> </tr>
+                        <tr> <td>Diagnostic tests:</td> <td id="tr-patient-count"></td> </tr>
+                        </tbody>
+                    </table>
+                    <br/>
+                    <br/>
                     <div id="patient-table-div">
-                        <table id="patient-table" class="display" cellspacing="0" width="100%">
+                        <h3 style="display: inline">Testing History</h3>
+                        <!--                        <input type="text" id="filterbox">-->
+                        <hr>
+                        <table id="patient-table" class="display nowrap" cellspacing="0" width="100%">
                             <thead>
                             <tr>
                                 <th>Test Date</th>

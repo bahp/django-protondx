@@ -88,7 +88,7 @@ class DiagnosticTestView(generics.ListAPIView):
     pagination_class = None
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = DiagnosticTestSerializer
-    # permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     # --------------------------
     #  Filter fields and options
@@ -113,6 +113,7 @@ class DiagnosticTestView(generics.ListAPIView):
 class PostcodeData(generics.ListAPIView):
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = PostcodeSerializer
+    permission_classes = [permissions.IsAuthenticated]
 
     def list(self, request, *args, **kwargs):
         postcode = self.request.query_params.get('postcode', False)
@@ -124,6 +125,7 @@ class PostcodeData(generics.ListAPIView):
 # Used to load all testing data with associated coordinates and
 # information using a geoJSON format
 class GeoView(APIView):
+    permission_classes = []
 
     def get(self, request):
         serializers = CustomGeoJSONSerializer()

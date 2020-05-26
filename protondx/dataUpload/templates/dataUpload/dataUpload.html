@@ -4,11 +4,14 @@
     <meta charset="UTF-8">
     <title>Data Upload</title>
 
+    <!--Jquery-->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/grid.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/displayArea.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/dragArea.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/listArea.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/grid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/displayArea.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/dragArea.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/listArea.css' %}">
     <script src="{% static 'dataUpload/JSZip/jszip.js' %}"></script>
     <script src="{% static 'dataUpload/JSZipUtils/jszip-utils.js' %}"></script>
 </head>
@@ -29,9 +32,10 @@
 </div>
 
 <label class="button button-right">Upload Selected</label>
-<label class="button button-right">Upload all</label>
+<label id="uploadAllButton" class="button button-right">Upload all</label>
 
-<script src="{% static 'dataUpload/loadData.js' %}"></script>
+<script src="{% static 'dataUpload/js/loadData.js' %}"></script>
+<script src="{% static 'dataUpload/js/sendData.js' %}"></script>
 
 </body>
 </html>

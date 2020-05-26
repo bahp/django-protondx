@@ -96,10 +96,23 @@ WSGI_APPLICATION = 'protondx.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 #
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+#     }
+# }
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.contrib.gis.db.backends.spatialite',
         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
+        'ENGINE': 'django.contrib.gis.db.backends.postgis',
+        'NAME': 'sample_database',
+        'USER': 'oliver_django',
+        'PASSWORD': '1234567T',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
@@ -167,18 +180,22 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    ),
+
     # Paggination
-    'DEFAULT_PAGINATION_CLASS': 
+    'DEFAULT_PAGINATION_CLASS':
         'rest_framework.pagination.PageNumberPagination',
-        #'rest_framework.pagination.LimitOffsetPagination',
-        #'rest_framework.pagination.CursorPagination'
+    #'rest_framework.pagination.LimitOffsetPagination',
+    #'rest_framework.pagination.CursorPagination'
     'PAGE_SIZE': 100,
 
     # Filter backends
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' 
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
 
 # These are the swagger settings

@@ -1,5 +1,5 @@
 from django.urls import path
-from . import views
+from . import views, api_viewsets
 
 
 app_name = 'dataUpload'
@@ -9,4 +9,8 @@ urlpatterns = [
     # <IP>/dataUpload/
     path('', views.dataUploadView.as_view(), name='dataUpload'),
 
+    # ---------------
+    # Django REST API
+    # ---------------
+    path('api/sample-poster/', api_viewsets.sample_poster, name='sample_poster'),
 ]

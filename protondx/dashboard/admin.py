@@ -27,6 +27,7 @@ class PatientAdmin(admin.ModelAdmin):
 class DiagnosticTestAdmin(admin.ModelAdmin):
     fieldsets = [
         ('Test Information', {'fields': ['patient', 'testing_centre', 'date_test', 'test_result']}),
+        ('Raw test data', {'fields': ['raw_test_data']})
     ]
 
     list_display = ['patient', 'date_test', 'test_result']

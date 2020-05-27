@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.gis.db import models as geomodels
+from .choices import GENDER, CENTRE_TYPE, DIAGNOSIS
 
 
 # Patient model (can contain any information related to the patient)
@@ -12,23 +13,13 @@ class Patient(models.Model):
     # -----------------------
     # Definitions
     # -----------------------
-    FEMALE = 'F'
-    MALE = 'M'
-    OTHER = 'O'
-    PREFER_NOT_SAY = 'X'
-
-    GENDER = [
-        (FEMALE, 'Female'),
-        (MALE, 'Male'),
-        (OTHER, 'Other'),
-        (PREFER_NOT_SAY, 'Prefer not to say'),
-    ]
 
     first_name = models.CharField(max_length=50, verbose_name='First name')
     last_name = models.CharField(max_length=50, verbose_name='Last name')
     gender = models.CharField(max_length=1, null=True, choices=GENDER, verbose_name='Gender')
     dob = models.DateField(null=True, verbose_name='Date of birth')
     postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
+
     # postcode. If other countries are to be added the max_length must be revised
 
     def __str__(self):
@@ -45,19 +36,6 @@ class TestingCentre(geomodels.Model):
     # -----------------------
     # Definitions
     # -----------------------
-    HOSPITAL = 'Hospital'
-    CLINIC = 'GP clinic'
-    DRIVE_THROUGH = 'Drive through centre'
-    HOME_TEST_SITE = 'Home'
-    OTHER_TEST_SITE = 'Other'
-
-    CENTRE_TYPE = [
-        (HOSPITAL, 'Hospital'),
-        (CLINIC, 'GP clinic'),
-        (DRIVE_THROUGH, 'Drive through centre'),
-        (HOME_TEST_SITE, 'Home'),
-        (OTHER_TEST_SITE, 'Other'),
-    ]
 
     centre_type = models.CharField(max_length=20, choices=CENTRE_TYPE, verbose_name='Centre type')
     coordinates = geomodels.PointField(verbose_name='Coordinates')
@@ -65,6 +43,7 @@ class TestingCentre(geomodels.Model):
     region = models.CharField(max_length=255, null=True, verbose_name='Region')
     county = models.CharField(max_length=255, null=True, verbose_name='County')
     postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
+
     # postcode. If other countries are to be added the max_length must be revised
 
     @property
@@ -99,14 +78,6 @@ class DiagnosticTest(models.Model):
 
     # Parameters
     #  ----------
-
-    POS = True
-    NEG = False
-
-    DIAGNOSIS = [
-        (POS, 'Positive'),
-        (NEG, 'Negative'),
-    ]
 
     test_result = models.BooleanField(choices=DIAGNOSIS, verbose_name='Test result')
 

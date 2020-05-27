@@ -7,10 +7,10 @@ urlpatterns = [
 
     # Data Upload page
     # <IP>/dataUpload/
-    path('', views.dataUploadView.as_view(), name='dataUpload'),
+    path('', views.dataUploadView, name='dataUpload'),
 
     # ---------------
     # Django REST API
     # ---------------
-    path('api/sample-poster/', api_viewsets.sample_poster, name='sample_poster'),
+    # path('api/sample-poster/', api_viewsets.sample_poster, name='sample_poster'),
 ]

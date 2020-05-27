@@ -21,3 +21,4 @@ class DashView(TemplateView):
             'count_indiv_patients': get_individuals_tested(),
         }
         return render(request, self.template_name, context)
+

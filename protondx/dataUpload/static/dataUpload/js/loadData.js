@@ -57,54 +57,7 @@ function openTab(evt, fileName) {
     document.getElementById(fileName + '-button').classList.add('active');
 }
 let uploadList = document.getElementById('upload-list');
-let viewPanel = document.getElementById('view-panel');
-
-// function displayJSON(obj) {
-//     let out = "<ul>";
-//     let i;
-//
-//     for (let key in obj) {
-//         if (obj.hasOwnProperty(key)) {
-//             if(typeof(obj[key]) === "string"){
-//                 out += '<li>' +
-//                     key + ": " + obj[key] + '</li><br>';
-//             }
-//             else {
-//                 out += '<li>' +
-//                     key + ": " + '</li><br>' + displayJSON(obj[key]);
-//             }
-//
-//         }
-//     }
-//     return out + "</ul>";
-// }
-
-function displayJSON(obj, form) {
-    let out = "";
-    let end = "";
-    if (form){
-        out = "<form>";
-        end = "</form>";
-    }
-
-    for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            if(typeof(obj[key]) === "string"){
-                out += '<label for="' +
-                    key + '">' + key + ': </label><br>' +
-                    '<input type="text" id="' + key + '" name="' +
-                    key + '" value="' + obj[key] + '"><br><br>'
-            }
-            else {
-                out += '<fieldset><legend>' + key + '</legend>' +
-                    displayJSON(obj[key], false) + '</fieldset>'
-            }
-
-        }
-    }
-    return out + end;
-}
-
+let viewPanel = document.getElementById('view-content');
 
 function readFile(file) {
 
@@ -149,9 +102,18 @@ function readFile(file) {
                     if (filename.endsWith('.json')){
                         zip.file(filename).async("string").then(function (data) {
                             newTab.appendChild(document.createElement('hr'))
-                            let jsonobj = JSON.parse(data);
-                            let newDiv = document.createElement('div');
-                            newDiv.innerHTML = displayJSON(jsonobj, true);
+                            const jsonobj = JSON.parse(data);
+                            const newDiv = document.createElement('div');
+
+                            const count = parseInt($('#id_data-TOTAL_FORMS').attr('value'), 10);
+                            const tmplMarkup = $('#upload-template').html();
+                            const compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+
+                            // update form count
+                            $('#id_data-TOTAL_FORMS').attr('value', count+1);
+                            console.log(compiledTmpl)
+
+                            newDiv.innerHTML = compiledTmpl;
                             newTab.appendChild(newDiv);
                             // ADD things to the TAB/JSON file HERE
 

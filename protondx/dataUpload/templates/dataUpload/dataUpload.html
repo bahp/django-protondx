@@ -18,7 +18,17 @@
 <body>
 
 <div class="grid-container">
-    <div id="view-panel" class="view-panel"></div>
+
+    <div id="view-panel" class="view-panel">
+        <form id="data-form" method="post" action="">
+            <div id="view-content">
+                {% csrf_token %}
+                {{ upload_formset.management_form }}
+            </div>
+
+        </form>
+    </div>
+
     <div class="upload-panel">
         <div id="upload-list" class="upload-list"></div>
         <div id="drop-area" class="drop-area">
@@ -32,10 +42,71 @@
 </div>
 
 <label class="button button-right">Upload Selected</label>
-<label id="uploadAllButton" class="button button-right">Upload all</label>
+<button class="button button-right" type="submit" form="data-form">Upload all</button>
+<!--<label id="uploadAllButton" class="button button-right">Upload all</label>-->
 
 <script src="{% static 'dataUpload/js/loadData.js' %}"></script>
 <script src="{% static 'dataUpload/js/sendData.js' %}"></script>
 
+<script type="text/html" id="upload-template">
+    <div id="dataUpload-__prefix__">
+        {{ upload_formset.empty_form  }}
+    </div>
+</script>
+
 </body>
 </html>
+
+
+
+<!--        <form class="form">-->
+<!--            <fieldset>-->
+<!--                <legend>Patient Information</legend>-->
+
+<!--                <label for="fname">First name</label><br>-->
+<!--                <input type="text" id="fname" name="fname"><br><br>-->
+<!--                <label for="lname">Last name</label><br>-->
+<!--                <input type="text" id="lname" name="lname"><br><br>-->
+
+<!--                <label>Gender</label><br>-->
+<!--                <input type="radio" id="male" name="gender" value="M">-->
+<!--                <label for="male">Male</label><br>-->
+<!--                <input type="radio" id="female" name="gender" value="F">-->
+<!--                <label for="female">Female</label><br>-->
+<!--                <input type="radio" id="other" name="gender" value="O">-->
+<!--                <label for="other">Other</label><br>-->
+<!--                <input type="radio" id="NA" name="gender" value="X">-->
+<!--                <label for="NA">Prefer not to say</label><br><br>-->
+
+<!--                <label for="dob">Date of birth</label><br>-->
+<!--                <input type="date" id="dob" name="dob"><br><br>-->
+
+<!--                <label>Postcode</label><br>-->
+<!--                <input type="text">-->
+<!--            </fieldset>-->
+<!--            <fieldset>-->
+<!--                <legend>Location Information</legend>-->
+
+<!--                <label for="centre_type">Centre Type</label><br>-->
+<!--                <select id="centre_type" name="centre_type">-->
+<!--                    <option value="Hospital">Hospital</option>-->
+<!--                    <option value="GP clinic">GP clinic</option>-->
+<!--                    <option value="Drive through centre">Drive through centre</option>-->
+<!--                    <option value="Home">Home</option>-->
+<!--                    <option value="Other">Other</option>-->
+<!--                </select>-->
+
+<!--            </fieldset>-->
+<!--            <fieldset>-->
+<!--                <legend>Diagnostic Test</legend>-->
+
+<!--                <label>Test result</label><br>-->
+<!--                <input type="radio" id="positive" name="result" value="positive">-->
+<!--                <label for="male">Positive</label><br>-->
+<!--                <input type="radio" id="negative" name="result" value="negative">-->
+<!--                <label for="female">Negative</label><br><br>-->
+
+<!--                <label for="comments">Clinician comments</label><br>-->
+<!--                <textarea id="comments" name="comments" rows="4" cols="50"></textarea>-->
+<!--            </fieldset>-->
+<!--        </form>-->

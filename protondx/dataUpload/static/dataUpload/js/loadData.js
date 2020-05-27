@@ -111,15 +111,34 @@ function readFile(file) {
 
                             // update form count
                             $('#id_data-TOTAL_FORMS').attr('value', count+1);
-                            console.log(compiledTmpl)
 
                             newDiv.innerHTML = compiledTmpl;
+
+                            const formFields = [
+                                ["test_result","id_data-" + count + "-test_result"],
+                                ["date_test",  "id_data-" + count + "-test_date"],
+                                ["patient_first_name", "id_data-" + count + "-first_name"],
+                                ["patient_last_name", "id_data-" + count + "-last_name"],
+                                ["patient_gender", "id_data-" + count + "-gender"],
+                                ["patient_dob", "id_data-" + count + "-dob"],
+                                ["patient_postcode", "id_data-" + count + "-patient_postcode"],
+                                ["testing_centre_type", "id_data-" + count + "-centre_type"],
+                                ["testing_centre_long", "id_data-" + count + "-longitude"],
+                                ["testing_centre_lat", "id_data-" + count + "-latitude"],
+                            ]
+
+
+
                             newTab.appendChild(newDiv);
                             // ADD things to the TAB/JSON file HERE
 
                             // ...
 
-
+                            formFields.forEach((fieldNames) => {
+                                if (fieldNames[0] in jsonobj) {
+                                    document.getElementById(fieldNames[1]).value = jsonobj[fieldNames[0]];
+                                }
+                            });
 
                         });
                     }

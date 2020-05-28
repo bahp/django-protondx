@@ -2,12 +2,18 @@ from django import forms
 from dashboard.choices import GENDER, CENTRE_TYPE, DIAGNOSIS
 
 
+# override colon at end of form labels
+class BaseForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault('label_suffix', '')
+        super(BaseForm, self).__init__(*args, **kwargs)
+
+
 class FileFieldForm(forms.Form):
     file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
 
-class dataUploadForm(forms.Form):
-
+class dataUploadForm(BaseForm):
     first_name = forms.CharField(label='First name', max_length=50)
     last_name = forms.CharField(label='Last name', max_length=50)
     gender = forms.ChoiceField(label='Gender', choices=GENDER, required=False)

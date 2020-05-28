@@ -39,9 +39,9 @@ def createModels(data):
     patient = Patient.objects.create(
         first_name=data['first_name'],
         last_name=data['last_name'],
-        gender=data['gender'],
-        dob=data['dob'],
-        postcode=data['patient_postcode']
+        gender=data.get('gender'),
+        dob=data.get('dob'),
+        postcode=data.get('patient_postcode')
     )
 
     patient.save()
@@ -75,8 +75,8 @@ def dataUploadView(request):
         if upload_formset.is_valid():
             for f in upload_formset:
                 data = f.cleaned_data
-                print(data)
-                createModels(data)
+                if data:
+                    createModels(data)
         else:
             print(upload_formset)
             # do something here

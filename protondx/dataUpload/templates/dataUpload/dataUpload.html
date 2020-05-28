@@ -19,7 +19,7 @@
 
 <div class="grid-container">
     <div id="view-panel" class="view-panel">
-        <form id="data-form" method="post" action="">
+        <form id="data-form" method="post" action="" enctype="multipart/form-data">
             <div id="view-content">
                 {% csrf_token %}
                 {{ upload_formset.management_form }}

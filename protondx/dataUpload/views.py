@@ -63,7 +63,8 @@ def createModels(data):
         patient=patient,
         test_result=data['test_result'],
         date_test=data['test_date'],
-        comment=data.get('comment')
+        comment=data.get('comment'),
+        raw_test_data=data.get('raw_test_data')
     )
     diagnostic_test.save()
 
@@ -72,14 +73,14 @@ def dataUploadView(request):
 
     UploadFormset = formset_factory(dataUploadForm)
     if request.method == 'POST':
-        upload_formset = UploadFormset(request.POST, prefix='data')
+        upload_formset = UploadFormset(request.POST, request.FILES, prefix='data')
         if upload_formset.is_valid():
             for f in upload_formset:
                 data = f.cleaned_data
                 if data:
                     createModels(data)
         else:
-            print(upload_formset)
+            print(upload_formset.errors)
             # do something here
     else:
         upload_formset = UploadFormset(prefix='data',)

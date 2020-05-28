@@ -25,7 +25,6 @@ function unhighlight(e) {
     dropArea.classList.remove('highlight')
 }
 
-
 dropArea.addEventListener('drop', handleDrop, false)
 
 function handleDrop(e) {
@@ -140,6 +139,12 @@ function readFile(file) {
                                 }
                             });
 
+                            // set form file input to be the .zip
+                            let dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(file);
+                            const fileInput = document.getElementById("id_data-" + count + "-raw_test_data");
+                            fileInput.files = dataTransfer.files;
+                            fileInput.style.display = "none";
                         });
                     }
 
@@ -175,4 +180,3 @@ function readFile(file) {
 
     reader.readAsDataURL(file);
 }
-

@@ -14,16 +14,17 @@ class FileFieldForm(forms.Form):
 
 
 class dataUploadForm(BaseForm):
-    first_name = forms.CharField(label='First name', max_length=50)
-    last_name = forms.CharField(label='Last name', max_length=50)
+    first_name = forms.CharField(label='First name', max_length=50, widget=forms.TextInput(attrs={'required': True}))
+    last_name = forms.CharField(label='Last name', max_length=50,  widget=forms.TextInput(attrs={'required': True}))
     gender = forms.ChoiceField(label='Gender', choices=GENDER, required=False)
     dob = forms.DateField(label='Date of birth', required=False)
     patient_postcode = forms.CharField(label='Postcode', max_length=8, required=False)
 
-    centre_type = forms.ChoiceField(label="Centre type", choices=CENTRE_TYPE)
-    latitude = forms.FloatField(label="Latitude")
-    longitude = forms.FloatField(label="Longitude")
+    centre_type = forms.ChoiceField(label="Centre type", choices=CENTRE_TYPE,  widget=forms.TextInput(attrs={'required': True}))
+    latitude = forms.FloatField(label="Latitude",  widget=forms.TextInput(attrs={'required': True}))
+    longitude = forms.FloatField(label="Longitude",  widget=forms.TextInput(attrs={'required': True}))
 
-    test_result = forms.ChoiceField(label="Result", choices=DIAGNOSIS)
-    test_date = forms.DateTimeField(label="Date")
+    test_result = forms.ChoiceField(label="Result", choices=DIAGNOSIS,  widget=forms.TextInput(attrs={'required': True}))
+    test_date = forms.DateTimeField(label="Date",  widget=forms.TextInput(attrs={'required': True}))
+    raw_test_data = forms.FileField(label=False)
     comment = forms.CharField(widget=forms.Textarea, required=False)

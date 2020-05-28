@@ -2,7 +2,7 @@ from django.contrib.gis.geos import Point
 from django.forms import formset_factory
 
 from dashboard.models import Patient, TestingCentre, DiagnosticTest
-from .models import CountryBorder
+from .models import CountryBorder, RegionBorder
 from .forms import  dataUploadForm
 from django.shortcuts import render
 import postcodes_io_api
@@ -14,11 +14,11 @@ def get_locations(lat, long):
     result = resp['result'] if ('result' in resp) and (resp['result'] != None) else []
     item = result[0] if len(result) > 0 else {}
     postcode = item['postcode'] if 'postcode' in item else str()
-    region = item['region'] if 'region' in item else (item['country'] if 'country' in item else str())
     pnt = Point(long, lat)
-    country = CountryBorder.objects.filter(mpoly__contains=pnt)
+    region = RegionBorder.objects.filter(mpoly__contains=pnt)[0].name
+    country = CountryBorder.objects.filter(mpoly__contains=pnt)[0].name
 
-    return {"country": country[0].name, "region": region, "postcode": postcode}
+    return {"country": country, "region": region, "postcode": postcode}
 
 
 def createModels(data):

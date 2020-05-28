@@ -10,9 +10,9 @@ class dataUploadForm(forms.Form):
 
     first_name = forms.CharField(label='First name', max_length=50)
     last_name = forms.CharField(label='Last name', max_length=50)
-    gender = forms.ChoiceField(label='Gender', choices=GENDER)
-    dob = forms.DateField(label='Date of birth')
-    patient_postcode = forms.CharField(label='Postcode', max_length=8)
+    gender = forms.ChoiceField(label='Gender', choices=GENDER, required=False)
+    dob = forms.DateField(label='Date of birth', required=False)
+    patient_postcode = forms.CharField(label='Postcode', max_length=8, required=False)
 
     centre_type = forms.ChoiceField(label="Centre type", choices=CENTRE_TYPE)
     latitude = forms.FloatField(label="Latitude")
@@ -20,4 +20,4 @@ class dataUploadForm(forms.Form):
 
     test_result = forms.ChoiceField(label="Result", choices=DIAGNOSIS)
     test_date = forms.DateTimeField(label="Date")
-    comment = forms.Textarea()
+    comment = forms.CharField(widget=forms.Textarea, required=False)

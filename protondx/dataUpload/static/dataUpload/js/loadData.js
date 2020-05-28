@@ -59,26 +59,28 @@ function openTab(evt, fileName) {
 let uploadList = document.getElementById('upload-list');
 let viewPanel = document.getElementById('view-content');
 
+let FILE_COUNT = 0;
+
 function readFile(file) {
 
     // create a new Div which contains a button/loading bar and file name
     let newDiv = document.createElement('div');
     let newBar = document.createElement('button');
-    let file_name = file.name;
+    let file_name = file.name + '-(' + FILE_COUNT + ')';
     let content = document.createTextNode(file_name);
     newBar.classList.add('tablinks');
     newBar.id = file_name + '-button';
     newBar.appendChild(content);
     newDiv.appendChild(newBar);
     uploadList.appendChild( newDiv );
-
+    FILE_COUNT += 1;
     // Open the file, exception if not .zip
     // Create a new tab linked to button in list
     // to display any relevant content
     const reader = new FileReader();
     reader.addEventListener('load', (event) => {
         newBar.addEventListener('click', function () {
-            openTab(event, file.name);
+            openTab(event, file_name);
         });
 
         const result = event.target.result;
@@ -91,7 +93,7 @@ function readFile(file) {
             zip.loadAsync(data).then(function (contents) {
                 let newTab = document.createElement('div');
                 newTab.classList.add('tabcontent');
-                newTab.id = file.name + '-tab';
+                newTab.id = file_name + '-tab';
 
                 let list = document.createElement('ul');
                 Object.keys(contents.files).forEach(function(filename) {

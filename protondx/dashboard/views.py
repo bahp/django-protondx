@@ -14,11 +14,12 @@ class DashView(TemplateView):
     template_name = 'dashboard/dash.html'
 
     def get(self, request, **kwargs):
-        context = {
-            'count_total_exp': get_total_experiments(),
-            'count_pos_exp': get_positive_experiments(),
-            'count_neg_exp': get_negative_experiments(),
-            'count_indiv_patients': get_individuals_tested(),
-        }
+        # context = {
+        #     'count_total_exp': get_total_experiments(),
+        #     'count_pos_exp': get_positive_experiments(),
+        #     'count_neg_exp': get_negative_experiments(),
+        #     'count_indiv_patients': get_individuals_tested(),
+        # }
+        context = {}
         return render(request, self.template_name, context)
 

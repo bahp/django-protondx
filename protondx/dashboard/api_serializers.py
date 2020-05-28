@@ -17,7 +17,6 @@ class PatientSerializer(serializers.ModelSerializer):
         fields = ['gender', 'dob', 'postcode', 'first_name', 'last_name']
 
 
-# Serializer for Diagnostic tests (Not currently used)
 class DiagnosticTestSerializer(serializers.ModelSerializer):
     test_result = serializers.CharField(source='get_test_result_display')
     centre_type = serializers.CharField(source='testing_centre.centre_type')
@@ -28,7 +27,12 @@ class DiagnosticTestSerializer(serializers.ModelSerializer):
         fields = ['test_result', 'centre_type', 'date_test', 'id']
 
 
-# Serializer for Testing Centres (Not currently used)
+class DiagnosticDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = DiagnosticTest
+        fields = ['comment', 'id']
+
+
 class TestingCentreSerializer(serializers.ModelSerializer):
     class Meta:
         model = TestingCentre

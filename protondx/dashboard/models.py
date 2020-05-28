@@ -39,12 +39,11 @@ class TestingCentre(geomodels.Model):
 
     centre_type = models.CharField(max_length=20, choices=CENTRE_TYPE, verbose_name='Centre type')
     coordinates = geomodels.PointField(verbose_name='Coordinates')
-    country = models.CharField(max_length=255, null=True, verbose_name='Country')
-    region = models.CharField(max_length=255, null=True, verbose_name='Region')
-    county = models.CharField(max_length=255, null=True, verbose_name='County')
-    postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
-
-    # postcode. If other countries are to be added the max_length must be revised
+    country = models.CharField(max_length=255, null=True, blank=True, verbose_name='Country')
+    region = models.CharField(max_length=255, null=True, blank=True, verbose_name='Region')
+    county = models.CharField(max_length=255, null=True, blank=True, verbose_name='County')
+    postcode = models.CharField(max_length=8, null=True, blank=True, verbose_name='Postcode')  # This assumes
+    # standard UK postcode. If other countries are to be added the max_length must be revised
 
     @property
     def latitude(self):
@@ -80,7 +79,7 @@ class DiagnosticTest(models.Model):
     #  ----------
 
     test_result = models.BooleanField(choices=DIAGNOSIS, verbose_name='Test result')
-
+    comment = models.TextField(null=True)
     raw_test_data = models.FileField(upload_to='uploads/', null=True, verbose_name='Raw Test Data')
 
     def __str__(self):

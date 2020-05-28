@@ -27,5 +27,6 @@ urlpatterns = [
     path('api/get-postcode-data/', api_viewsets.PostcodeData.as_view()),
     path('api/get-points/', api_viewsets.GeoView.as_view()),
     path('api/diagnostic-test/', api_viewsets.DiagnosticTestView.as_view()),
+    path('api/diagnostic-detail/', api_viewsets.DiagnosticDetailView.as_view()),
 
 ]

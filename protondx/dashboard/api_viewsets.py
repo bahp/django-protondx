@@ -7,6 +7,8 @@ from rest_framework import permissions, generics
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import OrderingFilter
 from rest_framework.views import APIView
+from rest_framework.response import Response
+
 
 # Django filters
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
@@ -17,6 +19,7 @@ from .api_serializers import PatientSerializer
 from .api_serializers import DiagnosticTestSerializer
 from .api_serializers import PostcodeSerializer
 from .api_serializers import CustomGeoJSONSerializer
+from .api_serializers import DiagnosticDetailSerializer
 
 # Models
 from .models import Patient, TestingCentre, DiagnosticTest
@@ -83,7 +86,6 @@ class PostcodeFilter(FilterSet):
         }
 
 
-# This viewset and the associated serializer may not be needed. Here now for testing purposes
 class DiagnosticTestView(generics.ListAPIView):
     pagination_class = None
     queryset = DiagnosticTest.objects.all().order_by('date_test')
@@ -107,6 +109,16 @@ class DiagnosticTestView(generics.ListAPIView):
 
     # Define default ordering
     ordering = ('date_test',)
+
+
+class DiagnosticDetailView(generics.ListAPIView):
+    queryset = DiagnosticTest.objects.only('comment', 'id')
+    serializer_class = DiagnosticDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_fields = ['id']
+
+    def get_paginated_response(self, data):
+        return Response(data)
 
 
 # Used to load data for one specific postcode specified as an argument in the URL

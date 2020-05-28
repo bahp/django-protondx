@@ -62,7 +62,8 @@ def createModels(data):
         testing_centre=testing_centre,
         patient=patient,
         test_result=data['test_result'],
-        date_test=data['test_date']
+        date_test=data['test_date'],
+        comment=data.get('comment')
     )
     diagnostic_test.save()
 

@@ -129,8 +129,6 @@ function readFile(file) {
                                 ["testing_centre_lat", "id_data-" + count + "-latitude"],
                             ]
 
-
-
                             newTab.appendChild(newDiv);
                             // ADD things to the TAB/JSON file HERE
 

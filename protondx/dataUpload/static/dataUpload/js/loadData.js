@@ -126,6 +126,7 @@ function readFile(file) {
                                 ["testing_centre_type", "id_data-" + count + "-centre_type"],
                                 ["testing_centre_long", "id_data-" + count + "-longitude"],
                                 ["testing_centre_lat", "id_data-" + count + "-latitude"],
+                                ["comment", "id_data-" + count + "-comment"]
                             ]
 
                             newTab.appendChild(newDiv);

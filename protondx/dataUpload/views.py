@@ -1,38 +1,24 @@
 from django.contrib.gis.geos import Point
 from django.forms import formset_factory
-from django.views.generic.edit import FormView
 
 from dashboard.models import Patient, TestingCentre, DiagnosticTest
-from .forms import FileFieldForm, dataUploadForm
+from .models import CountryBorder
+from .forms import  dataUploadForm
 from django.shortcuts import render
 import postcodes_io_api
 
 
-# class dataUploadView(FormView):
-#     form_class = dataUploadForm
-#     template_name = 'dataUpload/dataUpload.html'
-#
-#     def post(self, request, *args, **kwargs):
-#         form_class = self.get_form_class()
-#         form = self.get_form(form_class)
-#         files = request.FILES.getlist('file_field')
-#         if form.is_valid():
-#             for f in files:
-#                 print("file uploaded")
-#             return self.form_valid(form)
-#         else:
-#             return self.form_invalid(form)
-
 def get_locations(lat, long):
     api = postcodes_io_api.Api(debug_http=False)
-    resp = api.get_nearest_postcodes_for_coordinates(latitude=lat, longitude=long, limit=1)
+    resp = api.get_nearest_postcodes_for_coordinates(latitude=lat, longitude=long, limit=1, radius=2000)
     result = resp['result'] if ('result' in resp) and (resp['result'] != None) else []
     item = result[0] if len(result) > 0 else {}
     postcode = item['postcode'] if 'postcode' in item else str()
-    country = "United Kingdom"
     region = item['region'] if 'region' in item else (item['country'] if 'country' in item else str())
+    pnt = Point(long, lat)
+    country = CountryBorder.objects.filter(mpoly__contains=pnt)
 
-    return {"country": country, "region": region, "postcode": postcode}
+    return {"country": country[0].name, "region": region, "postcode": postcode}
 
 
 def createModels(data):

@@ -32,7 +32,7 @@ def new_diagnostic(test_date, test_result, centre_ID, patient_ID):
     entry.save()
 
 
-def create_entries():
+def create_entries(num):
     new_patient("John", "Doe", "M", 1, 1, 1990, "W8 5JJ")
     new_patient("John", "Smith", "M", 1, 1, 1990, "SW7 1AW")
     new_patient("Jane", "Doe", "F", 1, 1, 1990, "W8 5JJ")
@@ -59,11 +59,11 @@ def create_entries():
     start_dt = datetime.date.today().replace(day=1, month=1).toordinal()
     end_dt = datetime.date.today().toordinal()
 
-    for i in range(1000):
+    for i in range(num):
         random_day = datetime.date.fromordinal(random.randint(start_dt, end_dt))
         random_time = str(random_day) + " 00:00"
 
-        random_result = random.choice([True, False])
+        random_result = False if random.random() < 0.8 else True
 
         random_centre = random.choice(centre_ids)
         random_patient = random.choice(patient_ids)

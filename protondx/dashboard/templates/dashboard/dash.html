@@ -344,7 +344,7 @@
                         {color: "#ff2200", ratio: 0.913},
                         {color: "#ff0000", ratio: 1}
                     ],
-                    maxPixelIntensity: 200,
+                    maxPixelIntensity: 1000,
                     minPixelIntensity: 0,
                 };
 
@@ -552,37 +552,13 @@
                                 backgroundColor: "#FD7F6F",
                                 borderColor: "#B2E061",
                                 fill: false,
-                                data: [{
-                                    x: moment('2016-01-01T00:00:00Z').format(),
-                                    y: 1
-                                }, {
-                                    x: moment('2016-01-08T00:00:00Z').format(),
-                                    y: 2
-                                }, {
-                                    x: moment('2016-01-18T00:00:00Z').format(),
-                                    y: 3
-                                }, {
-                                    x: moment('2016-01-27T00:00:00Z').format(),
-                                    y: 4
-                                }],
+                                data: [],
                             }, {
                                 label: 'Daily positive tests',
                                 backgroundColor: "#7EB0D5",
                                 borderColor: "#BD7EBE",
                                 fill: false,
-                                data: [{
-                                    x: moment('2016-01-01T00:00:00Z').format(),
-                                    y: 4
-                                }, {
-                                    x: moment('2016-01-08T00:00:00Z').format(),
-                                    y: 3
-                                }, {
-                                    x: moment('2016-01-18T00:00:00Z').format(),
-                                    y: 2
-                                }, {
-                                    x: moment('2016-01-27T00:00:00Z').format(),
-                                    y: 1
-                                }],
+                                data: [],
                             }]
                         },
                         options: {
@@ -599,9 +575,13 @@
                                 xAxes: [{
                                     type: 'time',
                                     time: {
-                                        unit: 'day'
+                                        unit: 'month'
                                     }
                                 }]
+                            },
+                            tooltips: {
+                                mode: 'index',
+                                intersect: false,
                             }
                         }
                     });
@@ -617,6 +597,11 @@
                     chart.update();
                 }
 
+                function updateDateChart(data0, data1) {
+                    dateChart.data.datasets[0].data = data0;
+                    dateChart.data.datasets[1].data = data1;
+                    dateChart.update();
+                }
 
                 const selection_name = document.getElementById("selection-name");
                 const selection_total = document.getElementById("selection-total");
@@ -644,6 +629,8 @@
                     else{
                         console.log("Invalid search geometry")
                     }
+
+
 
 
                     const query = geoJSONLayer.createQuery();
@@ -719,10 +706,48 @@
 
                     ];
 
+                    let start = moment('2020-01-01');
+                    let end = moment();
+                    let i = 0;
+                    let dateTotal = [];
+                    let datePos = [];
+                    for (let m = moment(start); m.diff(end, 'days') <= 0; m.add(1, 'day')) {
+                        query.outStatistics.push(
+                            {
+                                onStatisticField: "CASE WHEN date_test = '" + m.format('DD-MM-YYYY') + "' THEN 1 ELSE 0 END",
+                                outStatisticFieldName: i + "_tot",
+                                statisticType: "sum"
+                            }
+                        );
+                        query.outStatistics.push(
+                            {
+                                onStatisticField: "CASE WHEN date_test = '" + m.format('DD-MM-YYYY') + "' AND test_result = 'Positive' THEN 1 ELSE 0 END",
+                                outStatisticFieldName: i + "_pos",
+                                statisticType: "sum"
+                            }
+                        );
+                        dateTotal.push(
+                            {
+                                x: m.format(),
+                                y: 0
+                            }
+                        );
+                        datePos.push(
+                            {
+                                x: m.format(),
+                                y: 0
+                            }
+                        );
+                        i += 1;
+                    }
+
 
                     let popup = geoJSONLayer.queryFeatures(query).then(function (response) {
                         let data = response.features[0].attributes;
-
+                        for (let j = 0; j < i; j++) {
+                            dateTotal[j].y = data[j.toString() + "_tot"];
+                            datePos[j].y = data[j.toString() + "_pos"];
+                        }
 
                         updateChart(centreChart, [
                             data.home,
@@ -739,9 +764,7 @@
                             data.gen_na,
                         ]);
 
-                        // selection_total.innerText = ((data.positive + data.negative) || 0);
-                        // selection_pos.innerText = (data.positive || 0);
-                        // selection_neg.innerText = (data.negative || 0);
+                        updateDateChart(dateTotal, datePos);
 
                         return ("<table> <tbody>" +
                             "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" + ((data.positive + data.negative) || 0) + "</td> </tr>" +

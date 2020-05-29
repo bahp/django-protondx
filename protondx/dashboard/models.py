@@ -17,8 +17,8 @@ class Patient(models.Model):
     first_name = models.CharField(max_length=50, verbose_name='First name')
     last_name = models.CharField(max_length=50, verbose_name='Last name')
     gender = models.CharField(max_length=1, null=True, choices=GENDER, verbose_name='Gender')
-    dob = models.DateField(null=True, verbose_name='Date of birth')
-    postcode = models.CharField(max_length=8, null=True, verbose_name='Postcode')  # This assumes standard UK
+    dob = models.DateField(null=True, blank=True, verbose_name='Date of birth')
+    postcode = models.CharField(max_length=8, null=True, blank=True, verbose_name='Postcode')  # This assumes standard UK
 
     # postcode. If other countries are to be added the max_length must be revised
 
@@ -79,7 +79,7 @@ class DiagnosticTest(models.Model):
     #  ----------
 
     test_result = models.BooleanField(choices=DIAGNOSIS, verbose_name='Test result')
-    comment = models.TextField(null=True)
+    comment = models.TextField(null=True, blank=True)
     raw_test_data = models.FileField(upload_to='uploads/', null=True, blank=True, verbose_name='Raw Test Data')
 
     def __str__(self):

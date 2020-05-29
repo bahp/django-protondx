@@ -80,7 +80,7 @@ class DiagnosticTest(models.Model):
 
     test_result = models.BooleanField(choices=DIAGNOSIS, verbose_name='Test result')
     comment = models.TextField(null=True)
-    raw_test_data = models.FileField(upload_to='uploads/', null=True, verbose_name='Raw Test Data')
+    raw_test_data = models.FileField(upload_to='uploads/', null=True, blank=True, verbose_name='Raw Test Data')
 
     def __str__(self):
         return self.patient.last_name + ", " + self.patient.first_name + ": " + str(self.date_test)

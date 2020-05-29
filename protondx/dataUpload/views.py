@@ -60,7 +60,6 @@ def get_locations(lat, long):
 
 
 def createModels(data):
-    # updatedArchive = appendZIP(data)
     patient = Patient.objects.create(
         first_name=data['first_name'],
         last_name=data['last_name'],
@@ -85,7 +84,7 @@ def createModels(data):
         test_result=data['test_result'],
         date_test=data['test_date'],
         comment=data.get('comment'),
-        # raw_test_data=updatedArchive
+        raw_test_data=data.get('raw_test_data')
     )
 
     patient.save()

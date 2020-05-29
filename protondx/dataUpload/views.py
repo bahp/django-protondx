@@ -1,11 +1,36 @@
+import copy
+import io
+import json
+import zipfile
+
+import postcodes_io_api
 from django.contrib.gis.geos import Point
+from django.core.files.uploadedfile import SimpleUploadedFile
+from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import formset_factory
+from django.shortcuts import render
 
 from dashboard.models import Patient, TestingCentre, DiagnosticTest
+from .forms import dataUploadForm
 from .models import CountryBorder, RegionBorder
-from .forms import  dataUploadForm
-from django.shortcuts import render
-import postcodes_io_api
+
+
+# def appendZIP(data):
+#     archive_orig = copy.deepcopy(data.get('raw_test_data'))
+#     del data['raw_test_data']
+#
+#     updatedData = json.dumps(
+#         data,
+#         sort_keys=False,
+#         indent=4,
+#         cls=DjangoJSONEncoder
+#     )
+#
+#     with zipfile.ZipFile(archive_orig, 'w') as zip_archive:
+#         with zip_archive.open('updated/updated.json', 'w') as file1:
+#             file1.write(b'compose-file-content...')
+#
+#     return archive_orig
 
 
 def get_locations(lat, long):
@@ -15,13 +40,27 @@ def get_locations(lat, long):
     item = result[0] if len(result) > 0 else {}
     postcode = item['postcode'] if 'postcode' in item else str()
     pnt = Point(long, lat)
-    region = RegionBorder.objects.filter(mpoly__contains=pnt)[0].name
-    country = CountryBorder.objects.filter(mpoly__contains=pnt)[0].name
+
+    # try and get region using local data, if that fails take data from postcodesAPI
+    try:
+        region = RegionBorder.objects.filter(mpoly__contains=pnt)[0].name
+    except IndexError:
+        region = item['region'] if 'region' in item else (item['country'] if 'country' in item else str())
+
+    # try and take country from local data, if that fails and there is a region country is UK else unknown
+    try:
+        country = CountryBorder.objects.filter(mpoly__contains=pnt)[0].name
+    except IndexError:
+        if region:
+            country = 'United Kingdom'
+        else:
+            country = ''
 
     return {"country": country, "region": region, "postcode": postcode}
 
 
 def createModels(data):
+    # updatedArchive = appendZIP(data)
     patient = Patient.objects.create(
         first_name=data['first_name'],
         last_name=data['last_name'],
@@ -29,8 +68,6 @@ def createModels(data):
         dob=data.get('dob'),
         postcode=data.get('patient_postcode')
     )
-
-    patient.save()
 
     location = get_locations(data['latitude'], data['longitude'])
 
@@ -42,21 +79,21 @@ def createModels(data):
         postcode=location['postcode'],
     )
 
-    testing_centre.save()
-
     diagnostic_test = DiagnosticTest.objects.create(
         testing_centre=testing_centre,
         patient=patient,
         test_result=data['test_result'],
         date_test=data['test_date'],
         comment=data.get('comment'),
-        raw_test_data=data.get('raw_test_data')
+        # raw_test_data=updatedArchive
     )
+
+    patient.save()
+    testing_centre.save()
     diagnostic_test.save()
 
 
 def dataUploadView(request):
-
     UploadFormset = formset_factory(dataUploadForm)
     if request.method == 'POST':
         upload_formset = UploadFormset(request.POST, request.FILES, prefix='data')
@@ -69,7 +106,7 @@ def dataUploadView(request):
             print(upload_formset.errors)
             # do something here
     else:
-        upload_formset = UploadFormset(prefix='data',)
+        upload_formset = UploadFormset(prefix='data', )
     return render(request, 'dataUpload/dataUpload.html', {
         'upload_formset': upload_formset,
     })

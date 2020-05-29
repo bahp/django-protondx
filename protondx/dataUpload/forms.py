@@ -20,11 +20,11 @@ class dataUploadForm(BaseForm):
     dob = forms.DateField(label='Date of birth', required=False)
     patient_postcode = forms.CharField(label='Postcode', max_length=8, required=False)
 
-    centre_type = forms.ChoiceField(label="Centre type", choices=CENTRE_TYPE,  widget=forms.TextInput(attrs={'required': True}))
+    centre_type = forms.ChoiceField(label="Centre type", choices=CENTRE_TYPE)
     latitude = forms.FloatField(label="Latitude",  widget=forms.TextInput(attrs={'required': True}))
     longitude = forms.FloatField(label="Longitude",  widget=forms.TextInput(attrs={'required': True}))
 
-    test_result = forms.ChoiceField(label="Result", choices=DIAGNOSIS,  widget=forms.TextInput(attrs={'required': True}))
+    test_result = forms.ChoiceField(label="Result", choices=DIAGNOSIS,)
     test_date = forms.DateTimeField(label="Date",  widget=forms.TextInput(attrs={'required': True}))
     raw_test_data = forms.FileField(label=False)
     comment = forms.CharField(widget=forms.Textarea, required=False)

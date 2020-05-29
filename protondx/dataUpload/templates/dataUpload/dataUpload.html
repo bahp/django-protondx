@@ -8,6 +8,7 @@
     <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
 
     {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/layout.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/grid.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/displayArea.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/dragArea.css' %}">
@@ -18,23 +19,41 @@
 <body>
 
 <div class="grid-container">
-    <div id="view-panel" class="view-panel">
-        <form id="data-form" method="post" action="" enctype="multipart/form-data">
-            <div id="view-content">
-                {% csrf_token %}
-                {{ upload_formset.management_form }}
-            </div>
-        </form>
-    </div>
+    <div class="grid-header">
+        <img src="{% static 'dashboard/images/logo.svg' %}" style='max-height: 100%; width: auto; object-fit: contain'/>
 
-    <div class="upload-panel">
-        <div id="upload-list" class="upload-list"></div>
-        <div id="drop-area" class="drop-area">
-            <form class="my-form">
-                <h2>Drag files here to upload</h2>
-                <input type="file" id="fileElem" multiple accept="*" onchange="handleFiles(this.files)">
-                <label class="button-link" for="fileElem">Choose your files</label>
+        <h2>
+            Centre for Bio-Inspired Technology
+        </h2>
+
+        <div class="dropdown">
+            <button onclick="openDropdown()" class="dropButton">Menu</button>
+            <div id="dropdown" class="dropdown-content">
+                <a href="http://localhost:8000/dashboard/" target="_blank">Dashboard</a>
+                <a href="https://www.imperial.ac.uk/bio-inspired-technology/about/" target="_blank">About</a>
+                <a>Contact</a>
+                <a href="http://localhost:8000/admin/" target="_blank">Admin</a>
+            </div>
+        </div>
+    </div>
+    <div class="grid-body">
+        <div id="view-panel" class="view-panel">
+            <form id="data-form" method="post" action="" enctype="multipart/form-data">
+                <div id="view-content">
+                    {% csrf_token %}
+                    {{ upload_formset.management_form }}
+                </div>
             </form>
+        </div>
+        <div class="upload-panel">
+            <div id="upload-list" class="upload-list"></div>
+            <div id="drop-area" class="drop-area">
+                <form class="my-form">
+                    <h2>Drag files here to upload</h2>
+                    <input type="file" id="fileElem" multiple accept="*" onchange="handleFiles(this.files)">
+                    <label class="button-link" for="fileElem">Choose your files</label>
+                </form>
+            </div>
         </div>
     </div>
 </div>
@@ -42,7 +61,9 @@
 <button class="button button-right" type="submit" form="data-form">Upload all</button>
 
 <script src="{% static 'dataUpload/js/loadData.js' %}"></script>
-<script src="{% static 'dataUpload/js/sendData.js' %}"></script>
+
+<!--dropdown menu script-->
+<script src="{% static 'dashboard/dropDown.js' %}"></script>
 
 <script type="text/html" id="upload-template">
     <div id="dataUpload-__prefix__">

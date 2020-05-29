@@ -7,25 +7,6 @@ p {
     margin-bottom: 10px;
 }
 
-.button {
-    display: inline-block;
-    padding: 10px;
-    background: #ccc;
-    cursor: pointer;
-    border-radius: 5px;
-    border: 1px solid #ccc;
-    font-family: Sans-Serif;
-}
-
-.button-right{
-    float: right;
-    margin-right: 20px;
-}
-
-.button:hover {
-    background: #ddd;
-}
-
 .button-link {
     background: none!important;
     border: none;

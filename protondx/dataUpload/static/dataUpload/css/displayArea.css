@@ -8,3 +8,20 @@ input[type=text], input[type=number], select, textarea {
     margin-bottom: 16px;
     resize: vertical;
 }
+
+.button {
+    display: inline-block;
+    padding: 10px;
+    background: #00ACD7;
+    cursor: pointer;
+    border: 0;
+}
+
+.button-right{
+    float: right;
+    margin-right: 20px;
+}
+
+.button:hover {
+    background: #006EAF;
+}

@@ -1,3 +1,7 @@
+"""
+This module contains the URL configuration settings for the Dashboard App
+"""
+
 from django.urls import include, path
 from rest_framework import routers
 

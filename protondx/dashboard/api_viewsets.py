@@ -1,3 +1,7 @@
+"""
+This module contains the views and viewsets for Dashboard App's Django Rest API.
+"""
+
 # Django Http Response
 from django.http import HttpResponse
 
@@ -30,6 +34,9 @@ from .queries import get_postcode_data
 
 # This viewset and the associated serializer may not be needed. Here now for testing purposes
 class PatientViewSet(viewsets.ModelViewSet):
+    """
+
+    """
     queryset = Patient.objects.all().order_by('first_name')
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -123,6 +130,12 @@ class DiagnosticDetailView(generics.ListAPIView):
 
 # Used to load data for one specific postcode specified as an argument in the URL
 class PostcodeData(generics.ListAPIView):
+    """
+    This view is used to obtain Diagnostic statistics related to one postcode.
+    It provides the total number of experiments,
+    the number of positive and negative diagnostics and the number of patients tested.
+    """
+    
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = PostcodeSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -137,6 +150,26 @@ class PostcodeData(generics.ListAPIView):
 # Used to load all testing data with associated coordinates and
 # information using a geoJSON format
 class GeoView(APIView):
+    """
+    This view is used to obtain Diagnostic Test data from the database. It provides all tests and their associated
+    coordinates and information in a GeoJSON format.
+    Each returned feature will have the form:
+
+    {"type": "Feature",
+     "properties": {
+        "date_test": string,
+        "patient": int,
+        "test_result": string,
+        "testing_centre__postcode": string,
+        "testing_centre__county": string,
+        "testing_centre__region": string,
+        "testing_centre__country": string,
+        "testing_centre__centre_type": string,
+        "patient__gender": string,
+        "pk": string},
+     "geometry": {"type": "Point", "coordinates": [float, float]}}
+    """
+
     permission_classes = []
 
     def get(self, request):

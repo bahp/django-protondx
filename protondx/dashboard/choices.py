@@ -1,3 +1,7 @@
+"""
+This module contains the choices to be used in database models, forms...
+"""
+
 # Gender choices
 FEMALE = 'F'
 MALE = 'M'

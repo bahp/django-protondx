@@ -13,6 +13,12 @@ class TestInLine(admin.TabularInline):
 
 # Patient admin view
 class PatientAdmin(admin.ModelAdmin):
+    """
+    This class defines the look of the PatientAdmin page.
+
+        .. note: Diagnostic tests are displayed as in-line elements
+
+    """
     fieldsets = [
         ('Patient Information', {'fields': ['first_name', 'last_name', 'dob', 'gender', 'postcode']}),
     ]
@@ -25,6 +31,12 @@ class PatientAdmin(admin.ModelAdmin):
 
 # Diagnostic test admin view
 class DiagnosticTestAdmin(admin.ModelAdmin):
+    """
+    This class defines the look of the DiagnosticTestAdmin page.
+
+        .. note: It allows to search by patient name, test date and test result.
+
+    """
     fieldsets = [
         ('Test Information', {'fields': ['patient', 'testing_centre', 'date_test', 'test_result']}),
         ('Raw test data', {'fields': ['raw_test_data']})
@@ -34,14 +46,26 @@ class DiagnosticTestAdmin(admin.ModelAdmin):
     search_fields = ['patient', 'date_test', 'test_result']
 
 
-# Form to input coordinates using a Map or a textbox
 class TestingCentreAdminForm(forms.ModelForm):
+    """
+    Form used to input coordinates into a PointField using a map or textbox.
+    """
     coordinates = forms.PointField(widget=forms.OSMWidget(attrs={
         'display_raw': True}))
 
 
 # Testing Centre admin view
 class CentreAdmin(admin.ModelAdmin):
+    """
+    This class defines the look of the CentreAdmin page.
+
+        .. note: Diagnostic tests are displayed as in-line elements.
+
+        .. note: It allows to search by centre type and postcode.
+
+        ..note: A form is used for coordinates selection. It displays a map and textbox.
+
+    """
     inlines = [TestInLine]
     list_display = ['centre_type', 'postcode', 'latitude', 'longitude']
     search_fields = ['centre_type', 'postcode']

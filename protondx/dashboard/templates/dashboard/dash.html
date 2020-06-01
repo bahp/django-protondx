@@ -28,9 +28,9 @@
 
     <!--CSS templates-->
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/layout.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/modal-grid.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/main-grid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/css/layout.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/css/modal-grid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/css/main-grid.css' %}">
     <!--    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/datatable.css' %}">-->
 
     <!--ARCGIS-->
@@ -848,7 +848,7 @@
 
 
                 let countries = new GeoJSONLayer({
-                    url: "{% static 'dashboard/countries.geojson' %}",
+                    url: "{% static 'dashboard/data/countries.geojson' %}",
                     outFields: ["NAME"],
                     popupTemplate: countryPopup,
                     renderer: countryRenderer,
@@ -870,7 +870,7 @@
                 };
 
                 let region = new GeoJSONLayer({
-                    url: "{% static 'dashboard/regions.geojson' %}",
+                    url: "{% static 'dashboard/data/regions.geojson' %}",
                     outFields: ["nuts118nm"],
                     popupTemplate: regionPopup,
                     renderer: lineRenderer,
@@ -1153,7 +1153,7 @@
 
 
 <!--dropdown menu script + modal exit-->
-<script src="{% static 'dashboard/dropDown.js' %}"></script>
+<script src="{% static 'dashboard/js/dropDown.js' %}"></script>
 
 
 </body>

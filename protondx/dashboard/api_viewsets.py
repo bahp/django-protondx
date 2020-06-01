@@ -1,5 +1,5 @@
 """
-This module contains the views and viewsets for Dashboard App's Django Rest API.
+This module contains the views and viewsets for the Dashboard App's Django Rest API.
 """
 
 # Django Http Response

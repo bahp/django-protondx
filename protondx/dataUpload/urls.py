@@ -1,3 +1,7 @@
+"""
+This module contains the URL configuration settings for the dataUpload App
+"""
+
 from django.urls import path
 from . import views
 

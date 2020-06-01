@@ -2,6 +2,8 @@ from django.contrib.gis.db import models
 
 
 class CountryBorder(models.Model):
+    """This contains the CountryBorder attributes."""
+
     name = models.CharField(max_length=255)
     mpoly = models.MultiPolygonField()
 
@@ -10,6 +12,8 @@ class CountryBorder(models.Model):
 
 
 class RegionBorder(models.Model):
+    """This contains the RegionBorder attributes."""
+
     name = models.CharField(max_length=255)
     mpoly = models.MultiPolygonField()
 
@@ -18,6 +22,8 @@ class RegionBorder(models.Model):
 
 
 class PostcodeBorder(models.Model):
+    """This contains the PostcodeBorder attributes."""
+
     name = models.CharField(max_length=255)
     mpoly = models.MultiPolygonField()
 

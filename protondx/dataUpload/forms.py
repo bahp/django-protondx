@@ -1,3 +1,7 @@
+"""
+This module contains the form definitions for the dataUpload App.
+"""
+
 from django import forms
 from dashboard.choices import GENDER, CENTRE_TYPE, DIAGNOSIS
 
@@ -10,10 +14,16 @@ class BaseForm(forms.Form):
 
 
 class FileFieldForm(forms.Form):
+    """
+    This class is used to crete a FileFiled form.
+    """
     file_field = forms.FileField(widget=forms.ClearableFileInput(attrs={'multiple': True}))
 
 
 class dataUploadForm(BaseForm):
+    """
+    This class is used to create a form for a DiagnosticTest entry and its associated Patient and TestingCentre.
+    """
     first_name = forms.CharField(label='First name', max_length=50, widget=forms.TextInput(attrs={'required': True}))
     last_name = forms.CharField(label='Last name', max_length=50,  widget=forms.TextInput(attrs={'required': True}))
     gender = forms.ChoiceField(label='Gender', choices=GENDER, required=False)

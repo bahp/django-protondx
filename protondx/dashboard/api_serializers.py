@@ -1,3 +1,7 @@
+"""
+This module contains the serializers for the Dashboard App's Django Rest API.
+"""
+
 #  Serializer imports
 from rest_framework import serializers
 from django.contrib.gis.serializers.geojson import Serializer as GeoJSONSerializer

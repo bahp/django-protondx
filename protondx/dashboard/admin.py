@@ -1,3 +1,7 @@
+"""
+This module contains the Admin page definitions for the Dashboard App.
+"""
+
 from django.contrib import admin
 from django.contrib.gis import forms
 

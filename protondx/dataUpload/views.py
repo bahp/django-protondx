@@ -34,6 +34,14 @@ from .models import CountryBorder, RegionBorder
 
 
 def get_locations(lat, long):
+    """
+    Uses coordinates to determine Country, Region, and Postcode.
+
+    :param float lat: Latitude
+    :param float long: Longitude
+    :return: Returns a dictionary of locations at different scales
+    :rtype: dict
+    """
     api = postcodes_io_api.Api(debug_http=False)
     resp = api.get_nearest_postcodes_for_coordinates(latitude=lat, longitude=long, limit=1, radius=2000)
     result = resp['result'] if ('result' in resp) and (resp['result'] != None) else []
@@ -60,6 +68,12 @@ def get_locations(lat, long):
 
 
 def createModels(data):
+    """
+    Creates database entries for Patient, TestingCentre and DiagnosticTest using cleaned form data.
+
+    :param dict data: Cleaned Diagnostic Data
+    :return:
+    """
     patient = Patient.objects.create(
         first_name=data['first_name'],
         last_name=data['last_name'],
@@ -93,6 +107,15 @@ def createModels(data):
 
 
 def dataUploadView(request):
+    """
+    This view displays the dataUpload page. Deals with POST and GET methods to supply forms and
+    receive the completed forms.
+
+    :param request: Request
+    :return:
+
+    ..todo: Deal with exceptions relating to missing form entries, or otherwise invalid data.
+    """
     UploadFormset = formset_factory(dataUploadForm)
     if request.method == 'POST':
         upload_formset = UploadFormset(request.POST, request.FILES, prefix='data')

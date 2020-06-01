@@ -1,3 +1,9 @@
+"""
+This module is used to populate the CountryBorder and RegionBorder tables in the database.
+It extracts location data from shape and project files under 'dataUpload/data'.
+"""
+
+
 import os
 from django.contrib.gis.utils import LayerMapping
 from .models import CountryBorder, RegionBorder
@@ -23,6 +29,12 @@ region_shp = os.path.abspath(
 
 
 def run(verbose=True):
+    """
+    This method adds Region and Country Borders to the database.
+
+    :param bool verbose:
+    :return:
+    """
     lm_country = LayerMapping(CountryBorder, country_shp, country_mapping, transform=False)
     lm_country.save(strict=True, verbose=verbose)
     lm_region = LayerMapping(RegionBorder, region_shp, region_mapping, transform=False)

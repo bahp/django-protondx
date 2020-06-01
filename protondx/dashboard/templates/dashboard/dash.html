@@ -28,9 +28,9 @@
 
     <!--CSS templates-->
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/layout.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/modal-grid.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/main-grid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/css/layout.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/css/modal-grid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/css/main-grid.css' %}">
     <!--    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/datatable.css' %}">-->
 
     <!--ARCGIS-->
@@ -233,6 +233,7 @@
 
                 const pcr_id = document.getElementById("pcr-id");
                 const comment_id = document.getElementById("comment-id");
+                const comment_body = document.getElementById("comment-body");
 
                 $('#patient-table tbody').on( 'click', 'tr', function () {
                     $(this).addClass('selected').siblings().removeClass('selected');
@@ -240,6 +241,23 @@
 
                     pcr_id.innerHTML = diagnostic_id;
                     comment_id.innerHTML = diagnostic_id;
+
+                    const diagnosticDetailURL = HOST_NAME + '/dashboard/api/diagnostic-detail/?id=' + diagnostic_id;
+                    let getDetail =  $.get(diagnosticDetailURL);
+
+                    $.when(getDetail).then(function (response) {
+                        if (Array.isArray(response)
+                            && response.length
+                            && 'comment' in response[0]
+                            && response[0]['comment']) {
+
+                            comment_body.innerHTML = response[0]['comment'];
+                        }
+                        else {
+                            comment_body.innerHTML = "No comment recorded for this diagnostic.";
+                        }
+                    });
+
                 });
 
                 // $("#filterbox").keyup(function() {
@@ -251,6 +269,7 @@
                     patientTable.search('').draw();
                     pcr_id.innerHTML = '';
                     comment_id.innerHTML = '';
+                    comment_body.innerHTML= '';
                     modal.style.display = "none";
                 }
 
@@ -533,37 +552,13 @@
                                 backgroundColor: "#FD7F6F",
                                 borderColor: "#B2E061",
                                 fill: false,
-                                data: [{
-                                    x: moment('2016-01-01T00:00:00Z').format(),
-                                    y: 1
-                                }, {
-                                    x: moment('2016-01-08T00:00:00Z').format(),
-                                    y: 2
-                                }, {
-                                    x: moment('2016-01-18T00:00:00Z').format(),
-                                    y: 3
-                                }, {
-                                    x: moment('2016-01-27T00:00:00Z').format(),
-                                    y: 4
-                                }],
+                                data: [],
                             }, {
                                 label: 'Daily positive tests',
                                 backgroundColor: "#7EB0D5",
                                 borderColor: "#BD7EBE",
                                 fill: false,
-                                data: [{
-                                    x: moment('2016-01-01T00:00:00Z').format(),
-                                    y: 4
-                                }, {
-                                    x: moment('2016-01-08T00:00:00Z').format(),
-                                    y: 3
-                                }, {
-                                    x: moment('2016-01-18T00:00:00Z').format(),
-                                    y: 2
-                                }, {
-                                    x: moment('2016-01-27T00:00:00Z').format(),
-                                    y: 1
-                                }],
+                                data: [],
                             }]
                         },
                         options: {
@@ -580,9 +575,13 @@
                                 xAxes: [{
                                     type: 'time',
                                     time: {
-                                        unit: 'day'
+                                        unit: 'month'
                                     }
                                 }]
+                            },
+                            tooltips: {
+                                mode: 'index',
+                                intersect: false,
                             }
                         }
                     });
@@ -598,6 +597,11 @@
                     chart.update();
                 }
 
+                function updateDateChart(data0, data1) {
+                    dateChart.data.datasets[0].data = data0;
+                    dateChart.data.datasets[1].data = data1;
+                    dateChart.update();
+                }
 
                 const selection_name = document.getElementById("selection-name");
                 const selection_total = document.getElementById("selection-total");
@@ -625,6 +629,8 @@
                     else{
                         console.log("Invalid search geometry")
                     }
+
+
 
 
                     const query = geoJSONLayer.createQuery();
@@ -700,10 +706,48 @@
 
                     ];
 
+                    let start = moment('2020-01-01');
+                    let end = moment();
+                    let i = 0;
+                    let dateTotal = [];
+                    let datePos = [];
+                    for (let m = moment(start); m.diff(end, 'days') <= 0; m.add(1, 'day')) {
+                        query.outStatistics.push(
+                            {
+                                onStatisticField: "CASE WHEN date_test = '" + m.format('DD-MM-YYYY') + "' THEN 1 ELSE 0 END",
+                                outStatisticFieldName: i + "_tot",
+                                statisticType: "sum"
+                            }
+                        );
+                        query.outStatistics.push(
+                            {
+                                onStatisticField: "CASE WHEN date_test = '" + m.format('DD-MM-YYYY') + "' AND test_result = 'Positive' THEN 1 ELSE 0 END",
+                                outStatisticFieldName: i + "_pos",
+                                statisticType: "sum"
+                            }
+                        );
+                        dateTotal.push(
+                            {
+                                x: m.format(),
+                                y: 0
+                            }
+                        );
+                        datePos.push(
+                            {
+                                x: m.format(),
+                                y: 0
+                            }
+                        );
+                        i += 1;
+                    }
+
 
                     let popup = geoJSONLayer.queryFeatures(query).then(function (response) {
                         let data = response.features[0].attributes;
-
+                        for (let j = 0; j < i; j++) {
+                            dateTotal[j].y = data[j.toString() + "_tot"];
+                            datePos[j].y = data[j.toString() + "_pos"];
+                        }
 
                         updateChart(centreChart, [
                             data.home,
@@ -720,9 +764,7 @@
                             data.gen_na,
                         ]);
 
-                        // selection_total.innerText = ((data.positive + data.negative) || 0);
-                        // selection_pos.innerText = (data.positive || 0);
-                        // selection_neg.innerText = (data.negative || 0);
+                        updateDateChart(dateTotal, datePos);
 
                         return ("<table> <tbody>" +
                             "<tr> <td style=\"padding:0 15px 0 0;\">Total tests:</td> <td>" + ((data.positive + data.negative) || 0) + "</td> </tr>" +
@@ -806,7 +848,7 @@
 
 
                 let countries = new GeoJSONLayer({
-                    url: "{% static 'dashboard/countries.geojson' %}",
+                    url: "{% static 'dashboard/data/countries.geojson' %}",
                     outFields: ["NAME"],
                     popupTemplate: countryPopup,
                     renderer: countryRenderer,
@@ -828,7 +870,7 @@
                 };
 
                 let region = new GeoJSONLayer({
-                    url: "{% static 'dashboard/regions.geojson' %}",
+                    url: "{% static 'dashboard/data/regions.geojson' %}",
                     outFields: ["nuts118nm"],
                     popupTemplate: regionPopup,
                     renderer: lineRenderer,
@@ -956,8 +998,6 @@
 
         <img src="{% static 'dashboard/images/logo.svg' %}" style='max-height: 100%; width: auto; object-fit: contain'/>
 
-
-
         <h2>
             Centre for Bio-Inspired Technology
         </h2>
@@ -968,10 +1008,9 @@
                 <a href="http://localhost:8000/dataUpload/" target="_blank">Upload Data</a>
                 <a href="https://www.imperial.ac.uk/bio-inspired-technology/about/" target="_blank">About</a>
                 <a>Contact</a>
-                <a>Settings</a>
+                <a href="http://localhost:8000/admin/" target="_blank">Admin</a>
             </div>
         </div>
-
 
     </div>
     <div class="body-container">
@@ -1072,6 +1111,7 @@
                     <div class="md-modal-comments">
                         <h3 style="display: inline">Diagnostic comments - Test ID: #</h3><h3 style="display: inline" id="comment-id"></h3>
                         <hr>
+                        <p id="comment-body"></p>
                     </div>
                 </div>
                 <div class="md-modal-patient">
@@ -1112,33 +1152,9 @@
 
 
 
-<!--dropdown menu script-->
-<script>
-    function openDropdown() {
-        document.getElementById("dropdown").classList.toggle("show");
-    }
-    const modal = document.getElementById("myModal");
+<!--dropdown menu script + modal exit-->
+<script src="{% static 'dashboard/js/dropDown.js' %}"></script>
 
-
-    // When the user clicks anywhere outside of the modal, close it
-    // Close the dropdown if the user clicks outside of it
-    window.onclick = function(event) {
-        if (event.target == modal) {
-            modal.style.display = "none";
-        }
-        else if (!event.target.matches('.dropButton')) {
-            let dropdowns = document.getElementsByClassName("dropdown-content");
-            console.log(dropdowns)
-            let i;
-            for (i = 0; i < dropdowns.length; i++) {
-                let openDropdown = dropdowns[i];
-                if (openDropdown.classList.contains('show')) {
-                    openDropdown.classList.remove('show');
-                }
-            }
-        }
-    }
-</script>
 
 </body>
 </html>

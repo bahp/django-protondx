@@ -167,18 +167,22 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
 
+    'DEFAULT_PARSER_CLASSES': (
+        'rest_framework.parsers.JSONParser',
+    ),
+
     # Paggination
-    'DEFAULT_PAGINATION_CLASS': 
+    'DEFAULT_PAGINATION_CLASS':
         'rest_framework.pagination.PageNumberPagination',
-        #'rest_framework.pagination.LimitOffsetPagination',
-        #'rest_framework.pagination.CursorPagination'
+    #'rest_framework.pagination.LimitOffsetPagination',
+    #'rest_framework.pagination.CursorPagination'
     'PAGE_SIZE': 100,
 
     # Filter backends
     'DEFAULT_FILTER_BACKENDS': (
         'django_filters.rest_framework.DjangoFilterBackend',
     ),
-    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema' 
+    'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
 
 # These are the swagger settings

@@ -1,3 +1,7 @@
+"""
+This module contains the views and viewsets for the Dashboard App's Django Rest API.
+"""
+
 # Django Http Response
 from django.http import HttpResponse
 
@@ -7,6 +11,8 @@ from rest_framework import permissions, generics
 from rest_framework.filters import SearchFilter
 from rest_framework.filters import OrderingFilter
 from rest_framework.views import APIView
+from rest_framework.response import Response
+
 
 # Django filters
 from django_filters.rest_framework import DjangoFilterBackend, FilterSet
@@ -17,6 +23,7 @@ from .api_serializers import PatientSerializer
 from .api_serializers import DiagnosticTestSerializer
 from .api_serializers import PostcodeSerializer
 from .api_serializers import CustomGeoJSONSerializer
+from .api_serializers import DiagnosticDetailSerializer
 
 # Models
 from .models import Patient, TestingCentre, DiagnosticTest
@@ -25,8 +32,13 @@ from .models import Patient, TestingCentre, DiagnosticTest
 from .queries import get_postcode_data
 
 
-# This viewset and the associated serializer may not be needed. Here now for testing purposes
 class PatientViewSet(viewsets.ModelViewSet):
+    """
+    This class handles the API Patient requests.
+
+    ..todo: Change viewset to ListPI view
+    """
+
     queryset = Patient.objects.all().order_by('first_name')
     serializer_class = PatientSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -48,8 +60,13 @@ class PatientViewSet(viewsets.ModelViewSet):
     ordering = ('last_name', 'first_name')
 
 
-# This viewset and the associated serializer may not be needed. Here now for testing purposes
 class TestingCentreViewSet(viewsets.ModelViewSet):
+    """
+    This class handles the API TestingCentre requests.
+
+    ..todo: Change viewset to ListPI view
+    """
+
     queryset = TestingCentre.objects.all().order_by('centre_type')
     serializer_class = TestingCentreSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -73,6 +90,12 @@ class TestingCentreViewSet(viewsets.ModelViewSet):
 
 # Postcode filter rules
 class PostcodeFilter(FilterSet):
+    """
+    This class is the filterset for the 'DiagnosticTestView'.
+
+    It allows queries to filter by postcode, date, result and patient ID.
+    """
+
     class Meta:
         model = DiagnosticTest
         fields = {
@@ -83,8 +106,13 @@ class PostcodeFilter(FilterSet):
         }
 
 
-# This viewset and the associated serializer may not be needed. Here now for testing purposes
 class DiagnosticTestView(generics.ListAPIView):
+    """
+    This view is used to list Diagnostic tests. Queries can filter by postcode, date, result and patient ID.
+
+    Each entry contains the Test ID (PK), the test's date and result and the type of centre it was held at.
+    """
+
     pagination_class = None
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = DiagnosticTestSerializer
@@ -109,8 +137,34 @@ class DiagnosticTestView(generics.ListAPIView):
     ordering = ('date_test',)
 
 
-# Used to load data for one specific postcode specified as an argument in the URL
+class DiagnosticDetailView(generics.ListAPIView):
+    """
+    This view is used to obtain detailed information relating to a diagnostic test.
+    The comment relating to a diagnostic is returned.
+
+    The test ID must be provided and users must be authenticated.
+
+    e.g. /?id=127885
+    """
+    queryset = DiagnosticTest.objects.only('comment', 'id')
+    serializer_class = DiagnosticDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    filter_fields = ['id']
+
+    def get_paginated_response(self, data):
+        return Response(data)
+
+
 class PostcodeData(generics.ListAPIView):
+    """
+    This view is used to obtain Diagnostic statistics related to one postcode.
+    It provides the total number of experiments,
+    the number of positive and negative diagnostics and the number of patients tested.
+
+    The postcode must be specified as a query argument.
+    e.g. /?postcode=SW5 0TU
+    """
+
     queryset = DiagnosticTest.objects.all().order_by('date_test')
     serializer_class = PostcodeSerializer
     permission_classes = [permissions.IsAuthenticated]
@@ -122,9 +176,27 @@ class PostcodeData(generics.ListAPIView):
         return response
 
 
-# Used to load all testing data with associated coordinates and
-# information using a geoJSON format
 class GeoView(APIView):
+    """
+    This view is used to obtain Diagnostic Test data from the database. It provides all tests and their associated
+    coordinates and information in a GeoJSON format.
+    Each returned feature will have the form:
+
+    {"type": "Feature",
+     "properties": {
+        "date_test": string,
+        "patient": int,
+        "test_result": string,
+        "testing_centre__postcode": string,
+        "testing_centre__county": string,
+        "testing_centre__region": string,
+        "testing_centre__country": string,
+        "testing_centre__centre_type": string,
+        "patient__gender": string,
+        "pk": string},
+     "geometry": {"type": "Point", "coordinates": [float, float]}}
+    """
+
     permission_classes = []
 
     def get(self, request):

@@ -1,0 +1,26 @@
+
+p {
+    margin-top: 0;
+}
+
+.my-form {
+    margin-bottom: 10px;
+}
+
+.button-link {
+    background: none!important;
+    border: none;
+    padding: 0!important;
+    font-family: sans-serif;
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.button-link:hover {
+    color: darkblue;
+}
+
+#fileElem {
+    display: none;
+}

@@ -1,3 +1,7 @@
+"""
+This module is used to generate sample database entries for Patients, Testing Centres, and Diagnostic Tests
+"""
+
 from dashboard.models import *
 from django.contrib.gis.geos import Point
 import datetime
@@ -5,6 +9,18 @@ import random
 
 
 def new_patient(first_name, last_name, gender, dob_day, dob_month, dob_year, postcode):
+    """
+    Creates a new Patient record in the database using the supplied attributes.
+
+    :param string first_name: First Name
+    :param string last_name: Last Name
+    :param string gender: Gender ('F', 'M', 'O', 'X')
+    :param int dob_day: Birth Day
+    :param int dob_month: Birth Month
+    :param int dob_year: Birth Year
+    :param string postcode: Postcode
+    :return:
+    """
     date = datetime.date(dob_year, dob_month, dob_day)
     entry = Patient(first_name=first_name,
                     last_name=last_name,
@@ -15,6 +31,15 @@ def new_patient(first_name, last_name, gender, dob_day, dob_month, dob_year, pos
 
 
 def new_centre(centre_type, postcode, lat, long):
+    """
+    Creates a new TestingCentre record in the database using the supplied attributes.
+
+    :param string centre_type: Centre Type ('Home', 'Hospital', 'GP clinic', 'Drive through centre', 'Other')
+    :param string postcode: Postcode
+    :param float lat: Latitude
+    :param float long: Longitude
+    :return:
+    """
     point = Point(long, lat)
     entry = TestingCentre(centre_type=centre_type,
                           postcode=postcode,
@@ -23,7 +48,16 @@ def new_centre(centre_type, postcode, lat, long):
 
 
 def new_diagnostic(test_date, test_result, centre_ID, patient_ID):
-    # example date time "2020-0 15:26"
+    """
+    Creates a new DiagnosticTest record in the database using the supplied attributes.
+
+    :param string test_date: Test date (e.g '2020-09-25 15:26')
+    :param bool test_result: Test result (True - Positive, False - Negative)
+    :param centre_ID: Testing Centre ID or record
+    :param patient_ID: Patient ID or record
+    :return:
+    """
+
     date = datetime.datetime.strptime(test_date, "%Y-%m-%d %H:%M")
     entry = DiagnosticTest(date_test=date,
                            test_result=test_result,
@@ -32,7 +66,15 @@ def new_diagnostic(test_date, test_result, centre_ID, patient_ID):
     entry.save()
 
 
-def create_entries():
+def create_entries(num):
+    """
+    Generates sample database entries for Patients, Testing Centres, and Diagnostic Tests.
+    The TestingCentres and Patient entries are fixed. DiagnosticTests are allocated random
+    results, dates, centres and patients.
+
+    :param int num: Number of entries
+    :return:
+    """
     new_patient("John", "Doe", "M", 1, 1, 1990, "W8 5JJ")
     new_patient("John", "Smith", "M", 1, 1, 1990, "SW7 1AW")
     new_patient("Jane", "Doe", "F", 1, 1, 1990, "W8 5JJ")
@@ -59,11 +101,11 @@ def create_entries():
     start_dt = datetime.date.today().replace(day=1, month=1).toordinal()
     end_dt = datetime.date.today().toordinal()
 
-    for i in range(1000):
+    for i in range(num):
         random_day = datetime.date.fromordinal(random.randint(start_dt, end_dt))
         random_time = str(random_day) + " 00:00"
 
-        random_result = random.choice([True, False])
+        random_result = False if random.random() < 0.8 else True
 
         random_centre = random.choice(centre_ids)
         random_patient = random.choice(patient_ids)

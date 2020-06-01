@@ -1,3 +1,7 @@
+"""
+This module contains the URL configuration settings for the dataUpload App
+"""
+
 from django.urls import path
 from . import views
 
@@ -7,6 +11,6 @@ urlpatterns = [
 
     # Data Upload page
     # <IP>/dataUpload/
-    path('', views.dataUploadView.as_view(), name='dataUpload'),
+    path('', views.dataUploadView, name='dataUpload'),
 
 ]

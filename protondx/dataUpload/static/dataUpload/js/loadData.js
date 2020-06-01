@@ -25,7 +25,6 @@ function unhighlight(e) {
     dropArea.classList.remove('highlight')
 }
 
-
 dropArea.addEventListener('drop', handleDrop, false)
 
 function handleDrop(e) {
@@ -57,75 +56,30 @@ function openTab(evt, fileName) {
     document.getElementById(fileName + '-button').classList.add('active');
 }
 let uploadList = document.getElementById('upload-list');
-let viewPanel = document.getElementById('view-panel');
+let viewPanel = document.getElementById('view-content');
 
-// function displayJSON(obj) {
-//     let out = "<ul>";
-//     let i;
-//
-//     for (let key in obj) {
-//         if (obj.hasOwnProperty(key)) {
-//             if(typeof(obj[key]) === "string"){
-//                 out += '<li>' +
-//                     key + ": " + obj[key] + '</li><br>';
-//             }
-//             else {
-//                 out += '<li>' +
-//                     key + ": " + '</li><br>' + displayJSON(obj[key]);
-//             }
-//
-//         }
-//     }
-//     return out + "</ul>";
-// }
-
-function displayJSON(obj, form) {
-    let out = "";
-    let end = "";
-    if (form){
-        out = "<form>";
-        end = "</form>";
-    }
-
-    for (let key in obj) {
-        if (obj.hasOwnProperty(key)) {
-            if(typeof(obj[key]) === "string"){
-                out += '<label for="' +
-                    key + '">' + key + ': </label><br>' +
-                    '<input type="text" id="' + key + '" name="' +
-                    key + '" value="' + obj[key] + '"><br><br>'
-            }
-            else {
-                out += '<fieldset><legend>' + key + '</legend>' +
-                    displayJSON(obj[key], false) + '</fieldset>'
-            }
-
-        }
-    }
-    return out + end;
-}
-
+let FILE_COUNT = 0;
 
 function readFile(file) {
 
     // create a new Div which contains a button/loading bar and file name
     let newDiv = document.createElement('div');
     let newBar = document.createElement('button');
-    let file_name = file.name;
+    let file_name = file.name + '-(' + FILE_COUNT + ')';
     let content = document.createTextNode(file_name);
     newBar.classList.add('tablinks');
     newBar.id = file_name + '-button';
     newBar.appendChild(content);
     newDiv.appendChild(newBar);
     uploadList.appendChild( newDiv );
-
+    FILE_COUNT += 1;
     // Open the file, exception if not .zip
     // Create a new tab linked to button in list
     // to display any relevant content
     const reader = new FileReader();
     reader.addEventListener('load', (event) => {
         newBar.addEventListener('click', function () {
-            openTab(event, file.name);
+            openTab(event, file_name);
         });
 
         const result = event.target.result;
@@ -138,7 +92,7 @@ function readFile(file) {
             zip.loadAsync(data).then(function (contents) {
                 let newTab = document.createElement('div');
                 newTab.classList.add('tabcontent');
-                newTab.id = file.name + '-tab';
+                newTab.id = file_name + '-tab';
 
                 let list = document.createElement('ul');
                 Object.keys(contents.files).forEach(function(filename) {
@@ -149,16 +103,49 @@ function readFile(file) {
                     if (filename.endsWith('.json')){
                         zip.file(filename).async("string").then(function (data) {
                             newTab.appendChild(document.createElement('hr'))
-                            let jsonobj = JSON.parse(data);
-                            let newDiv = document.createElement('div');
-                            newDiv.innerHTML = displayJSON(jsonobj, true);
+                            const jsonobj = JSON.parse(data);
+                            const newDiv = document.createElement('div');
+
+                            const count = parseInt($('#id_data-TOTAL_FORMS').attr('value'), 10);
+                            const tmplMarkup = $('#upload-template').html();
+                            const compiledTmpl = tmplMarkup.replace(/__prefix__/g, count);
+
+                            // update form count
+                            $('#id_data-TOTAL_FORMS').attr('value', count+1);
+
+                            newDiv.innerHTML = compiledTmpl;
+
+                            const formFields = [
+                                ["test_result","id_data-" + count + "-test_result"],
+                                ["date_test",  "id_data-" + count + "-test_date"],
+                                ["patient_first_name", "id_data-" + count + "-first_name"],
+                                ["patient_last_name", "id_data-" + count + "-last_name"],
+                                ["patient_gender", "id_data-" + count + "-gender"],
+                                ["patient_dob", "id_data-" + count + "-dob"],
+                                ["patient_postcode", "id_data-" + count + "-patient_postcode"],
+                                ["testing_centre_type", "id_data-" + count + "-centre_type"],
+                                ["testing_centre_long", "id_data-" + count + "-longitude"],
+                                ["testing_centre_lat", "id_data-" + count + "-latitude"],
+                                ["comment", "id_data-" + count + "-comment"]
+                            ]
+
                             newTab.appendChild(newDiv);
                             // ADD things to the TAB/JSON file HERE
 
                             // ...
 
+                            formFields.forEach((fieldNames) => {
+                                if (fieldNames[0] in jsonobj) {
+                                    document.getElementById(fieldNames[1]).value = jsonobj[fieldNames[0]];
+                                }
+                            });
 
-
+                            // set form file input to be the .zip
+                            let dataTransfer = new DataTransfer();
+                            dataTransfer.items.add(file);
+                            const fileInput = document.getElementById("id_data-" + count + "-raw_test_data");
+                            fileInput.files = dataTransfer.files;
+                            fileInput.style.display = "none";
                         });
                     }
 
@@ -194,4 +181,3 @@ function readFile(file) {
 
     reader.readAsDataURL(file);
 }
-

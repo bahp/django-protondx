@@ -4,34 +4,82 @@
     <meta charset="UTF-8">
     <title>Data Upload</title>
 
+    <!--Jquery-->
+    <script src="https://code.jquery.com/jquery-3.5.1.js"></script>
+
     {% load static %}
-    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/grid.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/displayArea.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/dragArea.css' %}">
-    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/listArea.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/layout.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/grid.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/displayArea.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/dragArea.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'dataUpload/css/listArea.css' %}">
     <script src="{% static 'dataUpload/JSZip/jszip.js' %}"></script>
     <script src="{% static 'dataUpload/JSZipUtils/jszip-utils.js' %}"></script>
 </head>
 <body>
 
 <div class="grid-container">
-    <div id="view-panel" class="view-panel"></div>
-    <div class="upload-panel">
-        <div id="upload-list" class="upload-list"></div>
-        <div id="drop-area" class="drop-area">
-            <form class="my-form">
-                <h2>Drag files here to upload</h2>
-                <input type="file" id="fileElem" multiple accept="*" onchange="handleFiles(this.files)">
-                <label class="button-link" for="fileElem">Choose your files</label>
+    <div class="grid-header">
+        <img src="{% static 'dashboard/images/logo.svg' %}" style='max-height: 100%; width: auto; object-fit: contain'/>
+
+        <h2>Centre for Bio-Inspired Technology</h2>
+
+        <div class="dropdown">
+            <button onclick="openDropdown()" class="dropButton">Menu</button>
+            <div id="dropdown" class="dropdown-content">
+                <a href="http://localhost:8000/dashboard/" target="_blank">Dashboard</a>
+                <a href="https://www.imperial.ac.uk/bio-inspired-technology/about/" target="_blank">About</a>
+                <a>Contact</a>
+                <a href="http://localhost:8000/admin/" target="_blank">Admin</a>
+            </div>
+        </div>
+    </div>
+    <div class="grid-body">
+        <div id="view-panel" class="view-panel">
+            <form id="data-form" method="post" action="" enctype="multipart/form-data">
+                <div id="view-content">
+                    {% csrf_token %}
+                    {{ upload_formset.management_form }}
+                </div>
             </form>
         </div>
+        <div class="upload-panel">
+            <div id="upload-list" class="upload-list"></div>
+            <div id="drop-area" class="drop-area">
+                <form class="my-form">
+                    <h2>Drag files here to upload</h2>
+                    <input type="file" id="fileElem" multiple accept="*" onchange="handleFiles(this.files)">
+                    <label class="button-link" for="fileElem">Choose your files</label>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="grid-button">
+        <button id="submit" class="button " type="submit" form="data-form">Upload all</button>
     </div>
 </div>
 
-<label class="button button-right">Upload Selected</label>
-<label class="button button-right">Upload all</label>
+<div id="pageloader">
+    <img src="http://cdnjs.cloudflare.com/ajax/libs/semantic-ui/0.16.1/images/loader-large.gif" alt="processing..." />
+</div>
+<script>
+    $(document).ready(function(){
+        $("#submit").on("click", function(){
+            $("#pageloader").fadeIn();
+        });//submit
+    });
+</script>
 
-<script src="{% static 'dataUpload/loadData.js' %}"></script>
+<script src="{% static 'dataUpload/js/loadData.js' %}"></script>
+
+<!--dropdown menu script-->
+<script src="{% static 'dashboard/dropDown.js' %}"></script>
+
+<script type="text/html" id="upload-template">
+    <div id="dataUpload-__prefix__">
+        {{ upload_formset.empty_form  }}
+    </div>
+</script>
 
 </body>
 </html>

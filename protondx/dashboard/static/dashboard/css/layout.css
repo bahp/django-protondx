@@ -22,20 +22,23 @@
 .dropButton {
     background-color: #002147;
     color: white;
-    padding: 16px;
+    padding-left: 30px;
+    padding-right: 30px;
     font-size: 16px;
     border: none;
     cursor: pointer;
+    height: 100%;
 }
 
 .dropButton:hover, .dropButton:focus {
     background-color: #006EAF;
+    outline: none;
+
 }
 
 .dropdown {
-  margin-left: auto;
+    margin-left: auto;
     height: 100%;
-
 }
 
 .dropdown-content {
@@ -56,6 +59,6 @@
     display: block;
 }
 
-.dropdown a:hover {background-color: #ddd;}
+.dropdown a:hover {background-color: #00ACD7;}
 
 .show {display: block;}

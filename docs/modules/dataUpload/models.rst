@@ -2,5 +2,5 @@
 Models
 ######
 
-.. automodule:: dashboard.models
+.. automodule:: dataUpload.models
     :members:

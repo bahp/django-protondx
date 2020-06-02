@@ -2,5 +2,5 @@
 Choices
 #######
 
-.. automodule:: protondx.dashboard.choices
+.. automodule:: dashboard.choices
     :members:

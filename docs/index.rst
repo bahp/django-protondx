@@ -8,8 +8,10 @@ Welcome to Protondx's documentation!
    :caption: Contents:
 
    modules/about.rst
-   modules/dashboard/overview.rst
-
+   modules/requirements.rst
+   modules/installation.rst
+   modules/usage.rst
+   modules/code.rst
 
 
 Indices and tables

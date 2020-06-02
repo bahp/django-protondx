@@ -2,5 +2,5 @@
 Views
 #####
 
-.. automodule:: dashboard.views
+.. automodule:: dataUpload.views
     :members:

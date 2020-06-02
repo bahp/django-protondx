@@ -2,5 +2,5 @@
 Dashboard Settings
 ##################
 
-.. automodule:: dashboard.apps
+.. automodule:: dataUpload.apps
     :members:

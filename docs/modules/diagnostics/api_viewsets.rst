@@ -2,5 +2,5 @@
 API Viewsets
 ############
 
-.. automodule:: dashboard.api_viewsets
+.. automodule:: diagnostics.api_viewsets
     :members:

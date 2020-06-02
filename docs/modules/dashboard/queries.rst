@@ -2,5 +2,5 @@
 Queries
 #######
 
-.. automodule:: protondx.dashboard.queries
+.. automodule:: dashboard.queries
     :members:

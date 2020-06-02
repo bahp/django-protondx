@@ -2,5 +2,5 @@
 URLs
 ####
 
-.. automodule:: protondx.dashboard.urls
+.. automodule:: dashboard.urls
     :members:

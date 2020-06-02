@@ -12,13 +12,12 @@
 #
 import os
 import sys
-# from django.conf import settings
-#
-# sys.path.insert(0, os.path.abspath('..'))
-# settings.configure()
+THIS_DIR = os.path.dirname(__file__)
+PROJECT_DIR = os.path.join(THIS_DIR, '../protondx')
+sys.path.append(PROJECT_DIR)
+
+os.environ['DJANGO_SETTINGS_MODULE'] = 'protondx.settings'
 import django
-sys.path.insert(0, os.path.abspath('..'))
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "protondx.protondx.settings")
 django.setup()
 
 

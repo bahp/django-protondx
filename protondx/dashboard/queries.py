@@ -66,7 +66,7 @@ def get_postcode_negative_experiments(postcode):
 
     :param string postcode: postcode
     :return: Number of 'Negative' diagnostic tests
-    :rtype: int:
+    :rtype: int
     """
     return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode, test_result=False).count()
 
@@ -77,7 +77,7 @@ def get_postcode_positive_experiments(postcode):
 
     :param string postcode: postcode
     :return: Number of 'Positive' diagnostic tests
-    :rtype: int:
+    :rtype: int
     """
     return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode, test_result=True).count()
 

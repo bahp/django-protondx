@@ -2,5 +2,5 @@
 Create sample data
 ##################
 
-.. automodule:: protondx.dashboard.fill_database_sample
+.. automodule:: dashboard.fill_database_sample
     :members:

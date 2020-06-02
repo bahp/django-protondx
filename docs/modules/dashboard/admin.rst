@@ -2,5 +2,5 @@
 Admin
 #####
 
-.. automodule:: protondx.dashboard.admin
+.. automodule:: dashboard.admin
     :members:

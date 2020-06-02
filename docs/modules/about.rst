@@ -2,6 +2,8 @@
 About
 #####
 
-This is a Django Project.
+- Short introduction or overview that explains what the project is.
+- About the team / platform as a whole
+- ...
 
 

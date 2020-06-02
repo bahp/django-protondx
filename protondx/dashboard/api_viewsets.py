@@ -195,6 +195,7 @@ class GeoView(APIView):
         "patient__gender": string,
         "pk": string},
      "geometry": {"type": "Point", "coordinates": [float, float]}}
+
     """
 
     permission_classes = []

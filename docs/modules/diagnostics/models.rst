@@ -2,5 +2,5 @@
 Models
 ######
 
-.. automodule:: dashboard.models
+.. automodule:: diagnostics.models
     :members:

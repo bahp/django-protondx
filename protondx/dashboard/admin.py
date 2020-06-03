@@ -5,6 +5,12 @@ This module contains the Admin page definitions for the Dashboard App.
 from django.contrib import admin
 from django.contrib.gis import forms
 
+# Import import/export libraries
+from import_export import resources
+from import_export.admin import ImportExportModelAdmin
+from import_export.admin import ImportExportActionModelAdmin
+
+
 # Register your models here.
 from .models import Patient, TestingCentre, DiagnosticTest
 
@@ -16,7 +22,8 @@ class TestInLine(admin.TabularInline):
 
 
 # Patient admin view
-class PatientAdmin(admin.ModelAdmin):
+class PatientAdmin(ImportExportActionModelAdmin,
+                   ImportExportModelAdmin):
     """
     This class defines the look of the PatientAdmin page.
 
@@ -34,7 +41,8 @@ class PatientAdmin(admin.ModelAdmin):
 
 
 # Diagnostic test admin view
-class DiagnosticTestAdmin(admin.ModelAdmin):
+class DiagnosticTestAdmin(ImportExportActionModelAdmin,
+                          ImportExportModelAdmin):
     """
     This class defines the look of the DiagnosticTestAdmin page.
 
@@ -59,7 +67,8 @@ class TestingCentreAdminForm(forms.ModelForm):
 
 
 # Testing Centre admin view
-class CentreAdmin(admin.ModelAdmin):
+class CentreAdmin(ImportExportActionModelAdmin,
+                  ImportExportModelAdmin):
     """
     This class defines the look of the CentreAdmin page.
 

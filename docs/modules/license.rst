@@ -1,0 +1,6 @@
+#######
+License
+#######
+
+- Describe the license
+- ...

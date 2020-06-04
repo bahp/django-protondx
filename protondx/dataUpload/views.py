@@ -55,6 +55,7 @@ def createModels(data):
         country=location['country'],
         region=location['region'],
         postcode=location['postcode'],
+        county=location['county'],
     )
 
     diagnostic_test = DiagnosticTest.objects.create(

@@ -1,9 +1,9 @@
 import random
-import postcodes_io_api
 from django.contrib.gis.db.models import Extent
 from django.contrib.gis.geos import Point
+import postcodes_io_api
 
-from dataUpload.models import CountryBorder, RegionBorder
+from dataUpload.models import CountryBorder, RegionBorder, CountyBorder
 
 
 def get_locations(lat, long):
@@ -15,33 +15,33 @@ def get_locations(lat, long):
     :return: Returns a dictionary of locations at different scales
     :rtype: dict
     """
-    # api = postcodes_io_api.Api(debug_http=False)
-    # resp = api.get_nearest_postcodes_for_coordinates(latitude=lat, longitude=long, limit=1, radius=2000)
-    # result = resp['result'] if ('result' in resp) and (resp['result'] != None) else []
-    # item = result[0] if len(result) > 0 else {}
-    # postcode = item['postcode'] if 'postcode' in item else str()
     pnt = Point(long, lat)
 
-    # try and get region using local data, if that fails take data from postcodesAPI
-    try:
-        region = RegionBorder.objects.distance(pnt).order_by('distance')
-        print(region)
-        region = region[0]
-    except IndexError:
+    api = postcodes_io_api.Api(debug_http=False)
+    resp = api.get_nearest_postcodes_for_coordinates(latitude=lat, longitude=long, limit=1, radius=2000)
+    result = resp['result'] if ('result' in resp) and (resp['result'] != None) else []
+    item = result[0] if len(result) > 0 else {}
+    postcode = item['postcode'] if 'postcode' in item else str()
+
+    county_query = CountyBorder.objects.filter(mpoly__contains=pnt)
+    if not county_query:
+        county = str()
+    else:
+        county = county_query[0].name
+
+    region_query = RegionBorder.objects.filter(mpoly__contains=pnt)
+    if not region_query:
         region = str()
+    else:
+        region = region_query[0].name
 
-        # region = item['region'] if 'region' in item else (item['country'] if 'country' in item else str())
+    country_query = CountryBorder.objects.filter(mpoly__contains=pnt)
+    if not country_query:
+        country = str()
+    else:
+        country = country_query[0].name
 
-    # try and take country from local data, if that fails and there is a region country is UK else unknown
-    try:
-        country = CountryBorder.objects.filter(mpoly__contains=pnt)[0].name
-    except IndexError:
-        if region:
-            country = 'United Kingdom'
-        else:
-            country = ''
-
-    return {"country": country, "region": region, "postcode": str()}
+    return {"country": country, "region": region, "county": county, "postcode": postcode}
 
 
 def generate_random(number):

@@ -4,7 +4,6 @@ This module is used to fill coordinate and location data in a 'TestingCentre' da
 
 import os
 import pandas as pd
-from django.contrib.gis.geos import Point
 
 from django.core.management.base import BaseCommand
 from ...fixtures.gen_location import generate_random
@@ -67,17 +66,15 @@ class Command(BaseCommand):
             module_dir = os.path.dirname(__file__)  # get current directory
             file_path = os.path.join(module_dir, '../../fixtures/centre_mock.csv')  # get data directory
 
-        df = pd.read_csv(file_path,  dtype={'id': "Int64",
-                                            'centre_type': str,
-                                            'coordinates': str,
-                                            'country': str,
-                                            'region': str,
-                                            'county': str,
-                                            'postcode': str})
+        df = pd.read_csv(file_path, dtype={'id': "Int64",
+                                           'centre_type': str,
+                                           'coordinates': str,
+                                           'country': str,
+                                           'region': str,
+                                           'county': str,
+                                           'postcode': str})
 
         count = df['coordinates'].isnull().sum()
-
-        print(df.info())
 
         locations = generate_random(count)
         location_index = 0
@@ -87,6 +84,7 @@ class Command(BaseCommand):
                 df.at[index, 'coordinates'] = str(locations[location_index]['coordinates'])
                 df.at[index, 'country'] = locations[location_index]['country']
                 df.at[index, 'region'] = locations[location_index]['region']
+                df.at[index, 'county'] = locations[location_index]['county']
                 df.at[index, 'postcode'] = locations[location_index]['postcode']
                 location_index += 1
 

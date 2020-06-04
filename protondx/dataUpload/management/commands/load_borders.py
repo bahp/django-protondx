@@ -1,13 +1,12 @@
 """
-This module is used to populate the CountryBorder and RegionBorder tables in the database.
+This module is used to populate the various Border tables in the database.
 It extracts location data from shape and project files under 'dataUpload/data'.
 """
 
 import os
 from django.contrib.gis.utils import LayerMapping
-from ...models import CountryBorder, RegionBorder
+from ...models import CountryBorder, RegionBorder, CountyBorder, PostcodeBorder
 from django.core.management.base import BaseCommand
-
 
 country_mapping = {
     'name': 'NAME',
@@ -27,19 +26,33 @@ region_shp = os.path.abspath(
     os.path.join(os.path.dirname(__file__), '../../data', 'NUTS_Level_1__January_2018__Boundaries_WGS_84.shp'),
 )
 
+county_mapping = {
+    'name': 'ctyua19nm',
+    'mpoly': 'MULTIPOLYGON',
+}
+
+county_shp = os.path.abspath(
+    os.path.join(os.path.dirname(__file__), '../../data',
+                 'Counties_and_Unitary_Authorities__December_2019__Boundaries_UK_BGC_WGS_84.shp'),
+)
+
 
 # Create database entries
 class Command(BaseCommand):
     """
-    usage: manage.py load_borders [-h] [-c] [-r] [--verbose] [--version]
-                              [-v {0,1,2,3}] [--settings SETTINGS]
-                              [--pythonpath PYTHONPATH] [--traceback]
-                              [--no-color] [--force-color] [--skip-checks]
+    This command is used to load border data into the database.
+
+    usage: manage.py load_borders [-h] [--country] [--region] [--county]
+                                  [--verbose] [--version] [-v {0,1,2,3}]
+                                  [--settings SETTINGS] [--pythonpath PYTHONPATH]
+                                  [--traceback] [--no-color] [--force-color]
+                                  [--skip-checks]
 
     optional arguments:
       -h, --help            show this help message and exit
-      -c, --country         Store country borders
-      -r, --region          Store country borders
+      --country             Store country borders
+      --region              Store country borders
+      --county              Store county borders
       --verbose             Verbose
       --version             show program's version number and exit
       -v {0,1,2,3}, --verbosity {0,1,2,3}
@@ -64,7 +77,6 @@ class Command(BaseCommand):
         """
 
         parser.add_argument(
-            '-c',
             '--country',
             action='store_true',
             dest='country',
@@ -72,11 +84,17 @@ class Command(BaseCommand):
         )
 
         parser.add_argument(
-            '-r',
             '--region',
             action='store_true',
             dest='region',
             help='Store country borders',
+        )
+
+        parser.add_argument(
+            '--county',
+            action='store_true',
+            dest='county',
+            help='Store county borders',
         )
 
         parser.add_argument(
@@ -91,7 +109,7 @@ class Command(BaseCommand):
         This method handles the command and adds Region and Country Borders to the database.
         """
 
-        if not options['country'] and not options['region']:
+        if not options['country'] and not options['region'] and not options['county']:
             print("Please select borders to be loaded to database. For help try: manage.py load_borders -h")
 
         if options['country']:
@@ -102,3 +120,8 @@ class Command(BaseCommand):
             lm_region = LayerMapping(RegionBorder, region_shp, region_mapping, transform=False)
             lm_region.save(strict=True, verbose=options['verbose'])
             print("Region borders loaded.")
+        if options['county']:
+            lm_county = LayerMapping(CountyBorder, county_shp, county_mapping, transform=False)
+            lm_county.save(strict=True, verbose=options['verbose'])
+            print("County borders loaded.")
+

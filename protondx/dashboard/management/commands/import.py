@@ -3,16 +3,49 @@ This module is used to import patient data into the database using Django Import
 """
 
 import os
-
+import datetime
+import random
 from django.core.management.base import BaseCommand
 from import_export import resources
 from tablib import Dataset
 
 from ...models import Patient, TestingCentre, DiagnosticTest
 
+
 LOAD_PATIENT = 0
 LOAD_CENTRE = 1
 LOAD_DIAGNOSTIC = 2
+
+
+def load_diagnostics(entries):
+    """
+    This method creates 'DiagnosticTest' database entries using pre-existing 'Patient' and 'TestingCentre' entries.
+    Test results and dates are generated pseudo-randomly.
+
+    :param int entries: Number of 'DiagnosticTest' entries to generate
+    :return:
+    """
+    centre_ids = list(TestingCentre.objects.values_list('id', flat=True))
+    patient_ids = list(Patient.objects.values_list('id', flat=True))
+
+    start_dt = datetime.date.today().replace(day=1, month=1).toordinal()
+    end_dt = datetime.date.today().toordinal()
+
+    for i in range(entries):
+        random_day = datetime.date.fromordinal(random.randint(start_dt, end_dt))
+        random_time = str(random_day) + " " + str((random.randint(0, 23))) + ":" + str((random.randint(0, 59)))
+
+        random_result = False if random.random() < 0.8 else True
+
+        random_centre = random.choice(centre_ids)
+        random_patient = random.choice(patient_ids)
+
+        date = datetime.datetime.strptime(random_time, "%Y-%m-%d %H:%M")
+        entry = DiagnosticTest(date_test=date,
+                               test_result=random_result,
+                               testing_centre=TestingCentre(random_centre),
+                               patient=Patient(random_patient))
+        entry.save()
 
 
 # Create database entries
@@ -52,6 +85,7 @@ class Command(BaseCommand):
         """
         This method creates flags which identify which model is to be loaded and an
         optional '--path' argument which can be used to specify a file path when loading data.
+        '--entries' is used to determine the number of 'DiagnosticTest entries to generate'
         """
 
         parser.add_argument("-p", "--patient",
@@ -68,6 +102,12 @@ class Command(BaseCommand):
             help='File path to Patient dataset',
         )
 
+        parser.add_argument(
+            '--entries',
+            type=int,
+            help='Number of patient entries to generate ([-d] or [--diagnostic] must be set)',
+        )
+
     def handle(self, *args, **options):
         """
         This method handles the command.
@@ -78,6 +118,12 @@ class Command(BaseCommand):
 
         # Check if model to load was specified
         if options.get("obj_type", None) is not None:
+
+            # If diagnostics are to be loaded, do so based on randomly generated data.
+            if options['obj_type'] == LOAD_DIAGNOSTIC:
+                load_diagnostics(options['entries'] or 1000)
+                return
+
             model_info = {
                 LOAD_PATIENT:
                     (resources.modelresource_factory(model=Patient)(), '../../fixtures/patient_mock.csv'),

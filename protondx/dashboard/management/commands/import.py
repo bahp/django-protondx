@@ -20,13 +20,16 @@ class Command(BaseCommand):
     """
     This command is used to load Patient data into the database
 
-    usage: manage.py import_patients [-h] [--path PATH] [--version] [-v {0,1,2,3}]
-                                 [--settings SETTINGS]
-                                 [--pythonpath PYTHONPATH] [--traceback]
-                                 [--no-color] [--force-color] [--skip-checks]
+    usage: manage.py import [-h] [-p] [-c] [-d] [--path PATH] [--version]
+                            [-v {0,1,2,3}] [--settings SETTINGS]
+                            [--pythonpath PYTHONPATH] [--traceback] [--no-color]
+                            [--force-color] [--skip-checks]
 
     optional arguments:
       -h, --help            show this help message and exit
+      -p, --patient         Upload patient data
+      -c, --centre          Upload centre data
+      -d, --diagnostic      Upload diagnostic data
       --path PATH           File path to Patient dataset
       --version             show program's version number and exit
       -v {0,1,2,3}, --verbosity {0,1,2,3}
@@ -47,7 +50,8 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         """
-        This method creates and optional '--path' argument which can be used to specify a file path when loading data.
+        This method creates flags which identify which model is to be loaded and an
+        optional '--path' argument which can be used to specify a file path when loading data.
         """
 
         parser.add_argument("-p", "--patient",
@@ -68,10 +72,11 @@ class Command(BaseCommand):
         """
         This method handles the command.
 
-        It creates 'Patient' database entries.
-        If a file path is not provided default data will be loaded from 'protondx/dashboard/fixtures/patient_mock.csv'.
+        It creates database entries for the specified model.
+        If a file path is not provided default data will be loaded from 'protondx/dashboard/fixtures/'.
         """
 
+        # Check if model to load was specified
         if options.get("obj_type", None) is not None:
             model_info = {
                 LOAD_PATIENT:
@@ -82,6 +87,7 @@ class Command(BaseCommand):
                     (resources.modelresource_factory(model=DiagnosticTest)(), '../../fixtures/diagnostic_mock.csv'),
             }
 
+            # Check if a path was given, use default if not
             if options['path']:
                 file_path = options['path']
             else:
@@ -90,9 +96,11 @@ class Command(BaseCommand):
 
             resource = model_info[options['obj_type']][0]
 
+            # open data source
             with open(file_path, 'r') as f:
                 dataset = Dataset().load(f)
 
+            # import
             resource.import_data(dataset, dry_run=False, raise_errors=True)
         else:
             print("Please provide the model type of data: [--patient] [-p] [--centre] [-c] [--diagnostic] [-d]")

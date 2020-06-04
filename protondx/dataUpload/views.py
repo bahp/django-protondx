@@ -3,7 +3,6 @@ import io
 import json
 import zipfile
 
-import postcodes_io_api
 from django.contrib.gis.geos import Point
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.core.serializers.json import DjangoJSONEncoder
@@ -11,8 +10,8 @@ from django.forms import formset_factory
 from django.shortcuts import render
 
 from dashboard.models import Patient, TestingCentre, DiagnosticTest
+from dashboard.fixtures.gen_location import get_locations
 from .forms import dataUploadForm
-from .models import CountryBorder, RegionBorder
 
 
 # def appendZIP(data):
@@ -31,40 +30,6 @@ from .models import CountryBorder, RegionBorder
 #             file1.write(b'compose-file-content...')
 #
 #     return archive_orig
-
-
-def get_locations(lat, long):
-    """
-    Uses coordinates to determine Country, Region, and Postcode.
-
-    :param float lat: Latitude
-    :param float long: Longitude
-    :return: Returns a dictionary of locations at different scales
-    :rtype: dict
-    """
-    api = postcodes_io_api.Api(debug_http=False)
-    resp = api.get_nearest_postcodes_for_coordinates(latitude=lat, longitude=long, limit=1, radius=2000)
-    result = resp['result'] if ('result' in resp) and (resp['result'] != None) else []
-    item = result[0] if len(result) > 0 else {}
-    postcode = item['postcode'] if 'postcode' in item else str()
-    pnt = Point(long, lat)
-
-    # try and get region using local data, if that fails take data from postcodesAPI
-    try:
-        region = RegionBorder.objects.filter(mpoly__contains=pnt)[0].name
-    except IndexError:
-        region = item['region'] if 'region' in item else (item['country'] if 'country' in item else str())
-
-    # try and take country from local data, if that fails and there is a region country is UK else unknown
-    try:
-        country = CountryBorder.objects.filter(mpoly__contains=pnt)[0].name
-    except IndexError:
-        if region:
-            country = 'United Kingdom'
-        else:
-            country = ''
-
-    return {"country": country, "region": region, "postcode": postcode}
 
 
 def createModels(data):

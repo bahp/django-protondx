@@ -1,6 +1,5 @@
 from django.contrib.gis.db import models
 
-
 class CountryBorder(models.Model):
     """This contains the CountryBorder attributes."""
 

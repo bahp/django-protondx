@@ -144,7 +144,8 @@ class Command(BaseCommand):
 
             # open data source
             with open(file_path, 'r') as f:
-                dataset = Dataset().load(f)
+                dataset = Dataset().load(f.read(), format='csv')
+
 
             # import
             resource.import_data(dataset, dry_run=False, raise_errors=True)

@@ -52,32 +52,44 @@ class Command(BaseCommand):
     """
     This command is used to load Patient data into the database
 
-    usage: manage.py import [-h] [-p] [-c] [-d] [--path PATH] [--version]
-                            [-v {0,1,2,3}] [--settings SETTINGS]
-                            [--pythonpath PYTHONPATH] [--traceback] [--no-color]
-                            [--force-color] [--skip-checks]
+    -usage:
+        manage.py import [-h] [-p] [-c] [-d] [--path PATH] [--version]
+        [-v {0,1,2,3}] [--settings SETTINGS]
+        [--pythonpath PYTHONPATH] [--traceback] [--no-color]
+        [--force-color] [--skip-checks]
 
-    optional arguments:
-      -h, --help            show this help message and exit
-      -p, --patient         Upload patient data
-      -c, --centre          Upload centre data
-      -d, --diagnostic      Upload diagnostic data
-      --path PATH           File path to Patient dataset
-      --version             show program's version number and exit
-      -v {0,1,2,3}, --verbosity {0,1,2,3}
-                            Verbosity level; 0=minimal output, 1=normal output,
-                            2=verbose output, 3=very verbose output
-      --settings SETTINGS   The Python path to a settings module, e.g.
-                            "myproject.settings.main". If this isn't provided, the
-                            DJANGO_SETTINGS_MODULE environment variable will be
-                            used.
-      --pythonpath PYTHONPATH
-                            A directory to add to the Python path, e.g.
-                            "/home/djangoprojects/myproject".
-      --traceback           Raise on CommandError exceptions
-      --no-color            Don't colorize the command output.
-      --force-color         Force colorization of the command output.
-      --skip-checks         Skip system checks.
+    -optional arguments:
+        --h, --help:
+            show this help message and exit
+        --p, --patient:
+            Upload patient data
+        --c, --centre:
+            Upload centre data
+        --d, --diagnostic:
+            Upload diagnostic data
+        ---path PATH:
+            File path to Patient dataset
+        ---version:
+            show program's version number and exit
+        --v {0,1,2,3}, --verbosity {0,1,2,3}:
+            Verbosity level; 0=minimal output, 1=normal output,
+            2=verbose output, 3=very verbose output
+        ---settings SETTINGS:
+            The Python path to a settings module, e.g.
+            "myproject.settings.main". If this isn't provided, the
+            DJANGO_SETTINGS_MODULE environment variable will be
+            used.
+        ---pythonpath PYTHONPATH:
+            A directory to add to the Python path, e.g.
+            "/home/djangoprojects/myproject".
+        ---traceback:
+            Raise on CommandError exceptions
+        ---no-color:
+            Don't colorize the command output.
+        ---force-color:
+            Force colorization of the command output.
+        ---skip-checks:
+            Skip system checks.
     """
 
     def add_arguments(self, parser):

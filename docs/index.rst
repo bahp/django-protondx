@@ -12,6 +12,7 @@ Welcome to |project_name|'s documentation!
     modules/history_index.rst
     modules/requirements.rst
     modules/installation.rst
+    modules/data_generation.rst
     modules/usage.rst
     modules/license.rst
     modules/code.rst

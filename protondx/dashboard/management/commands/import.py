@@ -11,7 +11,6 @@ from tablib import Dataset
 
 from ...models import Patient, TestingCentre, DiagnosticTest
 
-
 LOAD_PATIENT = 0
 LOAD_CENTRE = 1
 LOAD_DIAGNOSTIC = 2
@@ -145,7 +144,6 @@ class Command(BaseCommand):
             # open data source
             with open(file_path, 'r') as f:
                 dataset = Dataset().load(f.read(), format='csv')
-
 
             # import
             resource.import_data(dataset, dry_run=False, raise_errors=True)

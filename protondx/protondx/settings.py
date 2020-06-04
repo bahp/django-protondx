@@ -96,21 +96,10 @@ WSGI_APPLICATION = 'protondx.wsgi.application'
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
 #
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.contrib.gis.db.backends.spatialite',
-#         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-#     }
-# }
-
 DATABASES = {
     'default': {
-        'ENGINE': 'django.contrib.gis.db.backends.postgis',
-        'NAME': 'sample_database',
-        'USER': 'oliver_django',
-        'PASSWORD': '1234567T',
-        'HOST': 'localhost',
-        'PORT': '',
+        'ENGINE': 'django.contrib.gis.db.backends.spatialite',
+        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
     }
 }
 

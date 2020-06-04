@@ -21,6 +21,16 @@ class RegionBorder(models.Model):
         return self.name
 
 
+class CountyBorder(models.Model):
+    """This contains the CountyBorder attributes."""
+
+    name = models.CharField(max_length=255)
+    mpoly = models.MultiPolygonField()
+
+    def __str__(self):
+        return self.name
+
+
 class PostcodeBorder(models.Model):
     """This contains the PostcodeBorder attributes."""
 

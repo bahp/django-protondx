@@ -565,7 +565,10 @@
                             responsive: true,
 
                             legend: {
-                                position: "bottom"
+                                position: "bottom",
+                                labels: {
+                                    "fontSize": 16,
+                                }
                             },
                             title: {
                                 display: true,
@@ -576,6 +579,19 @@
                                     type: 'time',
                                     time: {
                                         unit: 'month'
+                                    },
+                                    ticks: {
+                                        fontSize: 14
+                                    },
+                                }],
+                                yAxes: [{
+                                    ticks: {
+                                        fontSize: 14
+                                    },
+                                    scaleLabel: {
+                                        display: true,
+                                        fontSize: 16,
+                                        labelString: "Number of tests"
                                     }
                                 }]
                             },

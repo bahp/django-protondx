@@ -215,6 +215,22 @@ SWAGGER_SETTINGS = {
     'OPERATIONS_SORTER' : 'methods'
 }
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+             'level': os.getenv('DJANGO_LOG_LEVEL', 'DEBUG'),
+        },
+    },
+}
+
 # Overrides production settings with the development ones
 if os.getenv('SETTINGS') == "DEV":
     from .dev_settings import *

@@ -1,1 +1,0 @@
-web: gunicorn protondx.protondx.wsgi --log-file=-

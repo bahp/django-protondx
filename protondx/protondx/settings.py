@@ -165,8 +165,6 @@ STATICFILES_DIRS = (
 
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
-
-
 # -----------------------------
 # Configure rest framework api
 # -----------------------------

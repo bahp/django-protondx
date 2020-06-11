@@ -40,7 +40,7 @@
 
     <script>
 
-        const HOST_NAME = "https://{{ HOSTNAME }}";
+        const HOST_NAME = "{{ URL_SCHEME }}://{{ HOSTNAME }}";
 
         function isMobileDevice() {
             return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
@@ -1021,10 +1021,10 @@
         <div class="dropdown">
             <button onclick="openDropdown()" class="dropButton">Menu</button>
             <div id="dropdown" class="dropdown-content">
-                <a href="https://{{ HOSTNAME }}/dataUpload/" target="_blank">Upload Data</a>
-                <a href="https://www.imperial.ac.uk/bio-inspired-technology/about/" target="_blank">About</a>
-                <a>Contact</a>
-                <a href="https://{{ HOSTNAME }}/admin/" target="_blank">Admin</a>
+                <a href="{{ URL_SCHEME }}://{{ HOSTNAME }}/dataUpload/" target="_blank">Upload Data</a>
+                <a href="https://protondx.com/" target="_blank">About</a>
+                <a href="https://protondx.com/contact/" target="_blank">Contact</a>
+                <a href="{{ URL_SCHEME }}://{{ HOSTNAME }}/admin/" target="_blank">Admin</a>
             </div>
         </div>
 

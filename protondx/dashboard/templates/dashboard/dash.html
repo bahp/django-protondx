@@ -244,6 +244,7 @@
                 const pcr_id = document.getElementById("pcr-id");
                 const comment_id = document.getElementById("comment-id");
                 const comment_body = document.getElementById("comment-body");
+                createPCRChart();
 
                 $('#patient-table tbody').on( 'click', 'tr', function () {
                     $(this).addClass('selected').siblings().removeClass('selected');
@@ -251,6 +252,7 @@
 
                     pcr_id.innerHTML = diagnostic_id;
                     comment_id.innerHTML = diagnostic_id;
+
 
                     const diagnosticDetailURL = HOST_NAME + '/dashboard/api/diagnostic-detail/?id=' + diagnostic_id;
                     let getDetail =  $.get(diagnosticDetailURL);
@@ -267,6 +269,7 @@
                             comment_body.innerHTML = "No comment recorded for this diagnostic.";
                         }
 
+                        updatePCRChart(["0","0.1","0.2","5"],[0.05,0.07,0.2,0.5]);
                     });
 
                 });
@@ -275,14 +278,18 @@
                 //     patientTable.search(this.value).draw();
                 // });
 
-                // When the user clicks on <span> (x), close the modal
-                span.onclick = function() {
-                    patientTable.search('').draw();
-                    pcr_id.innerHTML = '';
-                    comment_id.innerHTML = '';
-                    comment_body.innerHTML= '';
-                    modal.style.display = "none";
-                }
+
+                // Close and clear the modal
+                window.addEventListener('click', function(event) {
+                    if (event.target === modal || event.target === span) {
+                        patientTable.search('').draw();
+                        pcr_id.innerHTML = '';
+                        comment_id.innerHTML = '';
+                        comment_body.innerHTML= '';
+                        updatePCRChart([],[]);
+                        modal.style.display = "none";
+                    }
+                });
             }
 
 
@@ -982,9 +989,9 @@
                     <div class="md-modal-pcr">
                         <h3 style="display: inline">PCR Graph - Test ID: #</h3><h3 style="display: inline" id="pcr-id"></h3>
                         <hr>
-
-                        <canvas id="pcr-chart" width="0" height="0"></canvas>
-
+                        <div id="pcr-chart-div">
+                            <canvas id="pcr-chart" width="0" height="0"></canvas>
+                        </div>
                     </div>
                     <div class="md-modal-comments">
                         <h3 style="display: inline">Diagnostic comments - Test ID: #</h3><h3 style="display: inline" id="comment-id"></h3>

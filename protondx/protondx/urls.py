@@ -15,9 +15,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from rest_framework.documentation import include_docs_urls
+
 # Rest API framework
 from rest_framework.schemas import get_schema_view
+from rest_framework.documentation import include_docs_urls
+from rest_framework_swagger.views import get_swagger_view
 
 # ----------------------------------
 # Change basic admin template names
@@ -27,10 +29,12 @@ admin.site.site_header = "ProtonDx administration"
 admin.site.site_title = "ProtonDx | Administration"
 admin.site.index_title = "ProtonDx | Administration"
 
-
 urlpatterns = [
     # Add django admin
     path('admin/', admin.site.urls),
+
+    # Add login/out views
+    path('accounts/', include('django.contrib.auth.urls')),
 
     # Add diagnostics application
     path('diagnostics/', include('diagnostics.urls')),
@@ -41,22 +45,22 @@ urlpatterns = [
     # Add dataUpload application
     path('dataUpload/', include('dataUpload.urls')),
 
-    # ------------------------------------------
+    #  ------------------------------------------
     # Adding full REST API
     # ------------------------------------------
     # .. note: In the scenario of big project it might be necessary to keep
-    #          updating the API. As such, it might be useful to have also 
-    #          these API versions controlled. 
-    #          (READ MORE ABOUT THIS WHEN NEEDED)
+    #          updating the API. As such, it might be useful to have also
+    #          these API versions controlled.
+    #           (READ MORE ABOUT THIS WHEN NEEDED)
     #
     #  re_path('api/(?P<version>(v1|v2))/', include('trials.urls')),
-    # 
+    #
     # API documentation
     # ----------------------
     # Add coreapi docs (requires coreapi)
     path('api/schema/coreapi/', include_docs_urls(title='EPiC IMPOC API')),
     # Add default schema
     path('api/schema/default/', get_schema_view(title='EPiC IMPOC API')),
-    # Add Swagger schema (requires swagger - not working)
-    #path('api/schema/swagger/', get_swagger_view(title='EPiC IMPOC API')),
+    #  Add Swagger schema (requires swagger - not working)
+    # path('api/schema/swagger/', get_swagger_view(title='EPiC IMPOC API')),
 ]

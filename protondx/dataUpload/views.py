@@ -71,7 +71,9 @@ def createModels(data):
     testing_centre.save()
     diagnostic_test.save()
 
+from django.contrib.auth.decorators import login_required
 
+@login_required
 def dataUploadView(request):
     """
     This view displays the dataUpload page. Deals with POST and GET methods to supply forms and

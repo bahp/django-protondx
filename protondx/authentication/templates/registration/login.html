@@ -80,6 +80,8 @@
 </head>
 <body>
 
+{% load widget_tweaks %}
+
 <div id="form-div">
     <h2>Login to {{ PROJECT_NAME }}</h2>
     {% if form.errors %}
@@ -106,8 +108,8 @@
     <form method="post" action="{% url 'login' %}">
         {% csrf_token %}
 
-        {{ form.username }}<br>
-        {{ form.password }}<br>
+        {% render_field form.username placeholder=form.username.label %}<br>
+        {% render_field form.password placeholder=form.password.label %}<br>
 
         <br>
 

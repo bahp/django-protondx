@@ -217,7 +217,6 @@
                         // add patient diagnostic test table
                         patientTable.clear();
                         patientTable.rows.add(response2[0]);
-                        console.log(response2[0])
 
                         // add patient information
                         tr_patient_id.innerText = "# " + patient_id;
@@ -247,6 +246,7 @@
                 createPCRChart();
 
                 $('#patient-table tbody').on( 'click', 'tr', function () {
+                    updatePCRChart([],[]);
                     $(this).addClass('selected').siblings().removeClass('selected');
                     const diagnostic_id = patientTable.row( this ).data().id;
 
@@ -268,8 +268,7 @@
                         else {
                             comment_body.innerHTML = "No comment recorded for this diagnostic.";
                         }
-
-                        updatePCRChart(["0","0.1","0.2","5"],[0.05,0.07,0.2,0.5]);
+                        updatePCRChart(response[1]['x'],response[1]['y']);
                     });
 
                 });
@@ -511,8 +510,6 @@
                     else{
                         console.log("Invalid search geometry")
                     }
-
-
 
 
                     const query = geoJSONLayer.createQuery();
@@ -987,9 +984,11 @@
             <div class="md-modal-body">
                 <div class="md-modal-diagnostic">
                     <div class="md-modal-pcr">
-                        <h3 style="display: inline">PCR Graph - Test ID: #</h3><h3 style="display: inline" id="pcr-id"></h3>
-                        <hr>
-                        <div id="pcr-chart-div">
+                        <div class="row header">
+                            <h3 style="display: inline">PCR Graph - Test ID: #</h3><h3 style="display: inline" id="pcr-id"></h3>
+                            <hr>
+                        </div>
+                        <div id="pcr-chart-div" class="row content">
                             <canvas id="pcr-chart" width="0" height="0"></canvas>
                         </div>
                     </div>

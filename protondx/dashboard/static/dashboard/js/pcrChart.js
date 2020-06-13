@@ -20,7 +20,9 @@ function createPCRChart() {
             responsive:true,
             scales: {
                 xAxes:[{
-                    gridLines:{borderDash:[],},
+                    gridLines:{
+                        borderDash:[],
+                    },
                     scaleLabel:{
                         display:true,
                         labelString:'Time (minutes)',
@@ -29,14 +31,20 @@ function createPCRChart() {
                     },
                 }],
                 yAxes:[{
-                    gridLines:{borderDash:[],},
+                    gridLines:{
+                        borderDash:[],
+                    },
                     ticks: {
-                        beginAtZero: true
+                        beginAtZero: true,
+                        max: 1
+                    },
+                    scaleLabel:{
+                        display:true,
+                        labelString:'Normalised pH',
+                        fontColor:'#002147',
+                        fontSize:14,
                     },
                 }],
-            },
-            plugins:{
-                datalabels:{display:false},
             },
             legend:{
                 display:false
@@ -52,8 +60,14 @@ function createPCRChart() {
                 rectangle: {
                 },
             },
-            tooltips:{
+            tooltips: {
+                enabled: true,
                 intersect:false,
+                callbacks: {
+                    title: function(tooltipItem, data) {
+                        return tooltipItem[0]['label'] + ' minutes';
+                    }
+                }
             },
         }
     });

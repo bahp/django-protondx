@@ -50,6 +50,16 @@
     border: 16px solid #003E74;
     border-bottom: 8px solid #003E74;
     border-right: 8px solid #003E74;
+    display: flex;
+    flex-flow: column;
+}
+
+.row.header {
+    flex: 0 1 auto;
+}
+
+.row.content {
+    flex: 1 1 auto;
 }
 
 .md-modal-patient {
@@ -130,14 +140,4 @@
     display: flex;
     align-items: center;
     height: 100%;
-}
-
-
-#pcr-chart-div{
-    width: 100%;
-    height: calc(100% - 40px);
-    margin: 0;
-    padding: 0;
-    border: 0;
-    float: bottom;
 }

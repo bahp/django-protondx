@@ -1,11 +1,4 @@
-import copy
-import io
-import json
-import zipfile
-
 from django.contrib.gis.geos import Point
-from django.core.files.uploadedfile import SimpleUploadedFile
-from django.core.serializers.json import DjangoJSONEncoder
 from django.forms import formset_factory
 from django.shortcuts import render
 
@@ -13,29 +6,20 @@ from dashboard.models import Patient, TestingCentre, DiagnosticTest
 from dashboard.fixtures.gen_location import get_locations
 from .forms import dataUploadForm
 
+# Login required
+from django.contrib.auth.decorators import login_required
 
-# def appendZIP(data):
-#     archive_orig = copy.deepcopy(data.get('raw_test_data'))
-#     del data['raw_test_data']
-#
-#     updatedData = json.dumps(
-#         data,
-#         sort_keys=False,
-#         indent=4,
-#         cls=DjangoJSONEncoder
-#     )
-#
-#     with zipfile.ZipFile(archive_orig, 'w') as zip_archive:
-#         with zip_archive.open('updated/updated.json', 'w') as file1:
-#             file1.write(b'compose-file-content...')
-#
-#     return archive_orig
+# Store user who added model
+from django.contrib.admin.models import LogEntry, ADDITION
+from django.contrib.contenttypes.models import ContentType
+from django.utils.encoding import force_text
 
 
-def createModels(data):
+def createModels(request, data):
     """
     Creates database entries for Patient, TestingCentre and DiagnosticTest using cleaned form data.
 
+    :param request: POST request. Contains user information
     :param dict data: Cleaned Diagnostic Data
     :return:
     """
@@ -71,7 +55,35 @@ def createModels(data):
     testing_centre.save()
     diagnostic_test.save()
 
+    LogEntry.objects.log_action(
+        user_id=request.user.pk,
+        content_type_id=ContentType.objects.get_for_model(patient).pk,
+        object_id=patient.pk,
+        object_repr=force_text(patient),
+        action_flag=ADDITION,
+        change_message='ADDED'
+    )
 
+    LogEntry.objects.log_action(
+        user_id=request.user.pk,
+        content_type_id=ContentType.objects.get_for_model(testing_centre).pk,
+        object_id=testing_centre.pk,
+        object_repr=force_text(testing_centre),
+        action_flag=ADDITION,
+        change_message='ADDED'
+    )
+
+    LogEntry.objects.log_action(
+        user_id=request.user.pk,
+        content_type_id=ContentType.objects.get_for_model(diagnostic_test).pk,
+        object_id=diagnostic_test.pk,
+        object_repr=force_text(diagnostic_test),
+        action_flag=ADDITION,
+        change_message='ADDED'
+    )
+
+
+@login_required
 def dataUploadView(request):
     """
     This view displays the dataUpload page. Deals with POST and GET methods to supply forms and
@@ -89,7 +101,7 @@ def dataUploadView(request):
             for f in upload_formset:
                 data = f.cleaned_data
                 if data:
-                    createModels(data)
+                    createModels(request, data)
         else:
             print(upload_formset.errors)
             # do something here

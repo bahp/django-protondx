@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{PROJECT_NAME}} Login</title>
+    <style>
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            background-color: #9D9D9D;
+            font-family: Arial;
+        }
+
+        #form-div {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            width: 450px;
+            -webkit-transform: translate(-50%, -50%);
+            transform: translate(-50%, -50%);
+            background-color: #003E74;
+            color: white;
+            padding: 50px;
+        }
+
+        input[type=text], input[type=password] {
+            width: 100%;
+            border: none;
+            padding: 12px;
+            margin-top: 6px;
+            margin-bottom: 16px;
+            box-sizing: border-box;
+            resize: vertical;
+            outline: none;
+            background-color: white;
+            color: black;
+        }
+
+
+        #pw-reset {
+            color: white;
+        }
+
+        .button {
+            outline: none;
+            display: inline-block;
+            padding: 12px;
+            background: #002147;
+            cursor: pointer;
+            border: 0;
+            width: 100%;
+            color: white;
+            font-weight: bold;
+        }
+
+        .button:hover, .button:focus {
+            background: #006EAF;
+            outline: none;
+        }
+
+        .p-box {
+            padding: 10px;
+            background-color: #006EAF;
+            color: white;
+            width: calc(100% - 20px);
+            margin-bottom: 16px;
+        }
+
+        .p-in-box{
+            display: inline-block;
+        }
+
+        h2 {
+            margin-top: 0;
+        }
+
+    </style>
+
+</head>
+<body>
+
+{% load widget_tweaks %}
+
+<div id="form-div">
+    <h2>Login to {{ PROJECT_NAME }}</h2>
+    {% if form.errors %}
+    <div class="p-box">
+        <p class="p-in-box">Your username and password didn't match. Please try again.</p>
+    </div>
+    {% endif %}
+
+    {% if next %}
+    {% if user.is_authenticated %}
+    <div class="p-box">
+        <p class="p-in-box">Your account doesn't have access to this page. To proceed,
+            please login with an account that has access.</p>
+    </div>
+
+    {% else %}
+    <div class="p-box">
+        <p class="p-in-box">Please login to see this page.</p>
+    </div>
+
+    {% endif %}
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}">
+        {% csrf_token %}
+
+        {% render_field form.username placeholder=form.username.label %}<br>
+        {% render_field form.password placeholder=form.password.label %}<br>
+
+        <br>
+
+        <input class="button" type="submit" value="Login">
+        <input type="hidden" name="next" value="{{ next }}">
+    </form>
+
+<!--    {# Assumes you setup the password_reset view in your URLconf #}-->
+<!--    <p><a id="pw-reset" href="{% url 'password_reset' %}">Lost password?</a></p>-->
+</div>
+
+</body>
+</html>
+
+
+
+
+
+
+

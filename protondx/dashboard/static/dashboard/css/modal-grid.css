@@ -50,6 +50,16 @@
     border: 16px solid #003E74;
     border-bottom: 8px solid #003E74;
     border-right: 8px solid #003E74;
+    display: flex;
+    flex-flow: column;
+}
+
+.row.header {
+    flex: 0 1 auto;
+}
+
+.row.content {
+    flex: 1 1 auto;
 }
 
 .md-modal-patient {

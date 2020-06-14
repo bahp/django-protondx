@@ -25,6 +25,9 @@
     <script src="https://cdn.datatables.net/responsive/2.2.4/js/dataTables.responsive.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.6.2/js/dataTables.buttons.min.js"></script>
     <script src="https://cdn.datatables.net/buttons/1.6.2/js/buttons.colVis.min.js"></script>
+    <script src="https://cdn.datatables.net/plug-ins/1.10.21/sorting/datetime-moment.js"></script>
+
+
 
     <!--CSS templates-->
     {% load static %}
@@ -32,6 +35,11 @@
     <link rel="stylesheet" type="text/css" href="{% static 'dashboard/css/modal-grid.css' %}">
     <link rel="stylesheet" type="text/css" href="{% static 'dashboard/css/main-grid.css' %}">
     <!--    <link rel="stylesheet" type="text/css" href="{% static 'dashboard/datatable.css' %}">-->
+
+    <!--Charts-->
+    <script src="{% static 'dashboard/js/pcrChart.js' %}"></script>
+    <script src="{% static 'dashboard/js/pieCharts.js' %}"></script>
+    <script src="{% static 'dashboard/js/dateChart.js' %}"></script>
 
     <!--ARCGIS-->
     <link rel="stylesheet" href="https://js.arcgis.com/4.15/esri/themes/light/main.css">
@@ -109,7 +117,7 @@
             // /////////////////
 
             function populateDataTable(data) {
-
+                $.fn.dataTable.moment( 'DD-MM-YYYY' );
                 table = $('#side-table').DataTable( {
                     data: data.features,
                     columns: [
@@ -225,6 +233,7 @@
 
                         // display table
                         // done after displaying modal for correct column width
+                        $.fn.dataTable.moment( 'DD-MM-YYYY' );
                         patientTable.draw();
                     }).catch(function (e) {
                         console.log(e);
@@ -234,13 +243,16 @@
                 const pcr_id = document.getElementById("pcr-id");
                 const comment_id = document.getElementById("comment-id");
                 const comment_body = document.getElementById("comment-body");
+                createPCRChart();
 
                 $('#patient-table tbody').on( 'click', 'tr', function () {
+                    updatePCRChart([],[]);
                     $(this).addClass('selected').siblings().removeClass('selected');
                     const diagnostic_id = patientTable.row( this ).data().id;
 
                     pcr_id.innerHTML = diagnostic_id;
                     comment_id.innerHTML = diagnostic_id;
+
 
                     const diagnosticDetailURL = HOST_NAME + '/dashboard/api/diagnostic-detail/?id=' + diagnostic_id;
                     let getDetail =  $.get(diagnosticDetailURL);
@@ -256,6 +268,7 @@
                         else {
                             comment_body.innerHTML = "No comment recorded for this diagnostic.";
                         }
+                        updatePCRChart(response[1]['x'],response[1]['y']);
                     });
 
                 });
@@ -264,16 +277,18 @@
                 //     patientTable.search(this.value).draw();
                 // });
 
-                // When the user clicks on <span> (x), close the modal
-                span.onclick = function() {
-                    patientTable.search('').draw();
-                    pcr_id.innerHTML = '';
-                    comment_id.innerHTML = '';
-                    comment_body.innerHTML= '';
-                    modal.style.display = "none";
-                }
 
-
+                // Close and clear the modal
+                window.addEventListener('click', function(event) {
+                    if (event.target === modal || event.target === span) {
+                        patientTable.search('').draw();
+                        pcr_id.innerHTML = '';
+                        comment_id.innerHTML = '';
+                        comment_body.innerHTML= '';
+                        updatePCRChart([],[]);
+                        modal.style.display = "none";
+                    }
+                });
             }
 
 
@@ -468,161 +483,11 @@
 
                 ///////
                 // add charts
-
-                let centreChart;
-
-                function createCentreChart() {
-                    const centreCanvas = document.getElementById("centre-chart");
-                    centreChart = new Chart(centreCanvas.getContext("2d"), {
-                        type: "doughnut",
-                        data: {
-                            labels: ["Home", "Hospital", "GP Clinic", "Drive Through", "Other"],
-                            datasets: [
-                                {
-                                    backgroundColor: [
-                                        "#FD7F6F",
-                                        "#7EB0D5",
-                                        "#B2E061",
-                                        "#BD7EBE",
-                                        "#FFB55A"
-                                    ],
-                                    borderWidth: 0,
-                                    data: [0, 0, 0, 0, 0]
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            cutoutPercentage: 35,
-                            legend: {
-                                position: "bottom"
-                            },
-                            title: {
-                                display: true,
-                                text: "Centre Type"
-                            }
-                        }
-                    });
-                }
-
-                let genderChart;
-
-                function createGenderChart() {
-                    const genderCanvas = document.getElementById("gender-chart");
-                    genderChart = new Chart(genderCanvas.getContext("2d"), {
-                        type: "doughnut",
-                        data: {
-                            labels: ["Female", "Male", "Other", "Not provided"],
-                            datasets: [
-                                {
-                                    backgroundColor: [
-                                        "#FD7F6F",
-                                        "#7EB0D5",
-                                        "#B2E061",
-                                        "#BD7EBE",
-                                    ],
-                                    borderWidth: 0,
-                                    data: [0, 0, 0, 0]
-                                }
-                            ]
-                        },
-                        options: {
-                            responsive: true,
-                            cutoutPercentage: 35,
-                            legend: {
-                                position: "bottom"
-                            },
-                            title: {
-                                display: true,
-                                text: "Patient Gender"
-                            }
-                        }
-                    });
-                }
-
-                let dateChart;
-
-                function createDateChart() {
-                    const dateCanvas = document.getElementById("date-chart");
-                    dateChart = new Chart(dateCanvas.getContext("2d"), {
-                        type: "line",
-                        data: {
-                            datasets: [{
-                                label: 'Daily Tests',
-                                backgroundColor: "#FD7F6F",
-                                borderColor: "#B2E061",
-                                fill: false,
-                                data: [],
-                            }, {
-                                label: 'Daily positive tests',
-                                backgroundColor: "#7EB0D5",
-                                borderColor: "#BD7EBE",
-                                fill: false,
-                                data: [],
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-
-                            legend: {
-                                position: "bottom",
-                                labels: {
-                                    "fontSize": 16,
-                                }
-                            },
-                            title: {
-                                display: true,
-                                text: "Testing trends"
-                            },
-                            scales: {
-                                xAxes: [{
-                                    type: 'time',
-                                    time: {
-                                        unit: 'month'
-                                    },
-                                    ticks: {
-                                        fontSize: 14
-                                    },
-                                }],
-                                yAxes: [{
-                                    ticks: {
-                                        fontSize: 14
-                                    },
-                                    scaleLabel: {
-                                        display: true,
-                                        fontSize: 16,
-                                        labelString: "Number of tests"
-                                    }
-                                }]
-                            },
-                            tooltips: {
-                                mode: 'index',
-                                intersect: false,
-                            }
-                        }
-                    });
-                }
-
                 createCentreChart();
                 createGenderChart();
                 createDateChart();
 
-                // used to update charts
-                function updateChart(chart, dataValues) {
-                    chart.data.datasets[0].data = dataValues;
-                    chart.update();
-                }
-
-                function updateDateChart(data0, data1) {
-                    dateChart.data.datasets[0].data = data0;
-                    dateChart.data.datasets[1].data = data1;
-                    dateChart.update();
-                }
-
                 const selection_name = document.getElementById("selection-name");
-                const selection_total = document.getElementById("selection-total");
-                const selection_pos = document.getElementById("selection-pos");
-                const selection_neg = document.getElementById("selection-neg");
 
                 function queryPopup(target) {
                     //set overview name
@@ -645,8 +510,6 @@
                     else{
                         console.log("Invalid search geometry")
                     }
-
-
 
 
                     const query = geoJSONLayer.createQuery();
@@ -1025,6 +888,7 @@
                 <a href="https://protondx.com/" target="_blank">About</a>
                 <a href="https://protondx.com/contact/" target="_blank">Contact</a>
                 <a href="{{ URL_SCHEME }}://{{ HOSTNAME }}/admin/" target="_blank">Admin</a>
+                <a href="{% url "logout" %}?next=/dashboard">Logout</a>
             </div>
         </div>
 
@@ -1120,9 +984,13 @@
             <div class="md-modal-body">
                 <div class="md-modal-diagnostic">
                     <div class="md-modal-pcr">
-                        <h3 style="display: inline">PCR Graph - Test ID: #</h3><h3 style="display: inline" id="pcr-id"></h3>
-                        <hr>
-
+                        <div class="row header">
+                            <h3 style="display: inline">PCR Graph - Test ID: #</h3><h3 style="display: inline" id="pcr-id"></h3>
+                            <hr>
+                        </div>
+                        <div id="pcr-chart-div" class="row content">
+                            <canvas id="pcr-chart" width="0" height="0"></canvas>
+                        </div>
                     </div>
                     <div class="md-modal-comments">
                         <h3 style="display: inline">Diagnostic comments - Test ID: #</h3><h3 style="display: inline" id="comment-id"></h3>

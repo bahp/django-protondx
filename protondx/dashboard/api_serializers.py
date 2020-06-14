@@ -45,7 +45,7 @@ class DiagnosticDetailSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = DiagnosticTest
-        fields = ['comment', 'id']
+        fields = ['comment', 'id', 'test_result']
 
 
 class TestingCentreSerializer(serializers.ModelSerializer):

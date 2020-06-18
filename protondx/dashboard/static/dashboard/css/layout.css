@@ -12,12 +12,14 @@
     white-space: nowrap;
 }
 
-/*#timeSlider {*/
-/*    position: absolute;*/
-/*    left: 100px;*/
-/*    right: 100px;*/
-/*    bottom: 20px;*/
-/*}*/
+#timeSlider {
+    position: absolute;
+    left: 100px;
+    right: 100px;
+    bottom: 20px;
+    /*default to hidden for heatmap*/
+    visibility: hidden;
+}
 
 .dropButton {
     background-color: #002147;

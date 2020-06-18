@@ -72,6 +72,7 @@
             "esri/widgets/Fullscreen",
             "esri/widgets/Search",
             "esri/widgets/BasemapGallery",
+            "esri/widgets/TimeSlider"
         ], function(Map,
                     MapView,
                     Extent,
@@ -86,7 +87,8 @@
                     Expand,
                     Fullscreen,
                     Search,
-                    BasemapGallery,) {
+                    BasemapGallery,
+                    TimeSlider,) {
 
             // //////////
             // DATA fetch
@@ -127,7 +129,7 @@
                         {
                             data: "properties.date_test",
                             render: function (data, type, full, meta) {
-                                return moment.unix(data).format('DD-MM-YYYY');
+                                return moment(data).format('DD-MM-YYYY');
                             }
                         },
                         {
@@ -420,6 +422,15 @@
                     //         content: "This cluster represents {cluster_count} diagnostic tests."
                     //     }
                     // },
+                    timeInfo: {
+                        startField: "date_test", // name of the date field
+                        endField: new Date(),
+                        interval: {
+                            // set time interval to one day
+                            unit: "days",
+                            value: 1
+                        }
+                    },
                 });
 
                 geoJSONLayer.popup = {
@@ -466,6 +477,7 @@
 
                 //renderer selection w/ radio
                 let radios = document.getElementsByName("renderer");
+                let sliderDiv = document.getElementById("timeSlider")
                 let renderArray = [heatRenderer, dotRenderer];
                 for (let i = 0; i < radios.length; i++) {
                     radios[i].addEventListener("change", function (event) {
@@ -473,11 +485,13 @@
                         if (fieldName === "HEAT") {
                             renderArray[1] = geoJSONLayer.renderer.clone();
                             $("#dotsCheckboxSettings").hide('slow');
+                            sliderDiv.style.visibility='hidden'
                             geoJSONLayer.renderer = renderArray[0];
                         }
                         if (fieldName === "DOTS") {
                             renderArray[0] = geoJSONLayer.renderer.clone();
                             $("#dotsCheckboxSettings").show('slow');
+                            sliderDiv.style.visibility='visible'
                             geoJSONLayer.renderer = renderArray[1];
                         }
                     });
@@ -804,25 +818,25 @@
 
                 /////////
                 // time slider
-                // const timeSlider = new TimeSlider({
-                //     container: "timeSlider",
-                //     mode: "cumulative-from-start",
-                //     view: baseMap
-                // });
-                //
-                // baseMap.ui.add(timeSlider, "manual");
-                //
-                // baseMap.whenLayerView(geoJSONLayer).then(function(lv) {
-                //     const fullTimeExtent = geoJSONLayer.timeInfo.fullTimeExtent;
-                //
-                //     // set up time slider properties
-                //     timeSlider.fullTimeExtent = fullTimeExtent;
-                //     timeSlider.playRate = 200;
-                //
-                //     timeSlider.stops = {
-                //         interval: geoJSONLayer.timeInfo.interval,
-                //     };
-                // });
+                const timeSlider = new TimeSlider({
+                    container: "timeSlider",
+                    mode: "time-window",
+                    view: baseMap
+                });
+
+                baseMap.ui.add(timeSlider, "manual");
+
+                baseMap.whenLayerView(geoJSONLayer).then(function(lv) {
+                    const fullTimeExtent = geoJSONLayer.timeInfo.fullTimeExtent;
+
+                    // set up time slider properties
+                    timeSlider.fullTimeExtent = fullTimeExtent;
+                    timeSlider.playRate = 200;
+
+                    timeSlider.stops = {
+                        interval: geoJSONLayer.timeInfo.interval,
+                    };
+                });
 
 
                 ///////
@@ -897,6 +911,7 @@
 
     </div>
     <div class="body-container">
+        <div id="timeSlider"></div>
         <div id="viewDiv" class="mapView"></div>
         <div class="side-view">
             <div class="graph-container">
@@ -936,9 +951,6 @@
 </div>
 
 
-
-<!--<div id="viewDiv"></div>-->
-<!--<div id="timeSlider"></div>-->
 <div id="selectionPaneDiv" class="esri-widget">
     <p>Visualise COVID-19 spread using:</p>
     <label>

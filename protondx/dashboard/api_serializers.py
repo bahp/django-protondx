@@ -106,7 +106,7 @@ class CustomGeoJSONSerializer(GeoJSONSerializer):
             return obj.get_test_result_display()
         # Format test date to human readable format (discard time)
         elif str(field) == "dashboard.DiagnosticTest.date_test":
-            return int(obj.date_test.timestamp())
+            return obj.date_test.timestamp()*1000
         elif is_protected_type(value):
             return value
         else:

@@ -3,6 +3,8 @@ This module contains the serializers for the Dashboard App's Django Rest API.
 """
 
 #  Serializer imports
+from datetime import datetime
+
 from rest_framework import serializers
 from django.contrib.gis.serializers.geojson import Serializer as GeoJSONSerializer
 from django.utils.encoding import is_protected_type
@@ -104,7 +106,7 @@ class CustomGeoJSONSerializer(GeoJSONSerializer):
             return obj.get_test_result_display()
         # Format test date to human readable format (discard time)
         elif str(field) == "dashboard.DiagnosticTest.date_test":
-            return obj.date_test.strftime('%d-%m-%Y')
+            return int(obj.date_test.timestamp())
         elif is_protected_type(value):
             return value
         else:

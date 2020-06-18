@@ -126,6 +126,9 @@
                         },
                         {
                             data: "properties.date_test",
+                            render: function (data, type, full, meta) {
+                                return moment.unix(data).format('DD-MM-YYYY');
+                            }
                         },
                         {
                             data: "properties.test_result",

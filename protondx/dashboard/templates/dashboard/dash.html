@@ -443,7 +443,7 @@
 
                 // add geoJSON layer to map
                 map.add(geoJSONLayer);
-
+                let currentTimeExtent = geoJSONLayer.timeInfo.timeExtent;
 
                 /////////
                 // Select which dots to display
@@ -486,6 +486,7 @@
                             renderArray[1] = geoJSONLayer.renderer.clone();
                             $("#dotsCheckboxSettings").hide('slow');
                             sliderDiv.style.visibility='hidden'
+                            currentTimeExtent = geoJSONLayer.timeInfo.timeExtent;
                             geoJSONLayer.renderer = renderArray[0];
                         }
                         if (fieldName === "DOTS") {
@@ -601,6 +602,9 @@
                         },
 
                     ];
+
+
+                    query.timeExtent = currentTimeExtent;
 
                     let start = moment('2020-01-01');
                     let end = moment();
@@ -836,6 +840,11 @@
                     timeSlider.stops = {
                         interval: geoJSONLayer.timeInfo.interval,
                     };
+                });
+
+
+                timeSlider.watch("timeExtent", function(timeExtent){
+                    currentTimeExtent = timeExtent;
                 });
 
 

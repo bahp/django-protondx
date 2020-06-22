@@ -2,6 +2,8 @@
 Commands
 ########
 
+.. contents::
+    :local:
 
 Import Data
 -----------
@@ -79,16 +81,37 @@ Code
     :members:
 
 
-Generate location data (Centre dataset)
----------------------------------------
+.. _gen-location-command:
+
+Generate location data
+----------------------
 
 Overview
 ~~~~~~~~
+This command is used to add location information to a ``Testing Centre`` dataset.
+
+The provided dataset must be in ``csv`` format and contain the ``center_type`` for each row.
+
+.. csv-table:: Dataset before generating locations
+   :file: centre_mock_empty.csv
+   :header-rows: 1
+
+
+The resulting dataset will have location information added.
+
+.. csv-table:: Dataset after generating locations
+   :file: centre_mock_full.csv
+   :header-rows: 1
 
 
 Usage
 ~~~~~
 
+When using the command to fill location information, the path to the dataset must be specified using the ``--path`` flag.
+
+.. code-block:: console
+
+    manage.py fill_location –-path <path/to/file>
 
 Code
 ~~~~
@@ -102,11 +125,8 @@ Generate pseudorandom locations
 
 Overview
 ~~~~~~~~
-
-
-Usage
-~~~~~
-
+This module is used by the :ref:`gen-location-command` command to generate random coordinates and obtain the
+corresponding country, region and county information.
 
 Code
 ~~~~

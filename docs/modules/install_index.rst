@@ -11,4 +11,7 @@ the |project_name| server. They all cover the deployment process.
     :caption: Contents:
     :glob:
 
-    install/*
+    install/requirements.rst
+    install/installation.rst
+    install/deploy.rst
+    install/data_generation.rst

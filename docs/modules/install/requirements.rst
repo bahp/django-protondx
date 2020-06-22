@@ -2,6 +2,9 @@
 Requirements
 ############
 
+Refer to :ref:`install-guide` for a detailed install guide or
+:ref:`deploy-guide` for information on deploying |project_name|.
+
 Python
 ------
 

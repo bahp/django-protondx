@@ -7,11 +7,10 @@ Installation
 Environment
 -----------
 
-First, ensure that you have python installed
+First, ensure that you have Python 3 installed
 
 .. code-block:: console
 
-   $ which python  # python 2
    $ which python3 # python 3
 
 
@@ -21,6 +20,10 @@ Then, lets create a virtual environment for our project (e.g. virtualenv)
 
    $ virtualenv -p <python3-path> <virtualenv-name>  # Create the environment
    $ source <virtualenv-name>/bin/activate           # Activate virtual enviroment
+
+Clone the project, available
+`here <https://github.com/bahp/django-protondx.git>`_.
+
 
 Then, go to the corresponding folder and install the requirements
 

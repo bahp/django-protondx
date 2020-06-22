@@ -1,0 +1,14 @@
++protondx
+    +---authentication
+    |
+    +---dashboard
+    |
+    +---dataUpload
+    |
+    +---diagnostics
+    |
+    +---protondx
+    |
+    +---static
+    |
+    \---uploads

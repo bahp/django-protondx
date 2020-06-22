@@ -16,12 +16,26 @@ If it is the first time, create a superuser (user:cbit, pass:toor)
     $ cd protondx
     $ python manage.py createsu
 
+Development
+-----------
+
 Run the server locally
 
 .. code-block:: console
 
     $ python manage.py runserver
 
-Go to the browser and access the admin localhost:8000/admin
+Access the dashboard and relevant pages at:
 
-For more information read the django docs
+* localhost:8000/dashboard  or  localhost:8000
+* localhost:8000/dataUpload
+* localhost:8000/admin
+
+Production
+----------
+
+Access the dashboard and relevant pages at:
+
+* <hostname>/dashboard  or  <hostname>
+* <hostname>/dataUpload
+* <hostname>/admin

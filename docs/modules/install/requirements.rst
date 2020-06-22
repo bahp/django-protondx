@@ -19,6 +19,7 @@ Install using:
 
 or see :ref:`install-guide` for a complete guide.
 
+.. _python-packages-list:
 
 Packages
 ~~~~~~~~
@@ -46,3 +47,36 @@ Spatialite is a suitable alternative to Postgres during development. (:ref:`inst
 It should **not** be used for deployment on Heroku. It will not obey the durability characteristic of the ACID
 properties. SQLite databases are stored on disk, in the same directory as the source code. Heroku Dynos use an
 ephemeral filesystem meaning all uploaded files and data will be **deleted** when the Dyno is shut down.
+
+
+Browser
+-------
+
+A browser is needed to access the |project_name| dashboard along with it's associated pages.
+This is the case both when in development and when the project has been deployed.
+The browser must support WebGL.
+
+Full Support
+~~~~~~~~~~~~
+
+* Google Chrome
+* Brave
+* Other Chromium browsers
+
+
+Limited Support
+~~~~~~~~~~~~~~~
+
+* Firefox
+    + Logo is not resized correctly
+    + Patient age is incorrectly displayed in the detail view
+
+* Edge
+    + Logo is not resized correctly
+    + Data uploading is not operational
+
+
+Not supported
+~~~~~~~~~~~~~
+
+* Internet explorer

@@ -123,3 +123,5 @@ Used throughout the dashboard (dash.html) to convert between time formats.
 
 Python
 ------
+
+See :ref:`python-packages-list` for a full list of python packages used.

@@ -1,0 +1,14 @@
+##########################################
+|project_name| installation and deployment
+##########################################
+
+The following pages detail the requirements and installation process for
+the |project_name| server. They all cover the deployment process.
+
+
+.. toctree::
+    :maxdepth: 2
+    :caption: Contents:
+    :glob:
+
+    install/*

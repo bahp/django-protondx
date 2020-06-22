@@ -1,3 +1,5 @@
+.. _install-guide:
+
 ############
 Installation
 ############
@@ -27,6 +29,7 @@ Then, go to the corresponding folder and install the requirements
    $ pip install -r requirements.txt   # Install requirements
 
 
+.. _install-spatial-db:
 
 Spatial database (Linux)
 ------------------------

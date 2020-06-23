@@ -81,10 +81,12 @@ Limited Support
 ~~~~~~~~~~~~~~~
 
 * Firefox
+
     + Logo is not resized correctly
     + Patient age is incorrectly displayed in the detail view
 
 * Edge
+
     + Logo is not resized correctly
     + Data uploading is not operational
 

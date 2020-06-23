@@ -82,6 +82,7 @@ Resulting decisions
 
 ---------------
 
+.. _18-05-2020:
 
 18/05/2020
 ----------
@@ -116,7 +117,10 @@ Resulting decisions
 
 2. Work on the REST API used to query data
 
-3. Adding the updating data function (1) user drags/drop .zip file; (2) display main information on the screen (e.g. files to upload, size, experiment id, patient id, elapsed time, age, gender, ....).
+3. Add a view where users can upload data
+
+    - user drags and drops .zip archives
+    - display extracted information on the screen (e.g. files to upload, diagnostic data, patient data...)
 
 
 ---------------
@@ -137,15 +141,18 @@ Attendees
 Topics discussed
 ~~~~~~~~~~~~~~~~
 
-1. Present the draft website that the front-end is almost completed without data available.
+1. Present an initial version of the website
+2. Creating sample data for testing purposes
 
 
 Resulting decisions
 ~~~~~~~~~~~~~~~~~~~
 
-1. Focus on integration and finalising the functionality
+1. Focus on integration and finalisation of the minimum viable product
 
-2. Reverse-geocoding (from lat-lon to postcode, city, state, country).
+2. Reverse-geocoding - obtain country, region, county and postcode from latitude and longitude
+
+3. Add commands to automatically create and load data into the database
 
 
 ---------------
@@ -166,25 +173,25 @@ Attendees
 Topics discussed
 ~~~~~~~~~~~~~~~~
 
-1. Present the upload page and drag-file function.
+1. Present the upload page and drag & drop functionality
 
 2. Present the reverse-geocoding function
 
-3.  Present draft Leaflet
+3. Present a draft of the leaflet
 
 
 Resulting decisions
 ~~~~~~~~~~~~~~~~~~~
 
-1. Finish the integration.
+1. Finish website integration
 
 2. Explore transfer to Amazon Web Services
 
-3. Include PCR data
+3. Include PCR data on the patient specific view
 
-4. Introduce user management roles - mostly for doctors
+4. Introduce user management roles - administrators and clinicians
 
-5. Finalise leaflet - Send by Tuesday for feedback
+5. Finalise leaflet
 
 
 ---------------
@@ -205,19 +212,19 @@ Attendees
 Topics discussed
 ~~~~~~~~~~~~~~~~
 
-1. Present the website as whole
+1. Present the website as a whole
 
-2. Discuss the PPT for video demonstration
+2. Discuss the Powerpoint for the video demonstration and presentation
 
 
 Resulting decisions
 ~~~~~~~~~~~~~~~~~~~
 
-1. Keep exploring the AWS
+1. Keep exploring the deployment to AWS
 
-2. Finalise all the functions for the website, particularly PCR data.
+2. Finalise all the functions for the website, particularly displaying PCR data
 
-3. Keep working the demonstration
+3. Keep working on the demonstration
 
 
 ---------------
@@ -238,7 +245,7 @@ Attendees
 Topics discussed
 ~~~~~~~~~~~~~~~~
 
-1. Finalised all functions for the website that agreed  in 5/18/2020
+1. Finalised all functions for the website that agreed on :ref:`18-05-2020`.
 
 2. Suggestions for the video demonstration
 
@@ -246,7 +253,9 @@ Topics discussed
 Resulting decisions
 ~~~~~~~~~~~~~~~~~~~
 
-1. Preparing the video demonstration and documents
+1. Prepare the video demonstration and documents
+
+2. Work on bug-fixing and extending code documentation
 
 
 ---------------
@@ -254,6 +263,8 @@ Resulting decisions
 
 17/06/2020
 ----------
+
+The aim of this meeting was to present our work to the team at the Centre for Bio-Inspired Technology.
 
 Attendees
 ~~~~~~~~~
@@ -271,17 +282,20 @@ Topics discussed
 
 1. The overview of the website
 
-2. Comments for the product
+2. Comments on work so far
+
+3. Possible future work and improvements
+
+    * Time slider to visualise changes over time
+    * Different methods for uploading data (automated using API vs drag & drop upload page)
 
 
 Resulting decisions
 ~~~~~~~~~~~~~~~~~~~
 
-Attendess: Bernard Hernandez Perez, Chen Su, Miguel Cacho Soblechero, Oliver Stiff
-
 1. Adding the time evolution function to better understand the development process of the disease.
 
-2. Automatically updating the backend data.
+2. Automatically upload data using an API - already implemented for ``Patient`` and ``Testing_Centre`` database tables
 
 
 ---------------
@@ -302,10 +316,12 @@ Attendees
 Topics discussed
 ~~~~~~~~~~~~~~~~
 
-1. Discuss Documentation  format for both pdf and website.
+1. Discuss documentation format for both pdf and website
 
 
 Resulting decisions
 ~~~~~~~~~~~~~~~~~~~
 
 1. Keep working on the documentation
+
+2. Use a website as the platform for our documentation. Have a PDF version to make it easily accessible offline.

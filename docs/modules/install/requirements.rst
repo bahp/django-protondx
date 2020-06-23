@@ -5,6 +5,10 @@ Requirements
 Refer to :ref:`install-guide` for a detailed install guide or
 :ref:`deploy-guide` for information on deploying |project_name|.
 
+
+-------------
+
+
 Python
 ------
 
@@ -31,6 +35,9 @@ Packages
    :literal:
 
 
+-------------
+
+
 Database
 --------
 
@@ -50,6 +57,9 @@ Spatialite is a suitable alternative to Postgres during development. (:ref:`inst
 It should **not** be used for deployment on Heroku. It will not obey the durability characteristic of the ACID
 properties. SQLite databases are stored on disk, in the same directory as the source code. Heroku Dynos use an
 ephemeral filesystem meaning all uploaded files and data will be **deleted** when the Dyno is shut down.
+
+
+-------------
 
 
 Browser

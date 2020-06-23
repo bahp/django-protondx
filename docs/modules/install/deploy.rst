@@ -24,6 +24,9 @@ the ``WEB_HOST`` environment variable::
 The database settings will be configured automatically using the ``dj_database_url`` package.
 
 
+-------------
+
+
 Heroku setup
 ------------
 
@@ -94,6 +97,10 @@ Complete configuration for buildpacks:
     heroku buildpacks:add https://github.com/heroku/heroku-geo-buildpack
     heroku buildpacks:add heroku/python
     heroku config:set PROJECT_PATH=protondx/
+
+
+-------------
+
 
 Database
 --------

@@ -5,6 +5,10 @@ Commands
 .. contents::
     :local:
 
+
+-------------
+
+
 Import Data
 -----------
 
@@ -81,6 +85,8 @@ Code
     :members:
 
 
+-------------
+
 .. _gen-location-command:
 
 Generate location data
@@ -120,6 +126,9 @@ Code
     :members:
 
 
+-------------
+
+
 Generate pseudorandom locations
 -------------------------------
 
@@ -133,6 +142,9 @@ Code
 
 .. automodule:: dashboard.fixtures.gen_location
     :members:
+
+
+-------------
 
 
 Load borders

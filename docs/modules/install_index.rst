@@ -3,7 +3,7 @@
 ##########################################
 
 The following pages detail the requirements and installation process for
-the |project_name| server. They all cover the deployment process.
+the |project_name| server. They also cover the deployment process.
 
 
 .. toctree::

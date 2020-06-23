@@ -3,8 +3,11 @@
 ###################################
 
 .. toctree::
-    :maxdepth: 2
+    :maxdepth: 1
     :caption: Contents:
-    :glob:
 
-    history/*
+    history/meeting_history.rst
+    history/design_history.rst
+    history/ethical_consequences.rst
+    history/sustainability.rst
+    history/code_sources.rst

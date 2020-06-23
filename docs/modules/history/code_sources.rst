@@ -2,6 +2,63 @@
 Sources of code and resources used
 ##################################
 
+.. contents::
+    :depth: 1
+    :local:
+
+
+--------------
+
+
+Python
+------
+
+See :ref:`python-packages-list` for a full list of python packages used.
+
+
+-----------------
+
+
+
+Geographical data and resources
+-------------------------------
+
+Country boundaries
+~~~~~~~~~~~~~~~~~~
+
+Made with Natural Earth. Free vector and raster map data @ naturalearthdata.com.
+
+`Country boundaries <https://www.naturalearthdata.com/downloads/50m-cultural-vectors/50m-admin-0-countries-2/>`_
+
+Region Boundaries
+~~~~~~~~~~~~~~~~~
+
+**Source:** Office for National Statistics licensed under the Open Government Licence v.3.0
+
+Contains OS data © Crown copyright and database right [2020]
+
+`Region boundaries <https://geoportal.statistics.gov.uk/datasets/nuts-level-1-january-2018-full-clipped-boundaries-in-the-united-kingdom/data>`_
+
+County boundaries
+~~~~~~~~~~~~~~~~~
+
+**Source:** Office for National Statistics licensed under the Open Government Licence v.3.0
+
+Contains OS data © Crown copyright and database right [2020]
+
+`County boundaries <http://geoportal.statistics.gov.uk/datasets/b216b4c8a4e74f6fb692a1785255d777_0>`_
+
+Postcode Sector boundaries
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Accessed through the ArcGIS portal.
+
+`Sector Boundaries <https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer>`_
+
+
+---------------
+
+
 Javascript
 ----------
 
@@ -120,8 +177,3 @@ Used to extend Date-Time support in Javascript.
 Used throughout the dashboard (dash.html) to convert between time formats.
 (e.g. Unix time to human readable date)
 
-
-Python
-------
-
-See :ref:`python-packages-list` for a full list of python packages used.

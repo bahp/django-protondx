@@ -14,6 +14,7 @@ Welcome to |project_name|'s documentation!
     modules/usage.rst
     modules/license.rst
     modules/code.rst
+    modules/testing.rst
 
 
 Indices and tables

@@ -176,4 +176,3 @@ Moment.JS
 Used to extend Date-Time support in Javascript.
 Used throughout the dashboard (dash.html) to convert between time formats.
 (e.g. Unix time to human readable date)
-

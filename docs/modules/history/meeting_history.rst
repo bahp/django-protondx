@@ -10,8 +10,8 @@ Meeting History
 ---------------
 
 
-04/05/2020
-----------
+04 May 2020
+-----------
 
 Attendees
 ~~~~~~~~~
@@ -49,8 +49,8 @@ Resulting decisions
 ---------------
 
 
-11/05/2020
-----------
+11 May 2020
+-----------
 
 Attendees
 ~~~~~~~~~
@@ -84,8 +84,8 @@ Resulting decisions
 
 .. _18-05-2020:
 
-18/05/2020
-----------
+18 May 2020
+-----------
 
 Attendees
 ~~~~~~~~~
@@ -126,8 +126,8 @@ Resulting decisions
 ---------------
 
 
-25/05/2020
-----------
+25 May 2020
+-----------
 
 Attendees
 ~~~~~~~~~
@@ -158,8 +158,8 @@ Resulting decisions
 ---------------
 
 
-01/06/2020
-----------
+01 June 2020
+------------
 
 Attendees
 ~~~~~~~~~
@@ -197,8 +197,8 @@ Resulting decisions
 ---------------
 
 
-08/06/2020
-----------
+08 June 2020
+------------
 
 Attendees
 ~~~~~~~~~
@@ -230,8 +230,8 @@ Resulting decisions
 ---------------
 
 
-15/06/2020
-----------
+15 June 2020
+------------
 
 Attendees
 ~~~~~~~~~
@@ -261,8 +261,8 @@ Resulting decisions
 ---------------
 
 
-17/06/2020
-----------
+17 June 2020
+------------
 
 The aim of this meeting was to present our work to the team at the Centre for Bio-Inspired Technology.
 
@@ -301,8 +301,8 @@ Resulting decisions
 ---------------
 
 
-22/06/2020
-----------
+22 June 2020
+------------
 
 Attendees
 ~~~~~~~~~

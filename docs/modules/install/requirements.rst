@@ -75,17 +75,18 @@ Full Support
 * Google Chrome
 * Brave
 * Other Chromium browsers
+* Firefox
 
 
 Limited Support
 ~~~~~~~~~~~~~~~
 
-* Firefox
+* Edge
 
     + Logo is not resized correctly
-    + Patient age is incorrectly displayed in the detail view
+    + Data uploading is not operational
 
-* Edge
+* Safari
 
     + Logo is not resized correctly
     + Data uploading is not operational

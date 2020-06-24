@@ -492,7 +492,27 @@ integrate PCR data generation/querying into REST API"
 
 14 June 2020 - 17 June 2020
 ---------------------------
-Add time slider for the dot renderer (seperate branch)
+Based on feedback from the team, a time slider is added. It allows users to see how testing and positive diagnostics
+evolve over time. The slider can be set to move automatically or the user can control it manually. The data can be
+displayed for the whole available period or anything dow to a single day.
+
+To achieve this, the diagnostic times need to be serialised into `Unix time <https://en.wikipedia.org/wiki/Unix_time>`_
+instead of a human readable format. This means that they then need to be converted back to a human readable format on
+the client side, to be displayed in the table.
+
+**Issue:** The data for the time based graph on the right needs date data to be in a standard date format (YYYY-MM-DD
+or DD/MM/YY...) and is not functional when Unix time is used. This means that the graph cannot be used mas is.
+
+**The time slider branch of the repository was not merged with master for the above reason.**
+
+.. figure:: pictures/time-slider-demo_Moment-1.jpg
+
+   Time slider (All tests)
+
+.. figure:: pictures/time-slider-demo_Moment-2.jpg
+
+   Time slider (positive diagnostic tests)
+
 
 
 ---------------
@@ -500,5 +520,8 @@ Add time slider for the dot renderer (seperate branch)
 
 18 June 2020 - 25 June 2020
 ---------------------------
-document the project based on noted taken throughout
+
+Work on the project is finalised. The documentation is written based on code comments, notes and pictures taken
+throughout the project. `Sphinx <https://www.sphinx-doc.org/e>`_ is used to write the documentation and it's made
+available online using `Heroku <https://www.heroku.com/home>`_.
 

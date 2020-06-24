@@ -13,8 +13,17 @@ Design History
 
 04 May 2020
 -----------
-"Goal: design a webpage to display COVID-19 testing and diagnosis data
-Data is obtained from the Lacewing POC diagnostic device."
+
+Establish the project objectives and requirements. The aim is create a single-page dashboard which can be used
+to display COVID-19 testing data. That data will be provided by the Lacewing point of care diagnostic device
+(pictured below).
+
+The page should allow users to gain information on the spread of the virus and the extent to which testing is being
+carried out. The target audience has not yet been decided upon with clinicians, governments and the general population
+being possibilities.
+
+The project should be implemented using the Django web-framework on the server side. This framework will be used
+to create the database models, serve static files to clients and possibly implement web APIs or do data processing.
 
 .. figure:: pictures/20200413_121845.jpg
 
@@ -22,7 +31,7 @@ Data is obtained from the Lacewing POC diagnostic device."
 
 .. figure:: pictures/20200419_164716.jpg
 
-   Lacewing with sample (Centre for Bio-Inspired Technology)
+   Lacewing device with sample (Centre for Bio-Inspired Technology)
 
 
 ---------------
@@ -30,7 +39,25 @@ Data is obtained from the Lacewing POC diagnostic device."
 
 05 May 2020
 -----------
-Consider different database schemas
+
+The diagnostic data must be stored in a database.
+
+Brainstorming session to determine what attributes the database schema should have and how to design it.
+Two main options were considered:
+
+* Use one table where each tuple has all the information related to the diagnostic, the patient and the testing
+  location. This has the advantage of making accessing data straightforward but does have several considerable
+  drawbacks. There is no separation between confidential patient data and publicly available location data. Furthermore,
+  if a patient has several tests, or several tests are held at the same location, which is highly likely, there would
+  be redundant information being stored in the database.
+
+* Use three separate tables. One for patient information, one for diagnostic information and one for testing location
+  related fields. There are one-to-many relationships between the ``Patient`` table and the ``Diagnostic`` table, and
+  between the ``Testing_centre`` and ``Diagnostic`` tables. This resolves the issues present in the previous schema.
+  Patient data is held in a separate table from all other data. The ``Diagnostic`` table has information which can
+  be displayed openly as the only link to a patient is an anonymised patient ID. Having separate tables also means less
+  data needs ot be stored in cases where a patient has had several diagnostics or when a testing centre is used several
+  times.
 
 .. figure:: pictures/DB_ER_diagram.png
 
@@ -39,14 +66,18 @@ Consider different database schemas
 
 ---------------
 
+.. _query-function:
 
 06 May 2020
 -----------
-"Create Dashboard django application
-Use DB schema to design models
-3 tables
-Fn to query database and get statistics (start)
-start of administrator interface for dashboard app"
+
+Start working on the back-end implementation. An django application named ``dashboard`` is added to the ``protondx``
+project. The datatable models are created based on the three-table schema described previously.
+
+Work starts on functions which can be used to query the database to obtain general diagnostic information such as
+the total number of tests, the number of positive tests and the number of different patients tested.
+
+An administrator interface is added for the ``dashboard`` app based upon Django's 'automatic admin interface'.
 
 
 ---------------
@@ -54,9 +85,13 @@ start of administrator interface for dashboard app"
 
 07 May 2020
 -----------
-"Possible dashboard layout
-add map with dot density renderer (no actual data or geographical data in use)
-add widgets to map (zoom, search, extent reset)"
+
+An initial layout for the dashboard front-end is created (pictured below). The map is implemented using the ArcGIS
+API for Javascript. Basic widgets are added for zoom, search, view reset...
+
+The dot density renderer is considered as a possible option for representing the spread of the virus or the extent of
+testing in the UK.
+
 
 .. figure:: pictures/dash-1.PNG
 
@@ -68,8 +103,13 @@ add widgets to map (zoom, search, extent reset)"
 
 08 May 2020
 -----------
-"add radio buttons to select what rendere is used (density vs dots)
-add popup on postcode select (no data)"
+
+Radio buttons are added to select between two renderers:
+
+* Dot density renderer: randomly placed dots inside a geographic region based on the number of tests in that region.
+* Dot renderer: individual dots for each diagnostic.
+
+At this point, the data being plotted is not obtained from the database and is just based on pseudo-random numbers.
 
 .. figure:: pictures/old-render-select-1.PNG
 
@@ -81,7 +121,9 @@ add popup on postcode select (no data)"
 
 09 May 2020
 -----------
-use query Fns (6 may) to add data to popup - use django rest api
+The query functions designed on :ref:`query-function` are used to display data from the database in a popup when a
+postcode sector is clicked. The postcode data is hosted by ArcGIS. On click, that postcode is sent to the server which
+queries the database and returns statistics for that postcode.
 
 
 ---------------

@@ -147,6 +147,7 @@ Code
 
 -------------
 
+.. _import-borders-command:
 
 Load borders
 ------------

@@ -125,6 +125,9 @@ The query functions designed on :ref:`query-function` are used to display data f
 postcode sector is clicked. The postcode data is hosted by ArcGIS. On click, that postcode is sent to the server which
 queries the database and returns statistics for that postcode.
 
+A REST API was created to make these queries possible. All information from this point onwards which comes from the
+server is accessed using this REST API and extensions made to it.
+
 
 ---------------
 
@@ -369,9 +372,7 @@ The dashboard which was using floating divs for its layout is changed to a css g
 
 Country, region, county and postcode fields are added to the ``Testing_centre`` model. These were removed earlier on
 as they were no longer needed to obtain statistics. They were added back to support searching by these geographical
-areas in the table. They do, however, not need to be entered manually when data is uploaded. Reverse-geocoding is used
-to obtain all of this information. Reverse geocoding is done using locally stored data (:ref:`geographical-data`) for
-the country, region and county, and using the `Postcodes.io <http://api.postcodes.io/>`_ for the postcodes.
+areas in the table. They have to be entered manually at upload time.
 
 General patient information (name, date of birth, age, gender...) is now in the detailed analysis page. A table with
 all of the patients diagnostic tests was also added.
@@ -393,24 +394,33 @@ own directory for each app.
 
 ---------------
 
+.. _27-05-2020:
 
 27 May 2020
 -----------
-Form has  a defualt format and fileds are completed based on data in file
 
+The dataUpload page now has a fixed form which is created for each uploaded archive. The form fields are filled if the
+archive contains a JSON file with the required key.
+
+.. figure:: pictures/old-form.PNG
+
+   Auto-filled form
 
 ---------------
 
 
 28 May 2020
 -----------
-"Style form
-Store country data in database. use it for reverse geocoding. Use postcode API to get county and postcode"
 
+The form created on :ref:`27-05-2020` is styled to fill the display area.
 
-.. figure:: pictures/old-form.PNG
+Boundary data is stored in the database. New models are created to store a name along with a
+multi-polygon. Reverse geo-coding is used at upload time to obtain geographical information (country, region, county,
+postcode). Reverse geo-coding is done using locally stored data
+(:ref:`geographical-data`) for the country, region and county, and using `Postcodes.io <http://api.postcodes.io/>`_
+for the postcodes.
 
-   Original form
+The above means only coordinates need to be present at upload time. The rest will be filled automatically on the server.
 
 .. figure:: pictures/form-new.PNG
 
@@ -422,12 +432,16 @@ Store country data in database. use it for reverse geocoding. Use postcode API t
 
 29 May 2020
 -----------
-"Imperial theme on upload page
-date chart in dashboard"
+
+The styling of the upload page is changed to be more 'Imperial College oriented'.
 
 .. figure:: pictures/upload-page-new.PNG
 
    Revised theme on upload page
+
+
+A chart is added to the dashboard. It shows the number of diagnostics and number of positive tests for the full
+available time period.
 
 
 ---------------
@@ -435,7 +449,18 @@ date chart in dashboard"
 
 30 May 2020 - 01 June 2020
 --------------------------
-Change all code documentation/commetns to restructured text doctrings
+
+To facilitate writing documentation later on, the comments throughout the code are changed from standard Python comments
+to reStructuredText docstrings. An example of the change is given below
+
+.. code-block:: python
+    :caption: Document code using standard Python comments
+    :name: standard-comments
+
+    # Get the number of diagnostic tests made in a certain postcode
+    def get_postcode_total_experiments(postcode):
+        return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode).count()
+
 
 .. code-block:: python
     :caption: Document code using reStructuredText docstrings
@@ -452,24 +477,16 @@ Change all code documentation/commetns to restructured text doctrings
         return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode).count()
 
 
-.. code-block:: python
-    :caption: Document code using standard Python comments
-    :name: standard-comments
-
-    # Get the number of diagnostic tests made in a certain postcode
-    def get_postcode_total_experiments(postcode):
-        return DiagnosticTest.objects.filter(testing_centre__postcode__startswith=postcode).count()
-
-
 ---------------
 
 
 02 June 2020
 ------------
-Create the basic structure for documentation using Sphinx
 
+The basic structure for the documentation is created using `Sphinx <https://www.sphinx-doc.org/>`_.
 
-`Sphinx <https://www.sphinx-doc.org/>`_
+`Autodoc <https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html>`_ is used to take the docstrings in the
+code and generate documentation of out them.
 
 ---------------
 
@@ -477,7 +494,9 @@ Create the basic structure for documentation using Sphinx
 
 03 June 2020
 ------------
-Create patient sample data, add a command to import to DB
+
+Sample data is generated for patients (3000 entries). Commands are created to make that data easy to import into the
+database when deploying the project or running it locally.
 
 :ref:`import-command`
 
@@ -486,7 +505,10 @@ Create patient sample data, add a command to import to DB
 
 04 June 2020
 ------------
-Command to load region/country.. boundaries
+
+Commands are added to load geographical boundaries into the database.
+
+:ref:`import-borders-command`
 
 
 ---------------
@@ -494,30 +516,47 @@ Command to load region/country.. boundaries
 
 05 June 2020 - 11 June 2020
 ---------------------------
-Work on deploying to AWS and later to Heroku
 
-:ref:`deploy-guide`
+Following meetings with the team, work starts on deploying the website. During discussions AWS was decided upon.
+Due to limited support of spatial databases and Django, the decision was made to use Heroku instead.
+
+The deployment process is described in: :ref:`deploy-guide`.
 
 ---------------
 
 
 12 June 2020
 ------------
-"Compress static files and all data over 200B transferred using GZIP
-add login/logout for doctors"
 
+All data transferred from the server to the client is now compressed if the total size is over 200 bytes. This is done
+using `Django middleware <https://docs.djangoproject.com/en/3.0/ref/middleware/>`_.
+
+A login page was added. It requires users to be authenticated before they can access the uploadData page. Users must
+also login when accessing the detailed patient information on the dashboard. Users are added through the Admin page.
+There are separate permissions for clinicians and administrators.
+
+.. figure:: pictures/login-page.PNG
+
+    Login page
 
 ---------------
 
 
 13 June 2020
 ------------
-"log user who uplaods data
-integrate PCR data generation/querying into REST API"
+
+For auditing and information purposes, the user who uploads data through the upload page is logged. Any changes made
+later on through the Admin interface are also logged.
 
 .. figure:: pictures/log.png
 
    Audit log
+
+
+Detailed data about individual tests was added to the detailed information modal on the dashboard. The data is a DNA
+amplification curve (Polymerase chain reaction graph).
+
+This data is obtained based on additions made to the REST API. The user must be authenticated to access this data.
 
 
 ---------------

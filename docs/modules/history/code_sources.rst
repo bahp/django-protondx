@@ -18,7 +18,7 @@ See :ref:`python-packages-list` for a full list of python packages used.
 
 -----------------
 
-
+.. _geographical-data:
 
 Geographical data and resources
 -------------------------------

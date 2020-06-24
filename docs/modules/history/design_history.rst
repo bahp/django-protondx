@@ -310,14 +310,29 @@ database along with the coordinates.
 
 22 May 2020
 -----------
-"Add charts for centre type (chart.js) and gender
-consider the addition of a time slider (date format is majot obstacle)
-remove datatable and have global stats instead
-add a regions layer"
+
+Charts have been added to the ``div`` on the right side. They show testing centre types and gender distributions for the
+selected regions. These statistics are calculated on the client side. The ``Multi-Polygon`` data stored in the GeoJSON
+layers is used along with the diagnostic coordinates to determine these statistics and demographics.
 
 .. figure:: pictures/graphs.PNG
 
    Graphs and charts implemented using Chart.js
+
+The table on the right was removed to make space for the graphs. Global statistics are shown in the bottom right.
+
+A new layer is added to the map. The layer shows UK region borders and is visible when the user is zoomed in further
+than where the country boundaries are visible, and less than where the postcode boundaries are visible.
+Upon selection of a region, the database is queried for statistics. This **does not** require the region to be stored in
+the database thanks to the changes made when adding the charts. Countries and postcodes no longer need to be stored as
+all statistics are created on the client side, based solely on region boundaries and diagnostic test coordinates.
+
+The addition of a time slider was considered. It would allow users to show diagnostics over a variable time period.
+This was deemed to have too many downsides so was not implemented:
+
+* Increased loading times
+* More processing needed on both client and server sides
+* Not possible with the heatmap, only the dot renderer
 
 
 ---------------
@@ -325,7 +340,7 @@ add a regions layer"
 
 23 May 2020
 -----------
-Start transition to an imperial theme (on request from supervisor)
+Start the transition towards an Imperial College London theme on request from our supervisor.
 
 .. figure:: pictures/dashboard.PNG
 
@@ -337,8 +352,13 @@ Start transition to an imperial theme (on request from supervisor)
 
 24 May 2020
 -----------
-"Datatable is added back, clicking on an entry brings up a modal (to be used for patient information)
-float divs to grid"
+
+Decision is made to support more patient specific information.
+
+The table on the side is added back, underneath the graphs. It allows for data to be aggregated and filtered.
+Clicking on a table entry brings up a modal which will be used ot bring up more information specific to a patient.
+
+The dashboard which was using floating divs for its layout is changed to a css grid.
 
 
 ---------------
@@ -346,8 +366,15 @@ float divs to grid"
 
 25 May 2020
 -----------
-"Add: various location fileds to testing centre model (region, county, country...)
-add patient info and history to modal"
+
+Country, region, county and postcode fields are added to the ``Testing_centre`` model. These were removed earlier on
+as they were no longer needed to obtain statistics. They were added back to support searching by these geographical
+areas in the table. They do, however, not need to be entered manually when data is uploaded. Reverse-geocoding is used
+to obtain all of this information. Reverse geocoding is done using locally stored data (:ref:`geographical-data`) for
+the country, region and county, and using the `Postcodes.io <http://api.postcodes.io/>`_ for the postcodes.
+
+General patient information (name, date of birth, age, gender...) is now in the detailed analysis page. A table with
+all of the patients diagnostic tests was also added.
 
 
 ---------------
@@ -355,7 +382,13 @@ add patient info and history to modal"
 
 26 May 2020
 -----------
-Refactor repo, to sperate into js, css, ... static files
+
+The github repository was refactored. Where possible, Javascript and Cascading Style Sheets were removed from
+Hypertext Markup Language templates and put into separate JS and CSS files. These files are stored under their
+own directory for each app.
+
+.. include:: tree.txt
+    :literal:
 
 
 ---------------
@@ -522,6 +555,6 @@ or DD/MM/YY...) and is not functional when Unix time is used. This means that th
 ---------------------------
 
 Work on the project is finalised. The documentation is written based on code comments, notes and pictures taken
-throughout the project. `Sphinx <https://www.sphinx-doc.org/e>`_ is used to write the documentation and it's made
+throughout the project. `Sphinx <https://www.sphinx-doc.org/>`_ is used to write the documentation and it's made
 available online using `Heroku <https://www.heroku.com/home>`_.
 

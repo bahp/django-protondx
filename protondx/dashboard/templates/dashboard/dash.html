@@ -221,9 +221,13 @@
                         // add patient information
                         tr_patient_id.innerText = "# " + patient_id;
                         tr_patient_gender.innerText = response1[0].gender;
+
+                        let dob = moment(response1[0].dob, 'DD-MM-YYYY');
+                        let age = moment().diff(dob, 'years');
+
                         tr_patient_dob.innerText = response1[0].dob
                             + " ("
-                            + moment().diff(moment(response1[0].dob,'DD-MM-YYYY').format('MM-DD-YYYY'), 'years')
+                            + age
                             + ")";
                         tr_patient_postcode.innerText = response1[0].postcode;
                         tr_patient_count.innerText = response2[0].length;

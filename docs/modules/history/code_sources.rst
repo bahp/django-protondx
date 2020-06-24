@@ -56,6 +56,12 @@ Accessed through the ArcGIS portal.
 `Sector Boundaries <https://services.arcgis.com/dvWpUrMTxKmay5qM/arcgis/rest/services/PCSector%20with%20Regions/FeatureServer>`_
 
 
+Postcode reverse geo-coding
+---------------------------
+
+Reverse geo-coding from coordinates to UK postcodes was done using `Postcodes.io <http://api.postcodes.io/>`_.
+
+
 ---------------
 
 

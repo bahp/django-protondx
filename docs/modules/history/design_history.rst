@@ -131,19 +131,53 @@ queries the database and returns statistics for that postcode.
 
 10 May 2020 - 11 May 2020
 -------------------------
-"Add: Pointfield (for coordinates) to testing centre model
-Replace dot-density renderer with heatmap, allows us to not need fixed boundaries / data for each region, we can use just coordiantes
-add toggle for postcode layer: reduce data usage"
+
+Edit the database schema to store coordinates as a point and not separate longitude and latitude.
+
+
+For example:
+
+.. code-block::
+
+    SRID=4326;POINT(-123.365556 48.428611)
+
+as opposed to:
+
+.. code-block::
+
+    longitude = -123.365556
+    latitude = 48.428611
+
+
+Storing the coordinates in this manner allows us to keep track of what spatial reference system is being used and
+to use the data directly with geo-spatial libraries.
+
+The dot density renderer is replaced by a heatmap. This allows us to only need coordinates when plotting data. We don't
+need to query the database separately for the data displayed by the dot renderer and the heatmaps.
+The dot density renderer needed the database to be queried for each geographical region displayed on the map.
+
+A toggle option is added which allows users to not display postcode boundaries. This allows a user to reduce the
+amount of data loaded when the page is accessed. It also reduces the computational load on the client machine.
 
 
 ---------------
 
+.. _12-05-2020:
 
 12 May 2020
 -----------
-"add a table along whole left side using datatables
-issue : data need sto be loaded twice due to format issues
-Combine testing centre model with diagnostic test to avoid serialisation issues"
+
+The dashboard layout is changed to include a table on the right side. The idea is to display information in a way where
+it can easily be sorted or aggregated.
+
+**Issue:** The data loaded in the map and table do not use the same format. All the data therefore needs to be
+loaded twice using different formats. This impacts loading speeds and data usage for the client. It also affects the
+server as the data needs to be serialised twice. **Unresolved**
+
+**Issue:** Unable to serialise data in tables linked by a foreign key when the table contains geographical data such as
+points (used for coordinates) and polygons.
+
+**Temporary solution:** Combine ``testing_centre`` model with ``diagnostic_test`` model to avoid serialisation issues.
 
 .. figure:: pictures/dash-2.PNG
 
@@ -155,9 +189,14 @@ Combine testing centre model with diagnostic test to avoid serialisation issues"
 
 13 May 2020
 -----------
-"Selection in table highlights diagnostic on map
-fix the data laoded twice issue by using a glob to make it seem as if the laoded data was data which can be queried with a link
-write custom geoJSON serializer which works with foreign keys, centre model can be added back"
+Add a feature where selecting data in the table highlights it on the map and zooms onto that point.
+
+**Fix:** Issue where data is loaded twice is resolved by using a `Javascript blob <https://javascript.info/blob>`_ and
+serialising data into GeoJSON which can be used for both the table and map.
+
+**Fix:** The temporary solution described on :ref:`12-05-2020` is replaced by a more definitive one. The
+``testing_centre`` and ``diagnostic_test`` models are separated again. A custom GeoJSON serialiser is written to
+serialise data into a GeoJSON format, even when there are some columns linked to by a foreign key.
 
 
 ---------------
@@ -165,7 +204,11 @@ write custom geoJSON serializer which works with foreign keys, centre model can 
 
 14 May 2020
 -----------
-Add colour sensitive dot renderer (diff colour for pos and neg diagnostics)
+The dot renderer now displays positive and negative diagnostics using different colours:
+
+* Green: Negative - patient does not have the virus
+* Red: Positive - patient has the virus
+* Orange: Data not available or inconclusive
 
 .. figure:: pictures/dot-render-key.PNG
 
@@ -177,7 +220,8 @@ Add colour sensitive dot renderer (diff colour for pos and neg diagnostics)
 
 15 May 2020
 -----------
-Add error msg for cases when WebGL is not enabled
+An error message is added for cases when the dashboard is accessed from a web-browser which does not have support for
+WebGL. WebGL is a JavaScript API which is used by ArcGIS to render the map.
 
 
 ---------------
@@ -185,9 +229,19 @@ Add error msg for cases when WebGL is not enabled
 
 16 May 2020
 -----------
-"Edit dashboard layout
-seraching for address gives overview data for closest postcode (removed later on)
-search in map filters the datatable"
+The dashboard layout is edited for the map to take up the full height of the screen on the left side.
+The radio buttons and other features which were displayed on the bottom-left are now displayed in collapsible menus,
+directly on the map.
+
+Searching for an address or location now shows general statistics for the nearest postcode sector (number of tests,
+number of cases, number of patients...). This search also filters the data in the table.
+
+**Issue:** This search works at anything lower thant postcode level but is an issue when a user searches for a country,
+for example. The postcode closest to the centroid of the country will be selected which is not desired.
+
+**Solution (implemented later on):** Drop a pin on the map at the desired location. The user can then select the
+location manually. If the user is zoomed out, the country layer will be selected, when further in then the region layer
+is selected and if even further in, the postcode layer.
 
 
 ---------------
@@ -195,7 +249,10 @@ search in map filters the datatable"
 
 17 May 2020 - 18 May 2020
 -------------------------
-Write functions to create sample data (very basic, limited centres/patients)
+Functions are written to create sample data. They can be used to create any number of diagnostic test objects but there
+are a limited number of different patient and testing centre objects which can be created.
+
+A wider range of sample data is created on :ref:`03-06-2020`.
 
 
 ---------------
@@ -203,7 +260,22 @@ Write functions to create sample data (very basic, limited centres/patients)
 
 19 May 2020
 -----------
-Start file upload app
+Based on meetings with the team, the decision is made to add another page to the website. The aim is to have a page
+where data can easily be uploaded.
+
+The requirements as described by the team are:
+
+* Drag and drop interface
+* Extract .zip archives and display data
+* Data needs to be visible to the uploader and it must be able to be be edited
+* On upload data gets added to the database
+
+The initial design is pictured below. The page is composed of an upload area (top left), data can either be dragged
+into that area or selected using the client computers file explorer.
+An list area which displays all the files which have been selected (bottom left). It also acts as a way to select which
+file is to be displayed.
+A display area (right) which shows the contents of the zip archive.
+
 
 .. figure:: pictures/upload-page-old-1.PNG
 
@@ -215,7 +287,8 @@ Start file upload app
 
 20 May 2020
 -----------
-Open uploaded files, try and create a form based on json content
+Files uploaded through the upload page are opened. A basic form is created for each archive which contains a .json file.
+There is a form entry for each key in the JSON object.
 
 .. figure:: pictures/upload-page-old-2.PNG
 
@@ -227,7 +300,9 @@ Open uploaded files, try and create a form based on json content
 
 21 May 2020
 -----------
-Add a country GeoJSON layer + get basic statistics for the country
+A new layer is added to the map. The layer shows country borders and is only visible when the user is zoomed out.
+Upon selection of a country, the database is queried for statistics. This requires the country to be stored in the
+database along with the coordinates.
 
 
 ---------------
@@ -365,6 +440,7 @@ Create the basic structure for documentation using Sphinx
 
 ---------------
 
+.. _03-06-2020:
 
 03 June 2020
 ------------

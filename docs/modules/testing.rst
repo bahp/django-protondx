@@ -161,6 +161,58 @@ Interface Testing
 **Do interactions between the client, server and database operate as desired?**
 
 
+Client
+~~~~~~
+
+When a client requests a page which **does not exist**, this message is correctly displayed:
+
+.. code-block:: text
+
+    Not Found
+
+    The requested resource was not found on this server.
+
+When a client requests a page which **does exist**, it is displayed correctly.
+
+If a user tries to access a page which requires authentication he will have the option to login.
+
+When accessing the API directly (<hostname>/dashboard/api), if authentication is not provided, this message is correctly
+shown:
+
+.. code-block:: text
+
+    HTTP 401 Unauthorized
+    Allow: GET, HEAD, OPTIONS
+    Content-Type: application/json
+    Vary: Accept
+    WWW-Authenticate: Basic realm="api"
+
+    {
+        "detail": "Authentication credentials were not provided."
+    }
+
+The user should not, and is not shown any error messages which would be present during debugging.
+
+Requests which receive an invalid response are not displayed and any errors are caught. The data in valid responses is
+displayed properly. This was tested for:
+
+    * The request to get diagnostic location data (Used in map and table)
+    * The request to get data for the detailed view
+    * The request to get data related to a single test inside the detailed view (e.g. PCR data and comments)
+
+
+Server
+~~~~~~
+
+The server handles all requests when they are received. Seeing as load testing was not done (see
+:ref:`performance-testing`), it is impossible to say if this holds true when the server is under higher loads.
+
+The server queries the database when it receives a request to do so. It only does so if the required conditions are met
+(e.g. user authentication).
+
+The server **does not** handle data which is classed as invalid after being cleaned. No error message is currently
+displayed to the uploading user.
+
 
 -----------------
 
@@ -200,6 +252,8 @@ a method of accessing the |project_name| website.
 
 -----------------
 
+
+.. _performance-testing:
 
 Performance Testing
 -------------------
@@ -286,6 +340,12 @@ DataUpload page:
     * **Valid credentials and user**: A user who enters correct credentials will be given access to the dataUpload page.
     * **Invalid credentials**: Access rejected and display the following:
       "Your username and password didn't match. Please try again."
+
+
+On all pages, it was also checked if a user who logged out was subsequently rejected access.
+Logging out using the menu button on the dataUpload or dashboard pages will not impact the user's ability to access the
+detail view as this authentication is handled separably using Django Rest Framework
+
 
 Forms and uploads
 ~~~~~~~~~~~~~~~~~

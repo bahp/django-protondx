@@ -3,14 +3,6 @@ Design History
 ##############
 
 
-.. contents::
-    :depth: 1
-    :local:
-
-
----------------
-
-
 04 May 2020
 -----------
 
@@ -56,7 +48,7 @@ Two main options were considered:
   between the ``Testing_centre`` and ``Diagnostic`` tables. This resolves the issues present in the previous schema.
   Patient data is held in a separate table from all other data. The ``Diagnostic`` table has information which can
   be displayed openly as the only link to a patient is an anonymised patient ID. Having separate tables also means less
-  data needs ot be stored in cases where a patient has had several diagnostics or when a testing centre is used several
+  data needs to be stored in cases where a patient has had several diagnostics or when a testing centre is used several
   times.
 
 .. figure:: pictures/DB_ER_diagram.png
@@ -71,8 +63,8 @@ Two main options were considered:
 06 May 2020
 -----------
 
-Start working on the back-end implementation. An django application named ``dashboard`` is added to the ``protondx``
-project. The datatable models are created based on the three-table schema described previously.
+Start working on the back-end implementation. A django application named ``dashboard`` is added to the ``protondx``
+project. The database models are created based on the three-table schema described previously.
 
 Work starts on functions which can be used to query the database to obtain general diagnostic information such as
 the total number of tests, the number of positive tests and the number of different patients tested.
@@ -375,7 +367,7 @@ as they were no longer needed to obtain statistics. They were added back to supp
 areas in the table. They have to be entered manually at upload time.
 
 General patient information (name, date of birth, age, gender...) is now in the detailed analysis page. A table with
-all of the patients diagnostic tests was also added.
+all of the patient's diagnostic tests was also added.
 
 
 ---------------
@@ -451,7 +443,7 @@ available time period.
 --------------------------
 
 To facilitate writing documentation later on, the comments throughout the code are changed from standard Python comments
-to reStructuredText docstrings. An example of the change is given below
+to reStructuredText docstrings. An example of the change is given below:
 
 .. code-block:: python
     :caption: Document code using standard Python comments
@@ -510,6 +502,10 @@ Commands are added to load geographical boundaries into the database.
 
 :ref:`import-borders-command`
 
+Sample data is generated for testing centres (3000 entries). Commands are created to make that data easy to import into
+the database when deploying the project or running it locally. A command is also added to create ``diagnostic_test``
+objects.
+
 
 ---------------
 
@@ -566,14 +562,14 @@ This data is obtained based on additions made to the REST API. The user must be 
 ---------------------------
 Based on feedback from the team, a time slider is added. It allows users to see how testing and positive diagnostics
 evolve over time. The slider can be set to move automatically or the user can control it manually. The data can be
-displayed for the whole available period or anything dow to a single day.
+displayed for the whole available period or anything down to a single day.
 
 To achieve this, the diagnostic times need to be serialised into `Unix time <https://en.wikipedia.org/wiki/Unix_time>`_
 instead of a human readable format. This means that they then need to be converted back to a human readable format on
 the client side, to be displayed in the table.
 
 **Issue:** The data for the time based graph on the right needs date data to be in a standard date format (YYYY-MM-DD
-or DD/MM/YY...) and is not functional when Unix time is used. This means that the graph cannot be used mas is.
+or DD/MM/YY...) and is not functional when Unix time is used. This means that the graph cannot be used as is.
 
 **The time slider branch of the repository was not merged with master for the above reason.**
 

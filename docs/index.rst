@@ -4,6 +4,8 @@
 Welcome to |project_name|'s documentation!
 ==========================================
 
+The project repository can be found `here <https://github.com/bahp/django-protondx>`_.
+
 .. toctree::
     :maxdepth: 2
     :caption: Contents:
@@ -22,4 +24,4 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`
+

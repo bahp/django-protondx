@@ -179,14 +179,29 @@ Compatibility Testing
 Browser
 ~~~~~~~
 
+Browser support is summarised in the :ref:`requirements-browser` requirements.
+
+The browser must support WebGl and CSS grid in order for the page to be displayed properly and have access to the map.
+
+All of the platform's features are supported on Google Chrome and Brave Browser which were used for testing during
+development. Firefox and Opera were also found to support all of the website's features. Many Chromium browsers are
+likely to be compatible but this has not been tested other than for the browsers mentioned here.
+
+The dashboard has no compatibility issues with Safari and Microsoft Edge. These browsers, however, cannot be used when
+uploading data due to different security restrictions.
+
+Internet explorer is not supported due to issues with CSS grids.
 
 Operating system
 ~~~~~~~~~~~~~~~~
 
+The operating system was not found to have an impact as long as :ref:`requirements-browser` requirements are respected.
 
 Device
 ~~~~~~
-d
+
+Whilst the dashboard was found to be functional on mobile devices (subject to browser support), it is not recommended as
+a method of accessing the |project_name| website.
 
 -----------------
 

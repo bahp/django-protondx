@@ -76,8 +76,10 @@ Full Support
 
 * Google Chrome
 * Brave
-* Other Chromium browsers
+* Opera
 * Firefox
+
+    + Logo is not resized correctly
 
 
 Limited Support

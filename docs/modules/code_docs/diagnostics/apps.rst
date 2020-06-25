@@ -1,6 +1,6 @@
-##################
-Dashboard Settings
-##################
+####################
+Diagnostics Settings
+####################
 
 .. automodule:: diagnostics.apps
     :members:

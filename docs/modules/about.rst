@@ -2,8 +2,5 @@
 About
 #####
 
-- Short introduction or overview that explains what the project is.
-- About the team / platform as a whole
-- ...
-
-
+.. figure:: pictures/leaflet_final-1.png
+.. figure:: pictures/leaflet_final-2.png

@@ -1,6 +1,6 @@
-##################
-Dashboard Settings
-##################
+###################
+DataUpload Settings
+###################
 
 .. automodule:: dataUpload.apps
     :members:

@@ -1,0 +1,9 @@
++static
+    +---app_name
+        +---css
+        |
+        +---js
+        |
+        +---images
+        |
+        \---...

@@ -1,0 +1,6 @@
+id,centre_type,coordinates,country,region,county,postcode
+,Drive through centre,SRID=4326;POINT (-0.02375013134213866 51.01107905300483),United Kingdom,South East (England),West Sussex,RH17 7NR
+,GP clinic,SRID=4326;POINT (-5.271275650788161 56.57835928709388),United Kingdom,Scotland,Argyll and Bute,
+,Hospital,SRID=4326;POINT (0.6643268399235858 52.2722773563147),United Kingdom,East of England,Suffolk,IP28 6NA
+,Home,SRID=4326;POINT (-3.644052318331497 57.13933813903134),United Kingdom,Scotland,Highland,PH22 1RB
+,Other,SRID=4326;POINT (-1.571264162305298 52.26659727159994),United Kingdom,West Midlands (England),Warwickshire,CV34 6SS

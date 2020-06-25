@@ -62,6 +62,8 @@ ephemeral filesystem meaning all uploaded files and data will be **deleted** whe
 -------------
 
 
+.. _requirements-browser:
+
 Browser
 -------
 

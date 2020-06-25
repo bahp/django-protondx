@@ -86,7 +86,8 @@ The features tested included the following:
     * Stop upload of files with incompatible format (Error message)
     * File data is auto-completed into form
     * User can amend form
-    * Data gets added to database (Subject to browser support see :ref:`requirements-browser` and :ref:`compatibility-testing`)
+    * Data gets added to database (Subject to browser support see
+      :ref:`requirements-browser` and :ref:`compatibility-testing`)
 
 * Administrator interface
 
@@ -113,11 +114,10 @@ Links
 
 Forms
 ~~~~~
-- functional forms (see compatibility testing and requiremtns...)
 
-Cookies
-~~~~~~~
-- test cookies for login details
+The forms on the dataUpload page get created when a .zip archive which contains a JSON file is uploaded. Checks were
+made to ensure forms cannot be submitted with required fields missing. Similarly, that they can be submitted when
+optional fields are omitted.
 
 
 -----------------
@@ -131,15 +131,26 @@ Usability Testing
 User testing
 ~~~~~~~~~~~~
 
-- website used by devs + external tester (student/team)
-- site navigation and controls...
-- Check for user intuition.
+The website usability was tested by both developers and external users. Site navigation and controls were tested by
+using the website as a typical user would.
+
+Having developers use the site makes it possible to determine if all features and functionality operate as intended.
+This was found to be the case when the :ref:`requirements-browser` requirements were met.
+
+However, usability and user intuition are better determined when users who have never see the site before are asked to
+interact with it. A student who had never used the site before was supplied with a username and password and asked to
+use the site. They were able to successfully navigate the site and access all of its features. The dashboard was found
+to be intuitive to use with the user quickly figuring out how to use the map to gain information. The user was also able
+to display and use the detail view, without having prior knowledge of its existence.
+
 
 Content
 ~~~~~~~
 
-- content checked
-
+The content was checked for spelling and grammatical errors. The legibility of all content on the site was also ensured
+by making all text elements have high contrast ratios. The minimum recorded contrast ratio was 8.59:1. This is well
+above the minimum of 7.0:1 needed to reach the
+`Web Content Accessibility Guidelines 2.0 <https://www.w3.org/TR/WCAG20/>`_ level AAA rating.
 
 -----------------
 

@@ -211,20 +211,46 @@ Performance Testing
 
 **How are peak and sustained loads handled?**
 
-Connection Speed
-Tested on various networks like Dial-Up, ISDN, etc.
+Performance testing was done in a very limited capacity due to the unavailability of resources needed to carry out
+complete tests. The platform, as currently deployed, can support a maximum of 20 concurrent users due to limits on the
+number of database connections. The number of rows in the database is also restricted to 10000, limiting the amount of
+information which can be uploaded.
 
-Load
-i. What is the no. of users per time?
-ii. Check for peak loads and how the system behaves
-iii. A large amount of data accessed by the user
+The web application, being deployed on Heroku can be scaled easily by adding more
+`Dynos <https://www.heroku.com/dynos>`_ which will allow for more concurrent users to be served and more processing
+power. The database would also need to be upgraded to support more data storage and simultaneous users. A database with
+better hardware (quicker drives, more processing power, more RAM) would reduce query times. This would make reduced
+loading times or serving more users a possibility.
 
-Stress
-i. Continuous Load
-ii. Performance of memory, CPU, file handling, etc..
+The current server is also set to sleep after 30 minutes of inactivity. The dynos then need to be restarted when the
+website is next accessed which impacts loading times. A payed Heroku subscription would resolve this issue.
 
-Make sure optimization techniques like gzip compression, browser and server side cache enabled to reduce load times
+Loading times have already been reduced by introducing compression for static files and other data transferred to
+clients. Gzip compression reduced loading times by 22.1% and the amount of data transferred by 5.6%.
 
+.. list-table:: Dashboard loading times and resources transferred
+   :header-rows: 1
+
+   * - Compression
+     - Requests
+     - Data transferred
+     - Uncompressed data
+     - Loading time
+   * - No
+     - 195
+     - 7.1 MB
+     - 19.7 MB
+     - 22.81 s
+   * - **Yes**
+     - 195
+     - 6.7 MB
+     - 19.7 MB
+     - 17.77 s
+
+
+The differences on the dataUpload page were negligible due to the little amount of data transferred.
+
+As the number of datapoints increases, the benefit of having compression is expected to increase.
 
 -----------------
 

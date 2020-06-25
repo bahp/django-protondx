@@ -160,11 +160,6 @@ Interface Testing
 
 **Do interactions between the client, server and database operate as desired?**
 
-Application: Test requests are sent correctly to the Database and output at the client side is displayed correctly. Errors if any must be caught by the application and must be only shown to the administrator and not the end user.
-Web Server: Test Web server is handling all application requests without any service denial.
-Database Server: Make sure queries sent to the database give expected results.
-
-Test system response when connection between the three layers (Application, Web and Database) cannot be established and appropriate message is shown to the end user.
 
 
 -----------------
@@ -258,20 +253,45 @@ As the number of datapoints increases, the benefit of having compression is expe
 Security Testing
 ----------------
 
-**Does the website have any potential vulnerabilities**
+**Does the website have any potential vulnerabilities?**
 
-using username and password and browsing internal pages then try changing URL options directly. I.e. If you are checking some publisher site statistics with publisher site ID= 123. Try directly changing the URL site ID parameter to different site ID which is not related to the logged-in user. Access should be denied for this user to view other's stats.
-Try some invalid inputs in input fields like login username, password, input text boxes, etc. Check the system's reaction to all invalid inputs.
-Web directories or files should not be accessible directly unless they are given download option.
-Test the CAPTCHA for automating script logins.
-Test if SSL is used for security measures. If it is used, the proper message should get displayed when users switch from non-secure HTTP:// pages to secure HTTPS:// pages and vice versa.
-All transactions, error messages, security breach attempts should get logged in log files somewhere on the webserver.
-The primary reason for testing the security of a web is to identify potential vulnerabilities and subsequently repair them.
+User authentication
+~~~~~~~~~~~~~~~~~~~
 
-Network Scanning
-Vulnerability Scanning
-Password Cracking
-Log Review
-Integrity Checkers
-Virus Detection
+There are several pages or API requests which require the user to be authenticated. Before access is granted or data is
+transferred, the user's login credentials must be checked and validated. It is not enough for the user to be logged-in,
+the user must belong to a user group which has access to that specific resource.
+
+Admin page:
+
+    * **Valid administrator credentials**: Access granted
+    * **Invalid credentials**: Access rejected
+    * **Logged in but not administrator**: Access rejected and display the following:
+      "You are authenticated as <Username>, but are not authorized to access this page. Would you like to login to a
+      different account?"
+
+
+Dashboard page:
+
+    * Access granted regardless of user authentication
+
+    * When accessing the detail view, access is requested
+
+        * **Valid credentials**: Access granted to detail view
+        * **Invalid credentials**: Access rejected, no data is ever displayed or successfully queried from database
+
+
+DataUpload page:
+
+    * **Valid credentials and user**: A user who enters correct credentials will be given access to the dataUpload page.
+    * **Invalid credentials**: Access rejected and display the following:
+      "Your username and password didn't match. Please try again."
+
+Forms and uploads
+~~~~~~~~~~~~~~~~~
+
+When data is uploaded, it is first 'cleaned' to remove any malicious entries before it is accessed or added to the
+database. This process is handled directly by Django and was therefore not tested.
+
+
 

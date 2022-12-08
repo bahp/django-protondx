@@ -8,7 +8,7 @@ bleach==3.1.5
 botocore==1.15.49
 cachetools==4.1.0
 cement==2.8.2
-certifi==2020.4.5.1
+certifi==2022.12.7
 chardet==3.0.4
 colorama==0.4.3
 coreapi==2.3.3
